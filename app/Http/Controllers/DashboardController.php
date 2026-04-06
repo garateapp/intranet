@@ -37,7 +37,6 @@ class DashboardController extends Controller
         $activeLinks = Link::with(['user', 'category'])
             ->active()
             ->ordered()
-            ->take(8)
             ->get();
 
         $categories = Category::active()
