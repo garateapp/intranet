@@ -80,7 +80,7 @@ class DashboardController extends Controller
                 : $carouselPosts,
             'recent_links' => Link::with(['user', 'category'])
                 ->latest()
-                ->take(5)
+                ->take(12)
                 ->get(),
         ];
 
