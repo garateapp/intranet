@@ -25,15 +25,34 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+
+            // Debug: Log the Google user data
+            \Log::info('Google User Data:', [
+                'id' => $googleUser->id,
+                'email' => $googleUser->email,
+                'name' => $googleUser->name,
+            ]);
+
             $user = $this->findOrCreateUser($googleUser);
 
             Auth::login($user, true);
 
-            return redirect()->intended(route('dashboard', absolute: false));
-        } catch (\Exception $e) {
-            return redirect()->route('login')->withErrors([
-                'email' => 'Google authentication failed. Please try again.',
+            \Log::info('User logged in successfully:', [
+                'user_id' => $user->id,
+                'email' => $user->email,
             ]);
+
+            return redirect()->intended(route('dashboard'));
+        } catch (\Exception $e) {
+            \Log::error('Google authentication failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('login')
+                ->withErrors([
+                    'email' => 'Google authentication failed: ' . $e->getMessage(),
+                ]);
         }
     }
 

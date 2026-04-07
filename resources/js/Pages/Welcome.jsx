@@ -44,7 +44,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                                     <span className="text-2xl font-bold text-white">G</span>
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">GreenEx</h1>
+                                    <h1 className="text-2xl font-bold text-white">NOT GreenEx</h1>
                                     <p className="text-xs text-green-200">Portal Corporativo</p>
                                 </div>
                             </div>
