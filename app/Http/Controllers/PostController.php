@@ -108,11 +108,32 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->load(['user', 'category', 'comments.user']);
+        $post->load(['user', 'category']);
         $post->incrementViews();
+
+        // Get related posts
+        $relatedPosts = Post::with(['user', 'category'])
+            ->published()
+            ->where('id', '!=', $post->id)
+            ->where('category_id', $post->category_id)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        if ($relatedPosts->count() < 3) {
+            $morePosts = Post::with(['user', 'category'])
+                ->published()
+                ->where('id', '!=', $post->id)
+                ->whereNotIn('id', $relatedPosts->pluck('id'))
+                ->latest('published_at')
+                ->take(3 - $relatedPosts->count())
+                ->get();
+            $relatedPosts = $relatedPosts->merge($morePosts);
+        }
 
         return Inertia::render('Posts/Show', [
             'post' => $post,
+            'relatedPosts' => $relatedPosts,
         ]);
     }
 
