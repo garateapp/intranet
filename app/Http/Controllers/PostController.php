@@ -106,9 +106,14 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show(Request $request)
     {
-        $post->load(['user', 'category']);
+        $slug = $request->route('post');
+
+        $post = Post::where('slug', $slug)
+            ->with(['user', 'category'])
+            ->firstOrFail();
+
         $post->incrementViews();
 
         // Get related posts

@@ -13,7 +13,7 @@ use Inertia\Inertia;
 
 // Public routes
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
-Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/noticia/{post:slug}', [PostController::class, 'show'])->name('posts.show');
 
 // Google OAuth routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');

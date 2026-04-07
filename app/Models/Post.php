@@ -89,6 +89,11 @@ class Post extends Model
         return $query->where('is_pinned', true);
     }
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function incrementViews()
     {
         $this->increment('views');

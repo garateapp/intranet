@@ -258,7 +258,7 @@ export default function Dashboard({ stats, allPosts }) {
                                 {allPosts.map((post) => (
                                     <Link
                                         key={post.id}
-                                        href={route('posts.index')}
+                                        href={route('posts.show', post.slug)}
                                         className="group block rounded-xl overflow-hidden bg-white shadow-md border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1"
                                     >
                                         <div className="h-40 overflow-hidden relative">
