@@ -113,7 +113,8 @@ export default function Login({ status, canResetPassword }) {
                                     ¡Bienvenido! 👋
                                 </h2>
                                 <p className="text-gray-600">
-                                    Inicia sesión para acceder a tu intranet
+                                    Inicia sesión para acceder a tu intranet -Si tienes cuenta de correo Greenex Ingresa
+                                    presionando el botón de Google, si no tienes cuenta de correo Greenex, solicita tus credenciales
                                 </p>
                             </div>
 

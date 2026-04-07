@@ -65,12 +65,12 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                                         >
                                             Iniciar Sesión
                                         </Link>
-                                        <Link
+                                        {/* <Link
                                             href={route('register')}
                                             className="px-6 py-2.5 bg-gradient-to-r from-lime-400 to-green-500 text-white font-semibold rounded-lg hover:from-lime-500 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
                                         >
                                             Registrarse
-                                        </Link>
+                                        </Link> */}
                                     </>
                                 )}
                             </nav>
