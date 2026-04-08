@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             UserDirectorySeeder::class,
             FaqSeeder::class,
             CorporateEventSeeder::class,
+            OrganizationalUnitSeeder::class,
+            Phase2ContentSeeder::class,
         ]);
     }
 }

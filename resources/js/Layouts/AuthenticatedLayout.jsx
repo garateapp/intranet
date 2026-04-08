@@ -49,10 +49,40 @@ export default function AuthenticatedLayout({ header, children }) {
                                     FAQ
                                 </NavLink>
                                 <NavLink
+                                    href={route('organigram.index')}
+                                    active={route().current('organigram.index')}
+                                >
+                                    Organigrama
+                                </NavLink>
+                                <NavLink
                                     href={route('calendar.index')}
                                     active={route().current('calendar.index')}
                                 >
                                     Calendario
+                                </NavLink>
+                                <NavLink
+                                    href={route('onboarding.index')}
+                                    active={route().current('onboarding.index')}
+                                >
+                                    Onboarding
+                                </NavLink>
+                                <NavLink
+                                    href={route('documents.index')}
+                                    active={route().current('documents.index')}
+                                >
+                                    Documentos
+                                </NavLink>
+                                <NavLink
+                                    href={route('services.index')}
+                                    active={route().current('services.index')}
+                                >
+                                    Servicios
+                                </NavLink>
+                                <NavLink
+                                    href={route('my-requests.index')}
+                                    active={route().current('my-requests.index')}
+                                >
+                                    Mis Solicitudes
                                 </NavLink>
                                 <NavLink
                                     href={route('rrhh.index')}
@@ -119,6 +149,59 @@ export default function AuthenticatedLayout({ header, children }) {
                                             active={route().current('settings.index')}
                                         >
                                             Configuración
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('organizational-units.index')}
+                                            active={route().current('organizational-units.*')}
+                                        >
+                                            <span className="flex items-center gap-1">
+                                                Organigrama
+                                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-800 rounded">
+                                                    Admin
+                                                </span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('onboarding-stages.index')}
+                                            active={route().current('onboarding-stages.*')}
+                                        >
+                                            Onboarding
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('onboarding-tasks.index')}
+                                            active={route().current('onboarding-tasks.*')}
+                                        >
+                                            Tareas Onb.
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('documents.index')}
+                                            active={route().current('documents.*')}
+                                        >
+                                            Documentos
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('services.index')}
+                                            active={route().current('services.*')}
+                                        >
+                                            Servicios
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('request-types.index')}
+                                            active={route().current('request-types.*')}
+                                        >
+                                            Tipos Solic.
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.user-requests.index')}
+                                            active={route().current('admin.user-requests.*')}
+                                        >
+                                            Solicitudes
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('audit-logs.index')}
+                                            active={route().current('audit-logs.*')}
+                                        >
+                                            Auditoría
                                         </NavLink>
                                     </>
                                 )}
@@ -245,10 +328,40 @@ export default function AuthenticatedLayout({ header, children }) {
                             FAQ
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
+                            href={route('organigram.index')}
+                            active={route().current('organigram.index')}
+                        >
+                            Organigrama
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
                             href={route('calendar.index')}
                             active={route().current('calendar.index')}
                         >
                             Calendario
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('onboarding.index')}
+                            active={route().current('onboarding.index')}
+                        >
+                            Onboarding
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('documents.index')}
+                            active={route().current('documents.index')}
+                        >
+                            Documentos
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('services.index')}
+                            active={route().current('services.index')}
+                        >
+                            Servicios
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('my-requests.index')}
+                            active={route().current('my-requests.index')}
+                        >
+                            Mis Solicitudes
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('rrhh.index')}
@@ -286,6 +399,59 @@ export default function AuthenticatedLayout({ header, children }) {
                                     active={route().current('settings.index')}
                                 >
                                     Configuración
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('organizational-units.index')}
+                                    active={route().current('organizational-units.*')}
+                                >
+                                    <span className="flex items-center gap-1">
+                                        Organigrama
+                                        <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-800 rounded">
+                                            Admin
+                                        </span>
+                                    </span>
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('onboarding-stages.index')}
+                                    active={route().current('onboarding-stages.*')}
+                                >
+                                    Onboarding
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('onboarding-tasks.index')}
+                                    active={route().current('onboarding-tasks.*')}
+                                >
+                                    Tareas Onb.
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('documents.index')}
+                                    active={route().current('documents.*')}
+                                >
+                                    Documentos
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('services.index')}
+                                    active={route().current('services.*')}
+                                >
+                                    Servicios
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('request-types.index')}
+                                    active={route().current('request-types.*')}
+                                >
+                                    Tipos Solic.
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('admin.user-requests.index')}
+                                    active={route().current('admin.user-requests.*')}
+                                >
+                                    Solicitudes
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('audit-logs.index')}
+                                    active={route().current('audit-logs.*')}
+                                >
+                                    Auditoría
                                 </ResponsiveNavLink>
                             </>
                         )}
