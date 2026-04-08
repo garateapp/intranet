@@ -10,6 +10,9 @@ use App\Models\Category;
 use App\Models\CorporateEvent;
 use App\Models\Faq;
 use App\Models\Setting;
+use App\Models\Service;
+use App\Models\UserOnboardingProgress;
+use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -165,6 +168,65 @@ class DashboardController extends Controller
             ],
         ];
 
+        // Phase 2: Services status summary (only showing issues or all if < 5)
+        $services = Service::active()->public()->orderBy('sort_order')->get();
+        $servicesWithIssues = $services->where('status', '!=', 'operativo');
+        $servicesSummary = $servicesWithIssues->count() > 0 || $services->count() <= 5
+            ? $services->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'status' => $s->status,
+                'status_label' => $s->status_label,
+                'status_badge_color' => $s->status_badge_color,
+                'status_message' => $s->status_message,
+            ])
+            : $servicesWithIssues->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'status' => $s->status,
+                'status_label' => $s->status_label,
+                'status_badge_color' => $s->status_badge_color,
+                'status_message' => $s->status_message,
+            ]);
+
+        // Phase 2: Onboarding progress for current user
+        $onboardingStats = [
+            'total' => 0,
+            'completed' => 0,
+            'percentage' => 0,
+            'has_pending' => false,
+        ];
+
+        $stages = \App\Models\OnboardingStage::with(['activeTasks.userProgress' => function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        }])->active()->forRole($user->role)->get();
+
+        $totalTasks = $stages->sum(fn ($stage) => $stage->activeTasks->count());
+        $completedTasks = $stages->sum(fn ($stage) => $stage->activeTasks->where('pivot.is_completed', true)->count());
+        $onboardingStats = [
+            'total' => $totalTasks,
+            'completed' => $completedTasks,
+            'percentage' => $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0,
+            'has_pending' => $totalTasks > $completedTasks,
+        ];
+
+        // Phase 2: Recent user requests
+        $recentRequests = UserRequest::with('requestType')
+            ->forUser($user->id)
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'reference_code' => $r->reference_code,
+                'title' => $r->title,
+                'status' => $r->status,
+                'status_label' => $r->status_label,
+                'status_badge_color' => $r->status_badge_color,
+                'created_at' => $r->created_at->format('d/m/Y'),
+                'request_type' => $r->requestType?->name,
+            ]);
+
         return Inertia::render('Dashboard', [
             'hero' => [
                 'greeting' => "¡Hola, {$user->name}!",
@@ -176,6 +238,9 @@ class DashboardController extends Controller
             'directoryUsers' => $directoryUsers,
             'faqs' => $faqs,
             'hrPortal' => $hrPortal,
+            'services' => $servicesSummary,
+            'onboarding' => $onboardingStats,
+            'recentRequests' => $recentRequests,
         ]);
     }
 }

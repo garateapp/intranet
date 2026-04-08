@@ -31,6 +31,8 @@ class User extends Authenticatable
         'bio',
         'is_directory_visible',
         'is_directory_featured',
+        'organizational_unit_id',
+        'manager_id',
         'google_id',
         'google_token',
         'google_refresh_token',
@@ -74,6 +76,36 @@ class User extends Authenticatable
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function organizationalUnit()
+    {
+        return $this->belongsTo(OrganizationalUnit::class);
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function subordinates()
+    {
+        return $this->hasMany(User::class, 'manager_id');
+    }
+
+    public function onboardingProgress()
+    {
+        return $this->hasMany(UserOnboardingProgress::class);
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(UserRequest::class);
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class);
     }
 
     public function isAdmin()

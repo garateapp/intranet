@@ -16,6 +16,19 @@ use App\Http\Controllers\UserDirectoryAdminController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\CorporateEventController;
+use App\Http\Controllers\OrganigramController;
+use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\DocumentLibraryController;
+use App\Http\Controllers\ServiceStatusController;
+use App\Http\Controllers\MyRequestsController;
+use App\Http\Controllers\OrganizationalUnitController;
+use App\Http\Controllers\OnboardingStageAdminController;
+use App\Http\Controllers\OnboardingTaskAdminController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ServiceAdminController;
+use App\Http\Controllers\RequestTypeController;
+use App\Http\Controllers\UserRequestAdminController;
+use App\Http\Controllers\AuditLogController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,6 +54,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rrhh', [HrPortalController::class, 'index'])->name('rrhh.index');
     Route::get('/rrhh/redirect', [HrPortalController::class, 'redirect'])->name('rrhh.redirect');
 
+    // Phase 2: Portal pages
+    Route::get('/organigrama', [OrganigramController::class, 'index'])->name('organigram.index');
+    Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
+    Route::post('/onboarding/tasks/{task}/complete', [OnboardingController::class, 'completeTask'])->name('onboarding.complete-task');
+    Route::get('/documentos', [DocumentLibraryController::class, 'index'])->name('documents.index');
+    Route::get('/documentos/{document:slug}', [DocumentLibraryController::class, 'show'])->name('documents.show');
+    Route::get('/servicios', [ServiceStatusController::class, 'index'])->name('services.index');
+    Route::get('/mis-solicitudes', [MyRequestsController::class, 'index'])->name('my-requests.index');
+    Route::post('/mis-solicitudes', [MyRequestsController::class, 'store'])->name('my-requests.store');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -61,6 +84,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('faq-categories', FaqCategoryController::class);
         Route::resource('faqs', FaqController::class);
         Route::resource('corporate-events', CorporateEventController::class);
+
+        // Phase 2: Portal admin routes
+        Route::resource('organizational-units', OrganizationalUnitController::class);
+        Route::resource('onboarding-stages', OnboardingStageAdminController::class);
+        Route::resource('onboarding-tasks', OnboardingTaskAdminController::class);
+        Route::resource('documents', DocumentController::class);
+        Route::post('documents/{document}/upload', [DocumentController::class, 'upload'])->name('documents.upload');
+        Route::resource('services', ServiceAdminController::class);
+        Route::patch('services/{service}/status', [ServiceAdminController::class, 'updateStatus'])->name('services.update-status');
+        Route::get('services/{service}/history', [ServiceAdminController::class, 'history'])->name('services.history');
+        Route::resource('request-types', RequestTypeController::class);
+        Route::resource('admin/user-requests', UserRequestAdminController::class)->except(['create', 'store', 'destroy']);
+        Route::patch('admin/user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('admin.user-requests.update-status');
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
     });
 });
 
