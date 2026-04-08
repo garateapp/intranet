@@ -19,24 +19,22 @@ class HomePortalTest extends TestCase
             ->assertOk();
     }
 
-    public function test_portal_navigation_links_render_for_authenticated_users(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->get(route('dashboard'))
-            ->assertSee(route('search.index'), false)
-            ->assertSee(route('directory.index'), false)
-            ->assertSee(route('faq.index'), false)
-            ->assertSee(route('calendar.index'), false);
-    }
-
     public function test_dashboard_includes_portal_modules(): void
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)
-            ->get(route('dashboard'))
-            ->assertOk();
+        $response = $this->actingAs($user)
+            ->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertInertia(function ($page) {
+            $page->has('hero')
+                 ->has('quickLinks')
+                 ->has('featuredPosts')
+                 ->has('events')
+                 ->has('directoryUsers')
+                 ->has('faqs')
+                 ->has('hrPortal');
+        });
     }
 }

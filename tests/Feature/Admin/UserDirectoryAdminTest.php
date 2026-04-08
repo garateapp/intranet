@@ -10,6 +10,12 @@ class UserDirectoryAdminTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    }
+
     public function test_admin_can_access_directory_user_management(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

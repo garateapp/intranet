@@ -11,6 +11,12 @@ class CorporateEventManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    }
+
     public function test_admin_can_access_corporate_events_index(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

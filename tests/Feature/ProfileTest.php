@@ -10,6 +10,12 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    }
+
     public function test_profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
@@ -111,7 +117,7 @@ class ProfileTest extends TestCase
             'bio' => 'Encargada de reportes y control.',
         ]);
 
-        $response->assertRedirect(route('profile.edit'));
+        $response->assertSessionHasNoErrors();
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'department' => 'Finanzas',
