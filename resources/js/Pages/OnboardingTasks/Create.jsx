@@ -1,13 +1,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Create({ stages }) {
+export default function Create({ stages, documents }) {
     const { data, setData, post, processing, errors } = useForm({
         onboarding_stage_id: '',
         title: '',
         description: '',
         task_type: 'checklist',
         resource_url: '',
+        document_id: '',
         sort_order: 0,
         is_required: true,
         is_active: true,
@@ -132,6 +133,7 @@ export default function Create({ stages }) {
                                             <option value="resource">Recurso</option>
                                             <option value="link">Enlace</option>
                                             <option value="faq">Pregunta frecuente</option>
+                                            <option value="document">Documento</option>
                                         </select>
                                         {errors.task_type && (
                                             <p className="mt-1 text-sm text-red-600">{errors.task_type}</p>
@@ -157,6 +159,36 @@ export default function Create({ stages }) {
                                             <p className="mt-1 text-sm text-red-600">{errors.resource_url}</p>
                                         )}
                                     </div>
+                                </div>
+
+                                {/* Documento asociado */}
+                                <div>
+                                    <label
+                                        htmlFor="document_id"
+                                        className="block text-sm font-medium text-gray-700"
+                                    >
+                                        Documento asociado (opcional)
+                                    </label>
+                                    <select
+                                        id="document_id"
+                                        value={data.document_id}
+                                        onChange={(e) => setData('document_id', e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                    >
+                                        <option value="">Sin documento</option>
+                                        {documents.map((doc) => (
+                                            <option key={doc.id} value={doc.id}>
+                                                📄 {doc.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Selecciona un documento existente de la base documental.
+                                        Para subir uno nuevo, ve a <a href={route('admin.documents.create')} className="text-green-600 hover:underline">Documentos → Nuevo</a>
+                                    </p>
+                                    {errors.document_id && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.document_id}</p>
+                                    )}
                                 </div>
 
                                 {/* Orden */}

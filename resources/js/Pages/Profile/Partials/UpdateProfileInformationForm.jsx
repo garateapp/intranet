@@ -12,7 +12,7 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
+    const { data, setData, patch, post, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
@@ -21,12 +21,30 @@ export default function UpdateProfileInformation({
             phone: user.phone || '',
             location: user.location || '',
             bio: user.bio || '',
+            avatar: null,
+            _method: 'PATCH',
         });
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        const formData = new FormData();
+        formData.append('_method', 'PATCH');
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+        formData.append('department', data.department);
+        formData.append('position', data.position);
+        formData.append('phone', data.phone);
+        formData.append('location', data.location);
+        formData.append('bio', data.bio);
+        if (data.avatar) {
+            formData.append('avatar', data.avatar);
+        }
+
+        post(route('profile.update'), formData, {
+            forceFormData: true,
+            onSuccess: () => setData('avatar', null),
+        });
     };
 
     return (
@@ -42,6 +60,33 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                {/* Avatar Upload */}
+                <div>
+                    <InputLabel htmlFor="avatar" value="Foto de Perfil" />
+                    <div className="mt-2 flex items-center gap-4">
+                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-green-100 flex items-center justify-center">
+                            {user.avatar && user.avatar.startsWith('avatars/') ? (
+                                <img src={`/storage/${user.avatar}`} alt={user.name} className="h-full w-full object-cover" />
+                            ) : user.avatar ? (
+                                <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                            ) : (
+                                <span className="text-2xl font-bold text-green-700">{user.initials}</span>
+                            )}
+                        </div>
+                        <div className="flex-1">
+                            <input
+                                type="file"
+                                id="avatar"
+                                accept="image/*"
+                                onChange={(e) => setData('avatar', e.target.files[0])}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">JPG, PNG o GIF. Máximo 2MB.</p>
+                            {errors.avatar && <p className="mt-1 text-sm text-red-600">{errors.avatar}</p>}
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 

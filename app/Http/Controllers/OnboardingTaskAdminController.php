@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OnboardingTask;
 use App\Models\OnboardingStage;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,8 +27,10 @@ class OnboardingTaskAdminController extends Controller
     public function create()
     {
         $stages = OnboardingStage::active()->orderBy('sort_order')->get();
+        $documents = Document::published()->vigant()->orderBy('title')->get(['id', 'title', 'slug']);
         return Inertia::render('OnboardingTasks/Create', [
             'stages' => $stages,
+            'documents' => $documents,
         ]);
     }
 
@@ -37,8 +40,9 @@ class OnboardingTaskAdminController extends Controller
             'onboarding_stage_id' => ['required', 'exists:onboarding_stages,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'task_type' => ['required', 'string', 'in:checklist,resource,link,faq'],
+            'task_type' => ['required', 'string', 'in:checklist,resource,link,faq,document'],
             'resource_url' => ['nullable', 'string'],
+            'document_id' => ['nullable', 'exists:documents,id'],
             'sort_order' => ['nullable', 'integer'],
             'is_required' => ['boolean'],
             'is_active' => ['boolean'],
@@ -53,9 +57,11 @@ class OnboardingTaskAdminController extends Controller
     public function edit(OnboardingTask $onboardingTask)
     {
         $stages = OnboardingStage::active()->orderBy('sort_order')->get();
+        $documents = Document::published()->vigant()->orderBy('title')->get(['id', 'title', 'slug']);
         return Inertia::render('OnboardingTasks/Edit', [
             'task' => $onboardingTask,
             'stages' => $stages,
+            'documents' => $documents,
         ]);
     }
 
@@ -65,8 +71,9 @@ class OnboardingTaskAdminController extends Controller
             'onboarding_stage_id' => ['required', 'exists:onboarding_stages,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'task_type' => ['required', 'string', 'in:checklist,resource,link,faq'],
+            'task_type' => ['required', 'string', 'in:checklist,resource,link,faq,document'],
             'resource_url' => ['nullable', 'string'],
+            'document_id' => ['nullable', 'exists:documents,id'],
             'sort_order' => ['nullable', 'integer'],
             'is_required' => ['boolean'],
             'is_active' => ['boolean'],

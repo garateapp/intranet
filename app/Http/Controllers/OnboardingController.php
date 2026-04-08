@@ -16,7 +16,7 @@ class OnboardingController extends Controller
 
         $stages = OnboardingStage::with(['activeTasks.userProgress' => function ($query) use ($user) {
             $query->where('user_id', $user->id);
-        }])
+        }, 'activeTasks.document:id,title,slug,file_path,file_type'])
             ->active()
             ->forRole($user->role)
             ->get();

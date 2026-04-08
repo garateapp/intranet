@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function Edit({ user }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: user.name,
         email: user.email,
         department: user.department || '',
@@ -12,11 +12,19 @@ export default function Edit({ user }) {
         bio: user.bio || '',
         is_directory_visible: user.is_directory_visible,
         is_directory_featured: user.is_directory_featured,
+        avatar: null,
+        _method: 'PUT',
     });
 
     function submit(e) {
         e.preventDefault();
-        put(route('users.update', user.id));
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        Object.keys(data).forEach(key => {
+            if (data[key] !== null && key !== 'avatar') formData.append(key, data[key]);
+        });
+        if (data.avatar) formData.append('avatar', data.avatar);
+        post(route('users.update', user.id), { forceFormData: true });
     }
 
     return (
@@ -34,6 +42,34 @@ export default function Edit({ user }) {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <form onSubmit={submit} className="space-y-6">
+                                {/* Avatar Upload */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Foto de Perfil</label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-green-100 flex items-center justify-center">
+                                            {user.avatar && !user.avatar.includes('://') ? (
+                                                <img src={`/storage/${user.avatar}`} alt={user.name} className="h-full w-full object-cover" />
+                                            ) : user.avatar ? (
+                                                <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <span className="text-2xl font-bold text-green-700">
+                                                    {user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => setData('avatar', e.target.files[0])}
+                                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500">JPG, PNG o GIF. Máximo 2MB. Dejar vacío para mantener la foto actual.</p>
+                                            {errors.avatar && <p className="mt-1 text-sm text-red-600">{errors.avatar}</p>}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                         Nombre

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class UserDirectoryAdminController extends Controller
@@ -57,7 +58,17 @@ class UserDirectoryAdminController extends Controller
             'bio' => ['nullable', 'string'],
             'is_directory_visible' => ['boolean'],
             'is_directory_featured' => ['boolean'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && !str_contains($user->avatar, '://')) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $path;
+        }
 
         $user->update($validated);
 

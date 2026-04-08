@@ -16,6 +16,7 @@ class OnboardingTask extends Model
         'description',
         'task_type',
         'resource_url',
+        'document_id',
         'sort_order',
         'is_required',
         'is_active',
@@ -30,6 +31,11 @@ class OnboardingTask extends Model
     public function stage()
     {
         return $this->belongsTo(OnboardingStage::class, 'onboarding_stage_id');
+    }
+
+    public function document()
+    {
+        return $this->belongsTo(Document::class);
     }
 
     public function userProgress()

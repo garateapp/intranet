@@ -17,13 +17,13 @@ export default function Index({ posts, categories, filters }) {
     }
 
     function handleDelete(id) {
-        if (confirm('Are you sure you want to delete this post?')) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
             router.delete(route('posts.destroy', id));
         }
     }
 
     function formatDate(date) {
-        return new Date(date).toLocaleDateString('en-US', {
+        return new Date(date).toLocaleDateString('es-CL', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -35,18 +35,18 @@ export default function Index({ posts, categories, filters }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Posts Management
+                        Publicaciones
                     </h2>
                     <Link
                         href={route('posts.create')}
                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                     >
-                        Create New Post
+                        Nueva Publicación
                     </Link>
                 </div>
             }
         >
-            <Head title="Posts" />
+            <Head title="Publicaciones" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -57,36 +57,36 @@ export default function Index({ posts, categories, filters }) {
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Search
+                                            Buscar
                                         </label>
                                         <input
                                             type="text"
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
-                                            placeholder="Search by title..."
+                                            placeholder="Buscar por título..."
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         />
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Status
+                                            Estado
                                         </label>
                                         <select
                                             value={status}
                                             onChange={(e) => setStatus(e.target.value)}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         >
-                                            <option value="">All</option>
-                                            <option value="draft">Draft</option>
-                                            <option value="published">Published</option>
-                                            <option value="archived">Archived</option>
+                                            <option value="">Todos</option>
+                                            <option value="draft">Borrador</option>
+                                            <option value="published">Publicado</option>
+                                            <option value="archived">Archivado</option>
                                         </select>
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Category
+                                            Categoría
                                         </label>
                                         <select
                                             value={categoryId}
@@ -107,7 +107,7 @@ export default function Index({ posts, categories, filters }) {
                                             type="submit"
                                             className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                                         >
-                                            Apply Filters
+                                            Aplicar Filtros
                                         </button>
                                     </div>
                                 </div>
@@ -122,24 +122,12 @@ export default function Index({ posts, categories, filters }) {
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Title
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Category
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Author
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Published
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Actions
-                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Autor</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Publicado</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -171,7 +159,7 @@ export default function Index({ posts, categories, filters }) {
                                                                 {post.category.name}
                                                             </span>
                                                         ) : (
-                                                            <span className="text-gray-400">No Category</span>
+                                                            <span className="text-gray-400">Sin categoría</span>
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -184,7 +172,7 @@ export default function Index({ posts, categories, filters }) {
                                                                     : 'bg-orange-100 text-orange-800'
                                                             }`}
                                                         >
-                                                            {post.status}
+                                                            {post.status === 'published' ? 'Publicado' : post.status === 'draft' ? 'Borrador' : 'Archivado'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -198,13 +186,13 @@ export default function Index({ posts, categories, filters }) {
                                                             href={route('posts.edit', post.id)}
                                                             className="text-green-600 hover:text-green-900"
                                                         >
-                                                            Edit
+                                                            Editar
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(post.id)}
                                                             className="text-red-600 hover:text-red-900"
                                                         >
-                                                            Delete
+                                                            Eliminar
                                                         </button>
                                                     </td>
                                                 </tr>
