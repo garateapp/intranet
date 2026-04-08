@@ -11,18 +11,43 @@ use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with(['category', 'uploader'])
-            ->withTrashed()
-            ->orderBy('sort_order')
-            ->paginate(15);
+        $categoryId = $request->input('category', '');
+        $status = $request->input('status', '');
+        $trashed = $request->input('trashed', '');
+
+        $documentsQuery = Document::with(['category', 'uploader'])
+            ->orderBy('sort_order');
+
+        if (!empty($categoryId)) {
+            $documentsQuery->where('category_id', $categoryId);
+        }
+
+        if ($status === 'published') {
+            $documentsQuery->where('is_published', true);
+        } elseif ($status === 'unpublished') {
+            $documentsQuery->where('is_published', false);
+        }
+
+        if ($trashed === 'with') {
+            $documentsQuery->withTrashed();
+        } elseif ($trashed === 'only') {
+            $documentsQuery->onlyTrashed();
+        }
+
+        $documents = $documentsQuery->paginate(15);
 
         $categories = Category::where('is_active', true)->orderBy('sort_order')->get();
 
         return Inertia::render('Documents/Index', [
             'documents' => $documents,
             'categories' => $categories,
+            'filters' => [
+                'category' => $categoryId,
+                'status' => $status,
+                'trashed' => $trashed,
+            ],
         ]);
     }
 
