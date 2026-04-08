@@ -55,7 +55,10 @@ class OrganizationalUnitController extends Controller
 
     public function edit(OrganizationalUnit $organizationalUnit)
     {
-        $units = OrganizationalUnit::active()->orderBy('sort_order')->get();
+        $units = OrganizationalUnit::active()
+            ->where('id', '!=', $organizationalUnit->id)
+            ->orderBy('sort_order')
+            ->get();
         return Inertia::render('OrganizationalUnits/Edit', [
             'unit' => $organizationalUnit,
             'units' => $units,

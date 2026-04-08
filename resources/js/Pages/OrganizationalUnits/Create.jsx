@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Create({ parentUnits }) {
+export default function Create({ units }) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         description: '',
@@ -98,9 +98,9 @@ export default function Create({ parentUnits }) {
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         >
                                             <option value="">— Sin unidad padre (raíz) —</option>
-                                            {(parentUnits || []).map((unit) => (
+                                            {(units || []).map((unit) => (
                                                 <option key={unit.id} value={unit.id}>
-                                                    {unit.name}
+                                                    {unit.parent_id ? '  ↳ ' : ''}{unit.name}
                                                 </option>
                                             ))}
                                         </select>

@@ -173,7 +173,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Dropdown.Link>
 
                                             <div class="border-t border-gray-100 my-1"></div>
-                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Portal Fase 2</div>
+                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organizacional</div>
                                             <Dropdown.Link href={route('organizational-units.index')}>
                                                 <div className="flex items-center gap-2">Organigrama</div>
                                             </Dropdown.Link>
