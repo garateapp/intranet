@@ -16,6 +16,11 @@ export default function UpdateProfileInformation({
         useForm({
             name: user.name,
             email: user.email,
+            department: user.department || '',
+            position: user.position || '',
+            phone: user.phone || '',
+            location: user.location || '',
+            bio: user.bio || '',
         });
 
     const submit = (e) => {
@@ -67,6 +72,80 @@ export default function UpdateProfileInformation({
                     />
 
                     <InputError className="mt-2" message={errors.email} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <InputLabel htmlFor="department" value="Departamento" />
+
+                        <TextInput
+                            id="department"
+                            className="mt-1 block w-full"
+                            value={data.department}
+                            onChange={(e) => setData('department', e.target.value)}
+                            autoComplete="organization-title"
+                        />
+
+                        <InputError className="mt-2" message={errors.department} />
+                    </div>
+
+                    <div>
+                        <InputLabel htmlFor="position" value="Cargo" />
+
+                        <TextInput
+                            id="position"
+                            className="mt-1 block w-full"
+                            value={data.position}
+                            onChange={(e) => setData('position', e.target.value)}
+                            autoComplete="organization-title"
+                        />
+
+                        <InputError className="mt-2" message={errors.position} />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <InputLabel htmlFor="phone" value="Teléfono" />
+
+                        <TextInput
+                            id="phone"
+                            className="mt-1 block w-full"
+                            value={data.phone}
+                            onChange={(e) => setData('phone', e.target.value)}
+                            autoComplete="tel"
+                        />
+
+                        <InputError className="mt-2" message={errors.phone} />
+                    </div>
+
+                    <div>
+                        <InputLabel htmlFor="location" value="Ubicación" />
+
+                        <TextInput
+                            id="location"
+                            className="mt-1 block w-full"
+                            value={data.location}
+                            onChange={(e) => setData('location', e.target.value)}
+                            autoComplete="address-level2"
+                        />
+
+                        <InputError className="mt-2" message={errors.location} />
+                    </div>
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="bio" value="Biografía" />
+
+                    <textarea
+                        id="bio"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                        rows="3"
+                        value={data.bio}
+                        onChange={(e) => setData('bio', e.target.value)}
+                    />
+
+                    <InputError className="mt-2" message={errors.bio} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (

@@ -96,4 +96,27 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_user_can_update_directory_profile_fields(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->patch(route('profile.update'), [
+            'name' => 'Ana Torres',
+            'email' => 'ana@example.com',
+            'department' => 'Finanzas',
+            'position' => 'Analista',
+            'phone' => '+56 9 1111 2222',
+            'location' => 'Santiago',
+            'bio' => 'Encargada de reportes y control.',
+        ]);
+
+        $response->assertRedirect(route('profile.edit'));
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'department' => 'Finanzas',
+            'position' => 'Analista',
+            'location' => 'Santiago',
+        ]);
+    }
 }
