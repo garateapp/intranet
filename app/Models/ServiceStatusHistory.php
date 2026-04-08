@@ -9,6 +9,8 @@ class ServiceStatusHistory extends Model
 {
     use HasFactory;
 
+    protected $table = 'service_status_history';
+
     protected $fillable = [
         'service_id',
         'old_status',
