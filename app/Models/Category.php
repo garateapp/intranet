@@ -46,6 +46,11 @@ class Category extends Model
         return $this->hasMany(Link::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
