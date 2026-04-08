@@ -14,7 +14,7 @@ export default function Create() {
 
     function submit(e) {
         e.preventDefault();
-        post(route('services.store'));
+        post(route('admin.services.store'));
     }
 
     return (
@@ -25,7 +25,7 @@ export default function Create() {
                         Nuevo Servicio
                     </h2>
                     <Link
-                        href={route('services.index')}
+                        href={route('admin.services.index')}
                         className="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300"
                     >
                         Volver al Listado
@@ -152,7 +152,7 @@ export default function Create() {
 
                                 <div className="flex items-center justify-end gap-3">
                                     <Link
-                                        href={route('services.index')}
+                                        href={route('admin.services.index')}
                                         className="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300"
                                     >
                                         Cancelar

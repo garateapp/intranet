@@ -11,7 +11,7 @@ const statusColors = {
 export default function Index({ services }) {
     function handleDelete(id, name) {
         if (confirm(`¿Estás seguro de que deseas eliminar el servicio "${name}"?`)) {
-            router.delete(route('services.destroy', id));
+            router.delete(route('admin.services.destroy', id));
         }
     }
 
@@ -21,7 +21,7 @@ export default function Index({ services }) {
         );
         if (status && ['operativo', 'degradado', 'incidente', 'mantenimiento'].includes(status)) {
             const message = prompt('Mensaje de estado (opcional):') || '';
-            router.patch(route('services.update-status', id), {
+            router.patch(route('admin.services.update-status', id), {
                 status,
                 status_message: message,
             });
@@ -36,7 +36,7 @@ export default function Index({ services }) {
                         Gestión de Servicios
                     </h2>
                     <Link
-                        href={route('services.create')}
+                        href={route('admin.services.create')}
                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                     >
                         Nuevo Servicio
@@ -75,7 +75,7 @@ export default function Index({ services }) {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {services.map((service) => (
+                                        {admin.services.map((service) => (
                                             <tr key={service.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4">
                                                     <div>
@@ -123,7 +123,7 @@ export default function Index({ services }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                                     <Link
-                                                        href={route('services.edit', service.id)}
+                                                        href={route('admin.services.edit', service.id)}
                                                         className="text-green-600 hover:text-green-700"
                                                     >
                                                         Editar
@@ -147,7 +147,7 @@ export default function Index({ services }) {
                                 </table>
                             </div>
 
-                            {services.length === 0 && (
+                            {admin.services.length === 0 && (
                                 <div className="py-12 text-center">
                                     <svg
                                         className="mx-auto h-12 w-12 text-gray-400"

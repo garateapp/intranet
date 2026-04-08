@@ -89,11 +89,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('organizational-units', OrganizationalUnitController::class);
         Route::resource('onboarding-stages', OnboardingStageAdminController::class);
         Route::resource('onboarding-tasks', OnboardingTaskAdminController::class);
-        Route::resource('documents', DocumentController::class);
-        Route::post('documents/{document}/upload', [DocumentController::class, 'upload'])->name('documents.upload');
-        Route::resource('services', ServiceAdminController::class);
-        Route::patch('services/{service}/status', [ServiceAdminController::class, 'updateStatus'])->name('services.update-status');
-        Route::get('services/{service}/history', [ServiceAdminController::class, 'history'])->name('services.history');
+
+        // Admin documents (separate namespace from user-facing)
+        Route::resource('admin/documents', DocumentController::class)->names('admin.documents');
+        Route::put('admin/documents/{document}/restore', [DocumentController::class, 'restore'])->name('admin.documents.restore');
+        Route::post('admin/documents/{document}/upload', [DocumentController::class, 'upload'])->name('admin.documents.upload');
+        Route::resource('admin/services', ServiceAdminController::class)->names('admin.services');
+        Route::patch('admin/services/{service}/status', [ServiceAdminController::class, 'updateStatus'])->name('admin.services.update-status');
+        Route::get('admin/services/{service}/history', [ServiceAdminController::class, 'history'])->name('admin.services.history');
+
         Route::resource('request-types', RequestTypeController::class);
         Route::resource('user-requests', UserRequestAdminController::class)->only(['index', 'show', 'edit', 'update']);
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');

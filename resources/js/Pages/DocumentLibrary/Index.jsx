@@ -57,7 +57,7 @@ export default function Index({ documents, categories, filters }) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <PortalHero
                         greeting="Centro de Documentos"
-                        subtitle="Encuentra toda la documentación de la empresa organizada por categor\u00eda. Busca por nombre o filtra seg\u00fan tus necesidades."
+                        subtitle="Encuentra toda la documentación de la empresa organizada por categoría. Busca por nombre o filtra según tus necesidades."
                     />
 
                     {/* Filters */}
@@ -73,14 +73,14 @@ export default function Index({ documents, categories, filters }) {
                                         type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="Buscar por t\u00edtulo o descripci\u00f3n..."
+                                        placeholder="Buscar por título o descripción..."
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     />
                                 </div>
 
                                 <div className="w-full md:w-64">
                                     <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                                        Categor\u00eda
+                                        Categoría
                                     </label>
                                     <select
                                         id="category"
@@ -88,7 +88,7 @@ export default function Index({ documents, categories, filters }) {
                                         onChange={(e) => setCategory(e.target.value)}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     >
-                                        <option value="">Todas las categor\u00edas</option>
+                                        <option value="">Todas las categorías</option>
                                         {categories.map((cat) => (
                                             <option key={cat.id} value={cat.slug}>
                                                 {cat.name}
@@ -130,7 +130,7 @@ export default function Index({ documents, categories, filters }) {
                                     </div>
                                     <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron documentos</h3>
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Intenta con otros t\u00e9rminos de b\u00fasqueda o cambia el filtro de categor\u00eda.
+                                        Intenta con otros términos de búsqueda o cambia el filtro de categoría.
                                     </p>
                                 </div>
                             </div>
@@ -180,7 +180,7 @@ export default function Index({ documents, categories, filters }) {
                                                 </div>
 
                                                 <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                                                    <span>Versi\u00f3n {doc.version || '1.0'}</span>
+                                                    <span>Versiín {doc.version || '1.0'}</span>
                                                     <span>{doc.file_size_formatted || doc.file_type}</span>
                                                 </div>
                                             </div>

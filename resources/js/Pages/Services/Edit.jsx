@@ -20,12 +20,12 @@ export default function Edit({ service }) {
 
     function submit(e) {
         e.preventDefault();
-        put(route('services.update', service.id));
+        put(route('admin.services.update', service.id));
     }
 
     function handleUpdateStatus(e) {
         e.preventDefault();
-        router.patch(route('services.update-status', service.id), {
+        router.patch(route('admin.services.update-status', service.id), {
             status: statusData.status,
             status_message: statusData.status_message,
         });
@@ -39,7 +39,7 @@ export default function Edit({ service }) {
                         Editar Servicio: {service.name}
                     </h2>
                     <Link
-                        href={route('services.index')}
+                        href={route('admin.services.index')}
                         className="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300"
                     >
                         Volver al Listado
@@ -162,7 +162,7 @@ export default function Edit({ service }) {
 
                                 <div className="flex items-center justify-end gap-3">
                                     <Link
-                                        href={route('services.index')}
+                                        href={route('admin.services.index')}
                                         className="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300"
                                     >
                                         Cancelar

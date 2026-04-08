@@ -19,7 +19,7 @@ export default function Create({ categories }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        post(route('documents.store'), {
+        post(route('admin.documents.store'), {
             onSuccess: () => reset(),
         });
     }
@@ -41,7 +41,7 @@ export default function Create({ categories }) {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Title */}
                                 <div>
-                                    <InputLabel htmlFor="title" value="T\u00edtulo" />
+                                    <InputLabel htmlFor="title" value="Título" />
                                     <input
                                         id="title"
                                         type="text"
@@ -89,14 +89,14 @@ export default function Create({ categories }) {
                                 {/* Category and Version */}
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <div>
-                                        <InputLabel htmlFor="category_id" value="Categor\u00eda" />
+                                        <InputLabel htmlFor="category_id" value="Categoría" />
                                         <select
                                             id="category_id"
                                             value={data.category_id}
                                             onChange={(e) => setData('category_id', e.target.value)}
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         >
-                                            <option value="">Seleccionar categor\u00eda</option>
+                                            <option value="">Seleccionar categoría</option>
                                             {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.id}>
                                                     {cat.name}
@@ -169,7 +169,7 @@ export default function Create({ categories }) {
                                 {/* Actions */}
                                 <div className="flex items-center justify-end space-x-4">
                                     <Link
-                                        href={route('documents.index')}
+                                        href={route('admin.documents.index')}
                                         className="text-gray-600 hover:text-gray-900"
                                     >
                                         Cancelar

@@ -183,10 +183,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <Dropdown.Link href={route('onboarding-tasks.index')}>
                                                 <div className="flex items-center gap-2">Onboarding (Tareas)</div>
                                             </Dropdown.Link>
-                                            <Dropdown.Link href={route('documents.index')}>
+                                            <Dropdown.Link href={route('admin.documents.index')}>
                                                 <div className="flex items-center gap-2">Documentos</div>
                                             </Dropdown.Link>
-                                            <Dropdown.Link href={route('services.index')}>
+                                            <Dropdown.Link href={route('admin.services.index')}>
                                                 <div className="flex items-center gap-2">Servicios</div>
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('request-types.index')}>
@@ -340,8 +340,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* Recursos group */}
                         <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Recursos</div>
-                        <ResponsiveNavLink href={route('documents.index')} active={route().current('documents.index')}>Documentos</ResponsiveNavLink>
-                        <ResponsiveNavLink href={route('services.index')} active={route().current('services.index')}>Estado de Servicios</ResponsiveNavLink>
+                        <ResponsiveNavLink href={route('admin.documents.index')} active={route().current('documents.index')}>Documentos</ResponsiveNavLink>
+                        <ResponsiveNavLink href={route('admin.services.index')} active={route().current('services.index')}>Estado de Servicios</ResponsiveNavLink>
                         <ResponsiveNavLink href={route('my-requests.index')} active={route().current('my-requests.index')}>Mis Solicitudes</ResponsiveNavLink>
 
                         <ResponsiveNavLink
@@ -366,8 +366,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('organizational-units.index')} active={route().current('organizational-units.*')}>Organigrama</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-stages.index')} active={route().current('onboarding-stages.*')}>Onboarding (Etapas)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-tasks.index')} active={route().current('onboarding-tasks.*')}>Onboarding (Tareas)</ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('documents.index')} active={route().current('documents.*')}>Documentos</ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('services.index')} active={route().current('services.*')}>Servicios</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.documents.index')} active={route().current('admin.documents.*')}>Documentos (Admin)</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.services.index')} active={route().current('admin.services.*')}>Servicios (Admin)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('request-types.index')} active={route().current('request-types.*')}>Tipos de Solicitud</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('user-requests.index')} active={route().current('user-requests.*')}>Solicitudes</ResponsiveNavLink>
                                 <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">FAQ & Eventos</div>
