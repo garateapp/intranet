@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             InitialDataSeeder::class,
             UserDirectorySeeder::class,
+            FaqSeeder::class,
+            CorporateEventSeeder::class,
         ]);
     }
 }
