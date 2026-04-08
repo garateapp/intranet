@@ -12,6 +12,10 @@ use App\Http\Controllers\PeopleDirectoryController;
 use App\Http\Controllers\FaqPortalController;
 use App\Http\Controllers\CorporateCalendarController;
 use App\Http\Controllers\HrPortalController;
+use App\Http\Controllers\UserDirectoryAdminController;
+use App\Http\Controllers\FaqCategoryController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\CorporateEventController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -51,6 +55,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('links', LinkController::class);
         Route::resource('settings', SettingController::class)->except(['show']);
+
+        // Portal admin routes
+        Route::resource('users', UserDirectoryAdminController::class)->only(['index', 'edit', 'update']);
+        Route::resource('faq-categories', FaqCategoryController::class);
+        Route::resource('faqs', FaqController::class);
+        Route::resource('corporate-events', CorporateEventController::class);
     });
 });
 
