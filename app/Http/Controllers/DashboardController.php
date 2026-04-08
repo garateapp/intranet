@@ -133,6 +133,7 @@ class DashboardController extends Controller
                     'department' => $user->department,
                     'email' => $user->email,
                     'avatar' => $user->avatar,
+                    'avatar_url' => $user->avatar_url,
                 ];
             });
 

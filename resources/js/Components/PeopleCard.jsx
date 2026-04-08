@@ -8,13 +8,25 @@ export default function PeopleCard({ person }) {
             .toUpperCase();
     };
 
+    // Resolve avatar URL: prefer avatar_url from backend, fallback to avatar with /storage/ prefix
+    const getAvatarSrc = () => {
+        if (person.avatar_url) return person.avatar_url;
+        if (person.avatar) {
+            if (person.avatar.startsWith('http')) return person.avatar;
+            return `/storage/${person.avatar}`;
+        }
+        return null;
+    };
+
+    const avatarSrc = getAvatarSrc();
+
     return (
         <div className="portal-card-accent rounded-xl p-5 transition-all duration-200 hover:shadow-lg">
             <div className="flex items-start gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-emerald-600 text-white text-lg font-bold">
-                    {person.avatar ? (
+                    {avatarSrc ? (
                         <img
-                            src={person.avatar}
+                            src={avatarSrc}
                             alt={person.name}
                             className="h-16 w-16 rounded-full object-cover"
                         />

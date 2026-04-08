@@ -7,11 +7,21 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'avatar_url',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -123,5 +133,24 @@ class User extends Authenticatable
         return strtoupper(collect(explode(' ', $this->name))->map(function ($segment) {
             return substr($segment, 0, 1);
         })->take(2)->implode(''));
+    }
+
+    /**
+     * Get the full URL for the avatar.
+     * Handles both local storage paths and external URLs.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (empty($this->avatar)) {
+            return null;
+        }
+
+        // If it's already a full URL
+        if (str_starts_with($this->avatar, 'http')) {
+            return $this->avatar;
+        }
+
+        // Local storage path - prepend /storage/
+        return '/storage/' . $this->avatar;
     }
 }

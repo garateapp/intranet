@@ -48,7 +48,7 @@ export default function Edit({ user }) {
                                     <div className="flex items-center gap-4">
                                         <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-green-100 flex items-center justify-center">
                                             {user.avatar && !user.avatar.includes('://') ? (
-                                                <img src={`/storage/${user.avatar}`} alt={user.name} className="h-full w-full object-cover" />
+                                                <img src={user.avatar_url || `/storage/${user.avatar}`} alt={user.name} className="h-full w-full object-cover" />
                                             ) : user.avatar ? (
                                                 <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
                                             ) : (
