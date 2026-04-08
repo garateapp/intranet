@@ -28,7 +28,37 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                 >
-                                    Dashboard
+                                    Inicio
+                                </NavLink>
+                                <NavLink
+                                    href={route('search.index')}
+                                    active={route().current('search.index')}
+                                >
+                                    Buscador
+                                </NavLink>
+                                <NavLink
+                                    href={route('directory.index')}
+                                    active={route().current('directory.index')}
+                                >
+                                    Personas
+                                </NavLink>
+                                <NavLink
+                                    href={route('faq.index')}
+                                    active={route().current('faq.index')}
+                                >
+                                    FAQ
+                                </NavLink>
+                                <NavLink
+                                    href={route('calendar.index')}
+                                    active={route().current('calendar.index')}
+                                >
+                                    Calendario
+                                </NavLink>
+                                <NavLink
+                                    href={route('rrhh.index')}
+                                    active={route().current('rrhh.index')}
+                                >
+                                    RRHH
                                 </NavLink>
                                 {user.role === 'admin' && (
                                     <>
@@ -47,19 +77,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('categories.index')}
                                             active={route().current('categories.index') || route().current('categories.create') || route().current('categories.edit')}
                                         >
-                                            Categories
+                                            Categorías
                                         </NavLink>
                                         <NavLink
                                             href={route('links.index')}
                                             active={route().current('links.index') || route().current('links.create') || route().current('links.edit')}
                                         >
-                                            Links
+                                            Enlaces
                                         </NavLink>
                                         <NavLink
                                             href={route('settings.index')}
                                             active={route().current('settings.index')}
                                         >
-                                            Settings
+                                            Configuración
                                         </NavLink>
                                     </>
                                 )}
@@ -165,7 +195,37 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('dashboard')}
                             active={route().current('dashboard')}
                         >
-                            Dashboard
+                            Inicio
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('search.index')}
+                            active={route().current('search.index')}
+                        >
+                            Buscador
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('directory.index')}
+                            active={route().current('directory.index')}
+                        >
+                            Personas
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('faq.index')}
+                            active={route().current('faq.index')}
+                        >
+                            FAQ
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('calendar.index')}
+                            active={route().current('calendar.index')}
+                        >
+                            Calendario
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('rrhh.index')}
+                            active={route().current('rrhh.index')}
+                        >
+                            RRHH
                         </ResponsiveNavLink>
                         {user.role === 'admin' && (
                             <>
@@ -184,19 +244,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('categories.index')}
                                     active={route().current('categories.index') || route().current('categories.create') || route().current('categories.edit')}
                                 >
-                                    Categories
+                                    Categorías
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     href={route('links.index')}
                                     active={route().current('links.index') || route().current('links.create') || route().current('links.edit')}
                                 >
-                                    Links
+                                    Enlaces
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     href={route('settings.index')}
                                     active={route().current('settings.index')}
                                 >
-                                    Settings
+                                    Configuración
                                 </ResponsiveNavLink>
                             </>
                         )}
