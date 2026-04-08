@@ -8,7 +8,7 @@ export default function Index({ requests, filters }) {
 
     function handleFilter(e) {
         e.preventDefault();
-        router.get(route('admin.user-requests.index'), {
+        router.get(route('user-requests.index'), {
             status: statusFilter || undefined,
             type: typeFilter || undefined,
         });
@@ -158,7 +158,7 @@ export default function Index({ requests, filters }) {
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                     <Link
-                                                        href={route('admin.user-requests.show', req.id)}
+                                                        href={route('user-requests.show', req.id)}
                                                         className="text-green-600 hover:text-green-700"
                                                     >
                                                         Ver Detalle

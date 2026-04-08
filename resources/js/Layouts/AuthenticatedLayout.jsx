@@ -192,8 +192,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             Tipos Solic.
                                         </NavLink>
                                         <NavLink
-                                            href={route('admin.user-requests.index')}
-                                            active={route().current('admin.user-requests.*')}
+                                            href={route('user-requests.index')}
+                                            active={route().current('user-requests.*')}
                                         >
                                             Solicitudes
                                         </NavLink>
@@ -442,8 +442,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Tipos Solic.
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
-                                    href={route('admin.user-requests.index')}
-                                    active={route().current('admin.user-requests.*')}
+                                    href={route('user-requests.index')}
+                                    active={route().current('user-requests.*')}
                                 >
                                     Solicitudes
                                 </ResponsiveNavLink>

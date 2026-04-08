@@ -95,8 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('services/{service}/status', [ServiceAdminController::class, 'updateStatus'])->name('services.update-status');
         Route::get('services/{service}/history', [ServiceAdminController::class, 'history'])->name('services.history');
         Route::resource('request-types', RequestTypeController::class);
-        Route::resource('admin/user-requests', UserRequestAdminController::class)->except(['create', 'store', 'destroy']);
-        Route::patch('admin/user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('admin.user-requests.update-status');
+        Route::resource('user-requests', UserRequestAdminController::class)->only(['index', 'show', 'edit', 'update']);
+        Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
     });
 });
