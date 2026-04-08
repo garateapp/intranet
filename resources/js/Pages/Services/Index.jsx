@@ -75,7 +75,7 @@ export default function Index({ services }) {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {admin.services.map((service) => (
+                                        {services.map((service) => (
                                             <tr key={service.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4">
                                                     <div>
@@ -147,7 +147,7 @@ export default function Index({ services }) {
                                 </table>
                             </div>
 
-                            {admin.services.length === 0 && (
+                            {services.length === 0 && (
                                 <div className="py-12 text-center">
                                     <svg
                                         className="mx-auto h-12 w-12 text-gray-400"
