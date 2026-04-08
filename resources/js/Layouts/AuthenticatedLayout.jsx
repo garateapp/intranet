@@ -63,6 +63,35 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {user.role === 'admin' && (
                                     <>
                                         <NavLink
+                                            href={route('users.index')}
+                                            active={route().current('users.*')}
+                                        >
+                                            <span className="flex items-center gap-1">
+                                                Usuarios
+                                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-800 rounded">
+                                                    Admin
+                                                </span>
+                                            </span>
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('faq-categories.index')}
+                                            active={route().current('faq-categories.*')}
+                                        >
+                                            Cats. FAQ
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('faqs.index')}
+                                            active={route().current('faqs.*')}
+                                        >
+                                            FAQs
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('corporate-events.index')}
+                                            active={route().current('corporate-events.*')}
+                                        >
+                                            Eventos
+                                        </NavLink>
+                                        <NavLink
                                             href={route('posts.index')}
                                             active={route().current('posts.index') || route().current('posts.create') || route().current('posts.edit')}
                                         >
