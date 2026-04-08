@@ -6,7 +6,7 @@ use App\Models\OnboardingStage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class OnboardingStageController extends Controller
+class OnboardingStageAdminController extends Controller
 {
     public function index()
     {
