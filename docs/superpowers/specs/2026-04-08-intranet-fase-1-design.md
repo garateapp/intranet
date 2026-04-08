@@ -118,28 +118,42 @@ This is the page that should feel like the internal portal homepage, not a gener
 
 ## Data Model Changes
 
-Phase 1 requires persistence in the database for all new modules.
+Phase 1 requires persistence in the database for all new modules and directory-related user data.
 
-### People
+### Users as Directory Source
 
-Create a `people` table with fields:
+Do not create a separate `people` table.
+
+Instead, extend the existing `users` table so authenticated users are also the source of truth for the people directory and people search.
+
+The current schema already includes:
 
 - `name`
 - `email`
-- `position`
+- `role`
 - `department`
+- `position`
+- `avatar`
+
+Add the missing directory-oriented fields needed for Phase 1:
+
 - `phone`
 - `location`
 - `bio`
-- `avatar`
-- `is_featured`
-- `is_active`
-- timestamps
+- `is_directory_visible`
+- `is_directory_featured`
+
+Field expectations:
+
+- `phone`, `location`, and `bio` should be nullable
+- `is_directory_visible` should default to `true`
+- `is_directory_featured` should default to `false`
 
 Purpose:
 
-- Support the employee directory and people search.
-- Allow curated featured people on the home page.
+- Support the employee directory and people search from the existing user domain.
+- Avoid duplicating identity between `users` and a separate people table.
+- Allow curated featured employees on the home page.
 
 ### FAQ Categories
 
@@ -192,6 +206,10 @@ Purpose:
 
 - Support home summaries and a dedicated calendar page.
 
+Date handling:
+
+- `event_date` and `end_date` should be stored as datetimes so the schema can support both all-day and time-specific events without another migration
+
 ### HR Portal Configuration
 
 No standalone HR data table is required for Phase 1.
@@ -227,7 +245,7 @@ Admin-only content management should remain visibly separate and follow the curr
 - Categories
 - Links
 - Settings
-- People
+- Users
 - FAQ Categories
 - FAQs
 - Corporate Events
@@ -263,12 +281,12 @@ The navigation should remain consistent with the current layout rather than intr
 
 Add resource routes inside the existing admin middleware group:
 
-- `Route::resource('people', PeopleController::class);`
+- admin-oriented user directory management routes built on top of the existing `User` domain
 - `Route::resource('faq-categories', FaqCategoryController::class);`
 - `Route::resource('faqs', FaqController::class);`
 - `Route::resource('corporate-events', CorporateEventController::class);`
 
-This keeps the route style aligned with existing modules.
+This keeps the route style aligned with existing modules while avoiding a duplicate people resource.
 
 ## Home Experience Design
 
@@ -380,6 +398,11 @@ That means:
 - Frontend renders organized sections
 - The home search bar and the dedicated `/search` page should use the same backend endpoint and grouped response contract
 
+Visibility rules:
+
+- regular user-facing directory and search results should only include users where `is_directory_visible` is `true`
+- admin-facing user maintenance can still view and edit users regardless of directory visibility
+
 This keeps the architecture aligned with the current application and avoids premature client complexity.
 
 ### Search Result Structure
@@ -390,7 +413,7 @@ Each group should use content-appropriate cards:
 
 - Post result: title, excerpt, category, date
 - Link result: icon, title, description, destination
-- Person result: avatar, name, role, department, email
+- Person result: avatar, name, position, department, email
 - FAQ result: question, category, answer preview
 
 Initial grouped result limits should be:
@@ -404,7 +427,7 @@ Initial ordering should be:
 
 - posts: newest published first
 - links: `sort_order` ascending, then title
-- people: featured first, then name
+- people: featured directory users first, then name
 - FAQs: category order, then FAQ `sort_order`
 
 ### Search States
@@ -441,7 +464,7 @@ Each card should include:
 
 Directory index defaults should be:
 
-- featured people first, then alphabetical by name
+- featured visible users first, then alphabetical by name
 - 12 people per page
 - free-text query plus optional department filtering if needed during implementation
 
@@ -453,7 +476,11 @@ Phase 1 should focus on a strong searchable directory index with useful contact 
 
 ### Data Source Strategy
 
-People should be persisted in the new `people` table and seeded initially so the directory is populated and demo-ready from Phase 1.
+The people directory should read from `users`, not from a separate people table.
+
+Users should be seeded and/or updated with realistic directory data so the portal is populated and demo-ready from Phase 1.
+
+Directory visibility should be controlled through `is_directory_visible`, and home curation should use `is_directory_featured`.
 
 FAQ categories, FAQs, and corporate events should also ship with initial seed data so the Phase 1 portal is demo-ready without manual setup.
 
@@ -547,9 +574,9 @@ The portal must not imply that these HR flows are available locally.
 
 Phase 1 must be manageable by administrators without code changes.
 
-That requires admin CRUD pages for:
+That requires admin maintenance flows for:
 
-- People
+- Users as directory entries
 - FAQ Categories
 - FAQs
 - Corporate Events
@@ -560,6 +587,8 @@ These pages should follow the established project style:
 - Inertia-rendered pages
 - simple filtering and listing where needed
 - no unnecessary admin framework
+
+For users, this should not replace the authentication model. It should extend admin capabilities to maintain directory-related profile fields and visibility flags.
 
 ## Component Strategy
 
@@ -610,7 +639,7 @@ Minimum coverage should target:
 
 - authenticated access to new user-facing pages
 - admin protection on new CRUD routes
-- create/update validations for people, FAQ categories, FAQs, and events
+- create/update validations for directory-related user fields, FAQ categories, FAQs, and events
 - search endpoint behavior for grouped results
 
 Frontend behavior should remain simple enough that manual verification plus backend feature coverage is sufficient for this phase.
