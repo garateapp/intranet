@@ -118,6 +118,11 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
+
     public function isAdmin()
     {
         return $this->role === 'admin';

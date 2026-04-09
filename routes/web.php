@@ -29,6 +29,7 @@ use App\Http\Controllers\ServiceAdminController;
 use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\UserRequestAdminController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\UserActivityController as UserActivityWebController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -102,6 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('user-requests', UserRequestAdminController::class)->only(['index', 'show', 'edit', 'update']);
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
     });
 });
 

@@ -133,7 +133,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown>
                                         <Dropdown.Trigger>
                                             <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                                route().current('users.*') || route().current('posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*')
+                                                route().current('users.*') || route().current('posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
                                                     ? 'text-gray-900 border-b-2 border-orange-500'
                                                     : 'text-orange-600 hover:text-orange-700'
                                             }`}>
@@ -219,6 +219,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 <div className="flex items-center gap-2">
                                                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                                                     Auditoría
+                                                </div>
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('user-activities.index')}>
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    Actividad de Usuarios
                                                 </div>
                                             </Dropdown.Link>
                                         </Dropdown.Content>
@@ -375,6 +381,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('faqs.index')} active={route().current('faqs.*')}>FAQs</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('corporate-events.index')} active={route().current('corporate-events.*')}>Eventos</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('audit-logs.index')} active={route().current('audit-logs.*')}>Auditoría</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('user-activities.index')} active={route().current('user-activities.*')}>Actividad de Usuarios</ResponsiveNavLink>
                             </>
                         )}
                     </div>
