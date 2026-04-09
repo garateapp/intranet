@@ -104,6 +104,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
+
+        // Activity API endpoints (JSON responses, same session auth)
+        Route::get('api/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'index']);
+        Route::get('api/user-activities/stats', [\App\Http\Controllers\Api\UserActivityController::class, 'stats']);
+        Route::get('api/user-activities/export', [\App\Http\Controllers\Api\UserActivityController::class, 'export']);
+        Route::get('api/admin/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'adminIndex']);
+        Route::get('api/admin/user-activities/stats', [\App\Http\Controllers\Api\UserActivityController::class, 'adminStats']);
+        Route::get('api/admin/user-activities/export', [\App\Http\Controllers\Api\UserActivityController::class, 'adminExport']);
+        Route::get('api/admin/user-activities/{user}', [\App\Http\Controllers\Api\UserActivityController::class, 'adminUserDetail']);
     });
 });
 

@@ -41,8 +41,13 @@ export default function Index({ users }) {
 
         try {
             const res = await fetch(`/api/admin/user-activities?${params}`, {
-                headers: { 'Accept': 'application/json' },
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
             });
+            if (!res.ok) {
+                console.error('API error:', res.status, res.statusText);
+                return;
+            }
             const json = await res.json();
             if (json.success) {
                 setActivities(json.data.data);
@@ -58,8 +63,10 @@ export default function Index({ users }) {
     async function fetchStats() {
         try {
             const res = await fetch('/api/admin/user-activities/stats?days=30', {
-                headers: { 'Accept': 'application/json' },
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
             });
+            if (!res.ok) return;
             const json = await res.json();
             if (json.success) {
                 setStats(json.data);

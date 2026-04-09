@@ -5,16 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserActivity;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class UserActivityController extends Controller
 {
     /**
-     * Get current user's activity log.
+     * Get current user's activity log (JSON for Inertia page).
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $user = $request->user();
 
@@ -39,7 +37,7 @@ class UserActivityController extends Controller
     /**
      * Get activity stats for current user.
      */
-    public function stats(Request $request): JsonResponse
+    public function stats(Request $request)
     {
         $user = $request->user();
         $days = (int) $request->input('days', 30);
@@ -121,7 +119,7 @@ class UserActivityController extends Controller
     /**
      * Admin: Get all user activities.
      */
-    public function adminIndex(Request $request): JsonResponse
+    public function adminIndex(Request $request)
     {
         $activities = UserActivity::with('user:id,name,email,role,department')
             ->when($request->input('user_id'), fn ($q) => $q->forUser($request->input('user_id')))
@@ -146,7 +144,7 @@ class UserActivityController extends Controller
     /**
      * Admin: Get platform-wide activity stats.
      */
-    public function adminStats(Request $request): JsonResponse
+    public function adminStats(Request $request)
     {
         $days = (int) $request->input('days', 30);
 
@@ -178,13 +176,6 @@ class UserActivityController extends Controller
                 ->get(),
             'last_logins' => UserActivity::byAction('login')
                 ->with('user:id,name,email,department')
-                ->latest()
-                ->limit(10)
-                ->get(),
-            'recent_errors' => UserActivity::byAction('api_request')
-                ->where('method', '!=', 'GET')
-                ->recent(7)
-                ->with('user:id,name,email')
                 ->latest()
                 ->limit(10)
                 ->get(),
@@ -233,7 +224,7 @@ class UserActivityController extends Controller
     /**
      * Admin: Get detailed activity for a specific user.
      */
-    public function adminUserDetail(Request $request, User $user): JsonResponse
+    public function adminUserDetail(Request $request, User $user)
     {
         $days = (int) $request->input('days', 30);
 
