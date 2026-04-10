@@ -40,9 +40,11 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between h-20">
                             <div className="flex items-center space-x-3">
-                                <div className="w-12 h-12 bg-gradient-to-br from-lime-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
-                                    <span className="text-2xl font-bold text-white">G</span>
-                                </div>
+                                <img
+                                    src="/img/logo-garate.png"
+                                    alt="Garate Logo"
+                                    className="w-12 h-12 object-contain drop-shadow-lg"
+                                />
                                 <div>
                                     <h1 className="text-2xl font-bold text-white">Gárate</h1>
                                     <p className="text-xs text-green-200">Portal Corporativo</p>

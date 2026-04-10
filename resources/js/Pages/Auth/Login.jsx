@@ -23,7 +23,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <>
-            <Head title="Iniciar Sesión - GreenEx" />
+            <Head title="Iniciar Sesión - Gárate " />
 
             <div className="relative min-h-screen flex overflow-hidden bg-gray-100">
                 {/* Animated Background */}
@@ -38,10 +38,12 @@ export default function Login({ status, canResetPassword }) {
                     <div className="flex flex-col justify-center items-center p-12 text-white">
                         {/* Logo */}
                         <div className="mb-12 text-center">
-                            <div className="w-24 h-24 bg-gradient-to-br from-lime-400 to-green-500 rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-6 transform hover:rotate-12 transition-transform duration-300">
-                                <span className="text-5xl font-bold text-white">G</span>
-                            </div>
-                            <h1 className="text-5xl font-bold mb-4">GreenEx</h1>
+                            <img
+                                src="/img/logo-garate.png"
+                                alt="Garate Logo"
+                                className="h-32 w-auto mx-auto mb-6 drop-shadow-2xl transform hover:scale-105 transition-transform duration-300"
+                            />
+                            <h1 className="text-5xl font-bold mb-4">Gárate</h1>
                             <p className="text-green-200 text-lg">Portal Corporativo Intranet</p>
                         </div>
 
@@ -87,7 +89,7 @@ export default function Login({ status, canResetPassword }) {
                         {/* Footer */}
                         <div className="mt-12 text-center">
                             <p className="text-green-200 text-sm">
-                                © {new Date().getFullYear()} GreenEx • Diseñado con 💚 para nuestros colaboradores
+                                © {new Date().getFullYear()} Gárate • Diseñado con 💚 para nuestros colaboradores
                             </p>
                         </div>
                     </div>
@@ -98,9 +100,11 @@ export default function Login({ status, canResetPassword }) {
                     <div className="w-full max-w-md">
                         {/* Mobile Logo */}
                         <div className="lg:hidden text-center mb-8">
-                            <div className="w-16 h-16 bg-gradient-to-br from-lime-400 to-green-500 rounded-xl flex items-center justify-center shadow-xl mx-auto mb-4">
-                                <span className="text-3xl font-bold text-white">G</span>
-                            </div>
+                            <img
+                                src="/img/logo-garate.png"
+                                alt="Garate Logo"
+                                className="h-20 w-auto mx-auto mb-4 drop-shadow-xl"
+                            />
                             <h1 className="text-2xl font-bold text-gray-900">GreenEx</h1>
                             <p className="text-gray-600">Portal Corporativo</p>
                         </div>
