@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrganizationalUnit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -96,5 +97,74 @@ class OrganizationalUnitController extends Controller
 
         return redirect()->route('organizational-units.index')
             ->with('success', 'Unidad organizacional eliminada exitosamente.');
+    }
+
+    public function assignMembers(OrganizationalUnit $organizationalUnit)
+    {
+        $unit = $organizationalUnit->load(['users', 'children']);
+
+        // Get all users not in this unit
+        $availableUsers = User::where(function($query) use ($organizationalUnit) {
+            $query->where('organizational_unit_id', '!=', $organizationalUnit->id)
+                  ->orWhereNull('organizational_unit_id');
+        })
+        ->orderBy('name')
+        ->get(['id', 'name', 'email', 'department', 'position', 'organizational_unit_id']);
+
+        // Get all units for potential transfers
+        $allUnits = OrganizationalUnit::active()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return Inertia::render('OrganizationalUnits/AssignMembers', [
+            'unit' => $unit,
+            'availableUsers' => $availableUsers,
+            'allUnits' => $allUnits,
+        ]);
+    }
+
+    public function updateMembers(Request $request, OrganizationalUnit $organizationalUnit)
+    {
+        $validated = $request->validate([
+            'user_ids' => ['required', 'array'],
+            'user_ids.*' => ['exists:users,id'],
+        ]);
+
+        // Remove all users from this unit first
+        User::where('organizational_unit_id', $organizationalUnit->id)
+            ->update(['organizational_unit_id' => null]);
+
+        // Assign selected users to this unit
+        if (!empty($validated['user_ids'])) {
+            User::whereIn('id', $validated['user_ids'])
+                ->update(['organizational_unit_id' => $organizationalUnit->id]);
+        }
+
+        return redirect()->route('organizational-units.index')
+            ->with('success', 'Miembros asignados exitosamente.');
+    }
+
+    public function bulkAssignMembers(Request $request)
+    {
+        $validated = $request->validate([
+            'unit_id' => ['required', 'exists:organizational_units,id'],
+            'user_ids' => ['required', 'array'],
+            'user_ids.*' => ['exists:users,id'],
+        ]);
+
+        $unit = OrganizationalUnit::findOrFail($validated['unit_id']);
+
+        // Remove users from this unit
+        User::where('organizational_unit_id', $unit->id)
+            ->update(['organizational_unit_id' => null]);
+
+        // Assign selected users
+        if (!empty($validated['user_ids'])) {
+            User::whereIn('id', $validated['user_ids'])
+                ->update(['organizational_unit_id' => $unit->id]);
+        }
+
+        return redirect()->route('organizational-units.index')
+            ->with('success', 'Miembros asignados a ' . $unit->name . ' exitosamente.');
     }
 }

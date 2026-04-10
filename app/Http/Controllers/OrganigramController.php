@@ -11,7 +11,8 @@ class OrganigramController extends Controller
 {
     public function index()
     {
-        $units = OrganizationalUnit::with(['children', 'users'])
+        // Load all nested children recursively
+        $units = OrganizationalUnit::with(['children.children.children.children.children', 'users'])
             ->active()
             ->root()
             ->orderBy('sort_order')
@@ -22,9 +23,15 @@ class OrganigramController extends Controller
             ->get()
             ->groupBy('organizational_unit_id');
 
+        // Count unassigned users
+        $unassignedCount = User::where('is_directory_visible', true)
+            ->whereNull('organizational_unit_id')
+            ->count();
+
         return Inertia::render('Organigram/Index', [
             'units' => $units,
             'users' => $users,
+            'unassignedCount' => $unassignedCount,
         ]);
     }
 }

@@ -1,9 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Index({ units }) {
     const [filter, setFilter] = useState('all');
+    const [assignMenuOpen, setAssignMenuOpen] = useState(false);
+    const assignMenuRef = useRef(null);
 
     const filteredUnits = (units || []).filter((unit) => {
         if (filter === 'active') return unit.is_active;
@@ -26,6 +28,20 @@ export default function Index({ units }) {
     const activeCount = (units || []).filter((u) => u.is_active).length;
     const inactiveCount = (units || []).filter((u) => !u.is_active).length;
 
+    const activeUnits = (units || []).filter(u => u.is_active);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (assignMenuRef.current && !assignMenuRef.current.contains(event.target)) {
+                setAssignMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <AuthenticatedLayout
             header={
@@ -33,12 +49,58 @@ export default function Index({ units }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Unidades Organizacionales
                     </h2>
-                    <Link
-                        href={route('organizational-units.create')}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
-                    >
-                        Nueva Unidad
-                    </Link>
+                    <div className="flex gap-2">
+                        {/* Assign Members Dropdown */}
+                        <div className="relative" ref={assignMenuRef}>
+                            <button
+                                onClick={() => setAssignMenuOpen(!assignMenuOpen)}
+                                className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
+                            >
+                                Asignar Miembros
+                                <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {assignMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50 border border-gray-200">
+                                    <div className="py-2 px-3 border-b border-gray-200">
+                                        <h3 className="text-sm font-semibold text-gray-900">Selecciona una unidad</h3>
+                                    </div>
+                                    <div className="max-h-80 overflow-y-auto py-2">
+                                        {activeUnits.length === 0 ? (
+                                            <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                                                No hay unidades activas
+                                            </div>
+                                        ) : (
+                                            activeUnits
+                                                .sort((a, b) => a.sort_order - b.sort_order)
+                                                .map((unit) => (
+                                                    <Link
+                                                        key={unit.id}
+                                                        href={route('organizational-units.assign-members', unit.id)}
+                                                        className="block px-4 py-2 hover:bg-blue-50 transition-colors"
+                                                        onClick={() => setAssignMenuOpen(false)}
+                                                    >
+                                                        <div className="text-sm font-medium text-gray-900">{unit.name}</div>
+                                                        {unit.description && (
+                                                            <div className="text-xs text-gray-500 truncate">{unit.description}</div>
+                                                        )}
+                                                    </Link>
+                                                ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <Link
+                            href={route('organizational-units.create')}
+                            className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
+                        >
+                            Nueva Unidad
+                        </Link>
+                    </div>
                 </div>
             }
         >
@@ -140,6 +202,12 @@ export default function Index({ units }) {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                                    <Link
+                                                        href={route('organizational-units.assign-members', unit.id)}
+                                                        className="text-blue-600 hover:text-blue-700 font-medium"
+                                                    >
+                                                        Asignar
+                                                    </Link>
                                                     <Link
                                                         href={route('organizational-units.edit', unit.id)}
                                                         className="text-green-600 hover:text-green-700"

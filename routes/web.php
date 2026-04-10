@@ -88,6 +88,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Phase 2: Portal admin routes
         Route::resource('organizational-units', OrganizationalUnitController::class);
+        Route::get('organizational-units/{organizationalUnit}/assign-members', [OrganizationalUnitController::class, 'assignMembers'])
+            ->name('organizational-units.assign-members');
+        Route::post('organizational-units/{organizationalUnit}/update-members', [OrganizationalUnitController::class, 'updateMembers'])
+            ->name('organizational-units.update-members');
+        Route::post('organizational-units/bulk-assign-members', [OrganizationalUnitController::class, 'bulkAssignMembers'])
+            ->name('organizational-units.bulk-assign-members');
         Route::resource('onboarding-stages', OnboardingStageAdminController::class);
         Route::resource('onboarding-tasks', OnboardingTaskAdminController::class);
 
