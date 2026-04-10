@@ -246,9 +246,11 @@ export default function Show({ post, relatedPosts }) {
                 <footer className="bg-gray-900 text-white py-8">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <div className="flex items-center justify-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-lg flex items-center justify-center">
-                                <span className="text-xl font-bold text-white">G</span>
-                            </div>
+                            <img
+                                src="/img/logo-garate.png"
+                                alt="Garate Logo"
+                                className="w-10 h-10 object-contain"
+                            />
                             <span className="text-xl font-bold">Gárate</span>
                         </div>
                         <p className="text-gray-400 text-sm">

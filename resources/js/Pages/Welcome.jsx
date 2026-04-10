@@ -402,9 +402,11 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                 <footer className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10 bg-black/20 backdrop-blur-md">
                     <div className="max-w-7xl mx-auto text-center">
                         <div className="flex items-center justify-center space-x-3 mb-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-lg flex items-center justify-center">
-                                <span className="text-xl font-bold text-white">G</span>
-                            </div>
+                            <img
+                                src="/img/logo-garate.png"
+                                alt="Garate Logo"
+                                className="w-10 h-10 object-contain"
+                            />
                             <span className="text-xl font-bold text-white">Gárate</span>
                         </div>
                         <p className="text-green-200 text-sm mb-2">
