@@ -25,7 +25,7 @@ export default function Show({ post, relatedPosts }) {
 
     return (
         <>
-            <Head title={`${post.title} - GreenEx Intranet`} />
+            <Head title={`${post.title} - Gárate Intranet`} />
 
             <div className="min-h-screen bg-gray-50">
                 {/* Hero Image */}
@@ -36,7 +36,7 @@ export default function Show({ post, relatedPosts }) {
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                    
+
                     {/* Content overlay */}
                     <div className="absolute bottom-0 left-0 right-0 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                         {post.category && (
@@ -81,8 +81,8 @@ export default function Show({ post, relatedPosts }) {
                                         {post.excerpt}
                                     </p>
                                 )}
-                                
-                                <div 
+
+                                <div
                                     className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-a:no-underline hover:prose-a:underline"
                                     dangerouslySetInnerHTML={{ __html: post.content }}
                                 />
@@ -249,10 +249,10 @@ export default function Show({ post, relatedPosts }) {
                             <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-lg flex items-center justify-center">
                                 <span className="text-xl font-bold text-white">G</span>
                             </div>
-                            <span className="text-xl font-bold">GreenEx</span>
+                            <span className="text-xl font-bold">Gárate</span>
                         </div>
                         <p className="text-gray-400 text-sm">
-                            © {new Date().getFullYear()} GreenEx Intranet • Portal Corporativo
+                            © {new Date().getFullYear()} Gárate Intranet • Portal Corporativo
                         </p>
                     </div>
                 </footer>

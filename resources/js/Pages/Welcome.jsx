@@ -24,7 +24,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
 
     return (
         <>
-            <Head title="GreenEx Intranet - Portal Corporativo" />
+            <Head title="Gárate Intranet - Portal Corporativo" />
 
             <div className="min-h-screen relative overflow-hidden bg-gray-50">
                 {/* Animated Background */}
@@ -44,7 +44,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                                     <span className="text-2xl font-bold text-white">G</span>
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">GreenEx</h1>
+                                    <h1 className="text-2xl font-bold text-white">Gárate</h1>
                                     <p className="text-xs text-green-200">Portal Corporativo</p>
                                 </div>
                             </div>
@@ -403,7 +403,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                             <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-lg flex items-center justify-center">
                                 <span className="text-xl font-bold text-white">G</span>
                             </div>
-                            <span className="text-xl font-bold text-white">GreenEx</span>
+                            <span className="text-xl font-bold text-white">Gárate</span>
                         </div>
                         <p className="text-green-200 text-sm mb-2">
                             Portal Corporativo Intranet © {new Date().getFullYear()}
