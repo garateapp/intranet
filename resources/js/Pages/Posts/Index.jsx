@@ -9,7 +9,7 @@ export default function Index({ posts, categories, filters }) {
 
     function handleFilter(e) {
         e.preventDefault();
-        router.get(route('posts.index'), {
+        router.get(route('admin.posts.index'), {
             search,
             status,
             category_id: categoryId,
@@ -18,7 +18,7 @@ export default function Index({ posts, categories, filters }) {
 
     function handleDelete(id) {
         if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
-            router.delete(route('posts.destroy', id));
+            router.delete(route('admin.posts.destroy', id));
         }
     }
 
@@ -38,7 +38,7 @@ export default function Index({ posts, categories, filters }) {
                         Publicaciones
                     </h2>
                     <Link
-                        href={route('posts.create')}
+                        href={route('admin.posts.create')}
                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                     >
                         Nueva Publicación
@@ -127,13 +127,14 @@ export default function Index({ posts, categories, filters }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Autor</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Publicado</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visibilidad</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
                                         {posts.data.length === 0 ? (
                                             <tr>
-                                                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                                                <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
                                                     No posts found.
                                                 </td>
                                             </tr>
@@ -181,15 +182,29 @@ export default function Index({ posts, categories, filters }) {
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                         {post.published_at ? formatDate(post.published_at) : '-'}
                                                     </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {post.show_in_dashboard && (
+                                                                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                                                                    Logueados
+                                                                </span>
+                                                            )}
+                                                            {post.show_in_public && (
+                                                                <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                                                    Público
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                         <Link
-                                                            href={route('posts.edit', post.id)}
+                                                            href={route('admin.posts.edit', post.slug)}
                                                             className="text-green-600 hover:text-green-900"
                                                         >
                                                             Editar
                                                         </Link>
                                                         <button
-                                                            onClick={() => handleDelete(post.id)}
+                                                            onClick={() => handleDelete(post.slug)}
                                                             className="text-red-600 hover:text-red-900"
                                                         >
                                                             Eliminar

@@ -12,8 +12,10 @@ export default function Edit({ post: currentPost, categories }) {
         content: currentPost.content || '',
         category_id: currentPost.category_id ? String(currentPost.category_id) : '',
         status: currentPost.status || 'draft',
-        is_featured: currentPost.is_featured ? '1' : '0',
-        is_pinned: currentPost.is_pinned ? '1' : '0',
+        is_featured: Boolean(currentPost.is_featured),
+        is_pinned: Boolean(currentPost.is_pinned),
+        show_in_public: currentPost.show_in_public ?? true,
+        show_in_dashboard: currentPost.show_in_dashboard ?? true,
         published_at: currentPost.published_at ? new Date(currentPost.published_at).toISOString().slice(0, 16) : '',
         tags: Array.isArray(currentPost.tags) ? currentPost.tags.join(', ') : '',
         featured_image: null,
@@ -22,15 +24,12 @@ export default function Edit({ post: currentPost, categories }) {
     function handleSubmit(e) {
         e.preventDefault();
 
-        console.log('Submitting form with data:', data);
-
         if (!data.content || data.content.trim() === '' || data.content === '<p></p>') {
             alert('El contenido no puede estar vacío');
             return;
         }
 
-        // Use router.post with FormData to ensure proper data transmission
-        router.post(route('posts.update', currentPost.id), {
+        router.post(route('admin.posts.update', currentPost.slug), {
             _method: 'PUT',
             title: data.title,
             excerpt: data.excerpt || '',
@@ -39,18 +38,14 @@ export default function Edit({ post: currentPost, categories }) {
             status: data.status,
             is_featured: data.is_featured,
             is_pinned: data.is_pinned,
+            show_in_public: data.show_in_public,
+            show_in_dashboard: data.show_in_dashboard,
             published_at: data.published_at || null,
             tags: data.tags || '',
             featured_image: data.featured_image,
         }, {
             forceFormData: true,
             preserveScroll: true,
-            onSuccess: () => {
-                console.log('Update successful');
-            },
-            onError: (errors) => {
-                console.error('Validation errors:', errors);
-            },
         });
     }
 
@@ -103,10 +98,7 @@ export default function Edit({ post: currentPost, categories }) {
                                     <div className="mt-1">
                                         <RichTextEditor
                                             value={data.content}
-                                            onChange={(content) => {
-                                                console.log('RichTextEditor onChange called, content length:', content?.length);
-                                                setData('content', content);
-                                            }}
+                                            onChange={(content) => setData('content', content)}
                                             placeholder="Start writing your post content..."
                                         />
                                     </div>
@@ -203,7 +195,30 @@ export default function Edit({ post: currentPost, categories }) {
                                 </div>
 
                                 {/* Options */}
-                                <div className="flex space-x-4">
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap gap-4">
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.show_in_dashboard}
+                                                onChange={(e) => setData('show_in_dashboard', e.target.checked)}
+                                                className="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                            />
+                                            <span className="ms-2 text-sm text-gray-600">Visible para logueados</span>
+                                        </label>
+
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.show_in_public}
+                                                onChange={(e) => setData('show_in_public', e.target.checked)}
+                                                className="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                            />
+                                            <span className="ms-2 text-sm text-gray-600">Visible en la parte pública</span>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-4">
                                     <label className="flex items-center">
                                         <input
                                             type="checkbox"
@@ -223,12 +238,13 @@ export default function Edit({ post: currentPost, categories }) {
                                         />
                                         <span className="ms-2 text-sm text-gray-600">Pinned</span>
                                     </label>
+                                    </div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex items-center justify-end space-x-4">
                                     <Link
-                                        href={route('posts.index')}
+                                        href={route('admin.posts.index')}
                                         className="text-gray-600 hover:text-gray-900"
                                     >
                                         Cancel

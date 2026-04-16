@@ -22,6 +22,8 @@ class Post extends Model
         'status',
         'is_pinned',
         'is_featured',
+        'show_in_public',
+        'show_in_dashboard',
         'published_at',
         'views',
         'tags',
@@ -31,6 +33,8 @@ class Post extends Model
         'tags' => 'array',
         'is_pinned' => 'boolean',
         'is_featured' => 'boolean',
+        'show_in_public' => 'boolean',
+        'show_in_dashboard' => 'boolean',
         'published_at' => 'datetime',
         'views' => 'integer',
     ];
@@ -87,6 +91,16 @@ class Post extends Model
     public function scopePinned($query)
     {
         return $query->where('is_pinned', true);
+    }
+
+    public function scopeVisibleInPublic($query)
+    {
+        return $query->where('show_in_public', true);
+    }
+
+    public function scopeVisibleInDashboard($query)
+    {
+        return $query->where('show_in_dashboard', true);
     }
 
     public function getRouteKeyName()

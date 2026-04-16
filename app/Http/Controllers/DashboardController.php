@@ -22,6 +22,7 @@ class DashboardController extends Controller
     {
         $featuredPosts = Post::with(['user', 'category'])
             ->published()
+            ->visibleInPublic()
             ->featured()
             ->latest('published_at')
             ->take(3)
@@ -29,6 +30,7 @@ class DashboardController extends Controller
 
         $pinnedPosts = Post::with(['user', 'category'])
             ->published()
+            ->visibleInPublic()
             ->pinned()
             ->latest('published_at')
             ->take(5)
@@ -36,6 +38,7 @@ class DashboardController extends Controller
 
         $recentPosts = Post::with(['user', 'category'])
             ->published()
+            ->visibleInPublic()
             ->latest('published_at')
             ->take(6)
             ->get();
@@ -82,6 +85,7 @@ class DashboardController extends Controller
         // Featured posts
         $featuredPosts = Post::with(['user', 'category'])
             ->published()
+            ->visibleInDashboard()
             ->where(function ($query) {
                 $query->where('is_featured', true)
                       ->orWhere('is_pinned', true);

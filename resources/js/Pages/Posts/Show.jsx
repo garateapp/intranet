@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
-export default function Show({ post, relatedPosts }) {
+export default function Show({ post, relatedPosts, isPublicView = true }) {
+    const authUser = usePage().props.auth?.user;
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -108,13 +109,13 @@ export default function Show({ post, relatedPosts }) {
                             {/* Back to posts */}
                             <div className="mt-6">
                                 <Link
-                                    href={route('welcome')}
+                                    href={authUser ? route('dashboard') : route('welcome')}
                                     className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium transition-colors"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                     </svg>
-                                    Volver al inicio
+                                    {authUser ? 'Volver al dashboard' : 'Volver al inicio'}
                                 </Link>
                             </div>
                         </article>
@@ -183,6 +184,15 @@ export default function Show({ post, relatedPosts }) {
                                     </button>
                                 </div>
                             </div>
+
+                            <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
+                                <h3 className="text-lg font-bold text-gray-900 mb-3">Acceso</h3>
+                                <p className="text-sm text-gray-600">
+                                    {isPublicView
+                                        ? 'Esta noticia esta disponible en la parte publica de la aplicacion.'
+                                        : 'Esta noticia es visible solo para personas autenticadas.'}
+                                </p>
+                            </div>
                         </aside>
                     </div>
                 </div>
@@ -198,7 +208,7 @@ export default function Show({ post, relatedPosts }) {
                                 {relatedPosts.map((relatedPost) => (
                                     <Link
                                         key={relatedPost.id}
-                                        href={route('posts.show', relatedPost.slug)}
+                                        href={route('public.posts.show', relatedPost.slug)}
                                         className="group block bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
                                     >
                                         <div className="h-40 overflow-hidden relative">

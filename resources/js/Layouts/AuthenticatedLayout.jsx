@@ -133,7 +133,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown>
                                         <Dropdown.Trigger>
                                             <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                                route().current('users.*') || route().current('posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
+                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
                                                     ? 'text-gray-900 border-b-2 border-orange-500'
                                                     : 'text-orange-600 hover:text-orange-700'
                                             }`}>
@@ -153,7 +153,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                             <div class="border-t border-gray-100 my-1"></div>
                                             <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Contenidos</div>
-                                            <Dropdown.Link href={route('posts.index')}>
+                                            <Dropdown.Link href={route('admin.posts.index')}>
                                                 <div className="flex items-center gap-2">
                                                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
                                                     Publicaciones
@@ -364,7 +364,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('users.index')} active={route().current('users.*')}>
                                     <span className="flex items-center gap-1">Usuarios <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-800 rounded">Admin</span></span>
                                 </ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('posts.index')} active={route().current('posts.*')}>Publicaciones</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.posts.index')} active={route().current('admin.posts.*')}>Publicaciones</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('categories.index')} active={route().current('categories.*')}>Categorías</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('links.index')} active={route().current('links.*')}>Enlaces</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('settings.index')} active={route().current('settings.index')}>Configuración</ResponsiveNavLink>

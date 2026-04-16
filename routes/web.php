@@ -36,7 +36,7 @@ use Inertia\Inertia;
 
 // Public routes
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
-Route::get('/noticia/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/noticia/{post:slug}', [PostController::class, 'show'])->name('public.posts.show');
 
 // Google OAuth routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -75,7 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin-only resource routes
     Route::middleware(['admin'])->group(function () {
-        Route::resource('posts', PostController::class);
+        Route::resource('posts', PostController::class)->except(['show'])->names('admin.posts');
         Route::resource('categories', CategoryController::class);
         Route::resource('links', LinkController::class);
         Route::resource('settings', SettingController::class)->except(['show']);

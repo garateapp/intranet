@@ -72,6 +72,8 @@ class PostController extends Controller
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
             'is_pinned' => 'boolean',
+            'show_in_public' => 'boolean',
+            'show_in_dashboard' => 'boolean',
             'published_at' => 'nullable|date',
             'tags' => 'nullable|string',
             'featured_image' => 'nullable|image|max:2048',
@@ -81,6 +83,8 @@ class PostController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
         $validated['is_featured'] = $validated['is_featured'] ?? false;
         $validated['is_pinned'] = $validated['is_pinned'] ?? false;
+        $validated['show_in_public'] = $validated['show_in_public'] ?? false;
+        $validated['show_in_dashboard'] = $validated['show_in_dashboard'] ?? false;
 
         // Parse tags if provided
         if (!empty($validated['tags'])) {
@@ -99,26 +103,27 @@ class PostController extends Controller
 
         Post::create($validated);
 
-        return redirect()->route('posts.index')
+        return redirect()->route('admin.posts.index')
             ->with('success', 'Post created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)
+    public function show(Post $post)
     {
-        $slug = $request->route('post');
+        $canAccessInternalPost = auth()->check() && $post->show_in_dashboard;
 
-        $post = Post::where('slug', $slug)
-            ->with(['user', 'category'])
-            ->firstOrFail();
+        abort_unless($post->show_in_public || $canAccessInternalPost, 404);
+
+        $post->load(['user', 'category']);
 
         $post->incrementViews();
 
         // Get related posts
         $relatedPosts = Post::with(['user', 'category'])
             ->published()
+            ->visibleInPublic()
             ->where('id', '!=', $post->id)
             ->where('category_id', $post->category_id)
             ->latest('published_at')
@@ -128,6 +133,7 @@ class PostController extends Controller
         if ($relatedPosts->count() < 3) {
             $morePosts = Post::with(['user', 'category'])
                 ->published()
+                ->visibleInPublic()
                 ->where('id', '!=', $post->id)
                 ->whereNotIn('id', $relatedPosts->pluck('id'))
                 ->latest('published_at')
@@ -139,6 +145,7 @@ class PostController extends Controller
         return Inertia::render('Posts/Show', [
             'post' => $post,
             'relatedPosts' => $relatedPosts,
+            'isPublicView' => ! $canAccessInternalPost,
         ]);
     }
 
@@ -168,6 +175,8 @@ class PostController extends Controller
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
             'is_pinned' => 'boolean',
+            'show_in_public' => 'boolean',
+            'show_in_dashboard' => 'boolean',
             'published_at' => 'nullable|date',
             'tags' => 'nullable|string',
             'featured_image' => 'nullable|image|max:2048',
@@ -176,6 +185,8 @@ class PostController extends Controller
         $validated['slug'] = Str::slug($validated['title']);
         $validated['is_featured'] = $validated['is_featured'] ?? false;
         $validated['is_pinned'] = $validated['is_pinned'] ?? false;
+        $validated['show_in_public'] = $validated['show_in_public'] ?? false;
+        $validated['show_in_dashboard'] = $validated['show_in_dashboard'] ?? false;
 
         // Parse tags if provided
         if (!empty($validated['tags'])) {
@@ -201,7 +212,7 @@ class PostController extends Controller
 
         $post->update($validated);
 
-        return redirect()->route('posts.index')
+        return redirect()->route('admin.posts.index')
             ->with('success', 'Post updated successfully.');
     }
 
@@ -217,7 +228,7 @@ class PostController extends Controller
 
         $post->delete();
 
-        return redirect()->route('posts.index')
+        return redirect()->route('admin.posts.index')
             ->with('success', 'Post deleted successfully.');
     }
 }

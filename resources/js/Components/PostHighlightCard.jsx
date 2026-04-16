@@ -12,7 +12,7 @@ export default function PostHighlightCard({ post }) {
 
     return (
         <Link
-            href={route('posts.show', { post: post.slug })}
+            href={route('public.posts.show', { post: post.slug })}
             className="group block rounded-lg border border-gray-200 bg-white p-5 transition-all duration-200 hover:shadow-md hover:border-green-300"
         >
             <div className="flex items-start justify-between gap-4">

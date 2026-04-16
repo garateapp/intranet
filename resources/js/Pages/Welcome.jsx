@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import PublicPostsCarousel from '@/Components/PublicPostsCarousel';
 
 export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts, activeLinks, categories }) {
     const formatDate = (date) => {
@@ -122,92 +123,24 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                     </div>
                 </section>
 
-                {/* Featured Post - Hero Style */}
+                {/* Public Posts Carousel */}
                 {featuredPosts && featuredPosts.length > 0 && (
                     <section className="relative z-10 pb-16 px-4 sm:px-6 lg:px-8">
                         <div className="max-w-7xl mx-auto">
-                            {/* Main Featured Post */}
-                            <div className="group relative overflow-hidden rounded-2xl shadow-2xl mb-8">
-                                <img
-                                    src={getImageUrl(featuredPosts[0])}
-                                    alt={featuredPosts[0].title}
-                                    className="w-full h-[500px] object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-                                <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <span
-                                            className="px-4 py-1.5 text-sm font-bold text-white rounded-full"
-                                            style={{ backgroundColor: featuredPosts[0].category?.color || '#038c34' }}
-                                        >
-                                            {featuredPosts[0].category?.name || 'Noticia'}
-                                        </span>
-                                        {featuredPosts[0].is_pinned && (
-                                            <span className="px-4 py-1.5 bg-orange-500 text-white text-sm font-bold rounded-full">
-                                                📌 Destacado
-                                            </span>
-                                        )}
-                                    </div>
-                                    <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 line-clamp-2">
-                                        {featuredPosts[0].title}
+                            <div className="mb-6 flex items-end justify-between gap-4">
+                                <div>
+                                    <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                                        Noticias Destacadas
                                     </h3>
-                                    <p className="text-green-100 text-lg mb-4 line-clamp-3 max-w-3xl">
-                                        {featuredPosts[0].excerpt}
-                                    </p>
-                                    <div className="flex items-center gap-3 text-green-200 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-gradient-to-br from-lime-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
-                                                {getInitials(featuredPosts[0].user?.name || 'U')}
-                                            </div>
-                                            <span>{featuredPosts[0].user?.name}</span>
-                                        </div>
-                                        <span>•</span>
-                                        <span>{formatDate(featuredPosts[0].published_at)}</span>
-                                    </div>
+                                    <p className="text-green-200">Actualizaciones visibles para toda la organización</p>
                                 </div>
                             </div>
-
-                            {/* Secondary Featured Posts */}
-                            {featuredPosts.length > 1 && (
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    {featuredPosts.slice(1).map((post) => (
-                                        <div key={post.id} className="group relative overflow-hidden rounded-xl shadow-xl">
-                                            <img
-                                                src={getImageUrl(post)}
-                                                alt={post.title}
-                                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-                                            <div className="absolute bottom-0 left-0 right-0 p-6">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <span
-                                                        className="px-3 py-1 text-xs font-bold text-white rounded-full"
-                                                        style={{ backgroundColor: post.category?.color || '#038c34' }}
-                                                    >
-                                                        {post.category?.name || 'Noticia'}
-                                                    </span>
-                                                </div>
-                                                <h4 className="text-xl font-bold text-white mb-2 line-clamp-2">
-                                                    {post.title}
-                                                </h4>
-                                                <p className="text-green-100 text-sm line-clamp-2 mb-3">
-                                                    {post.excerpt}
-                                                </p>
-                                                <div className="flex items-center gap-2 text-green-200 text-xs">
-                                                    <div className="flex items-center gap-1">
-                                                        <div className="w-6 h-6 bg-gradient-to-br from-lime-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                                                            {getInitials(post.user?.name || 'U')}
-                                                        </div>
-                                                        <span>{post.user?.name}</span>
-                                                    </div>
-                                                    <span>•</span>
-                                                    <span>{formatDate(post.published_at)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            <PublicPostsCarousel
+                                posts={featuredPosts}
+                                formatDate={formatDate}
+                                getImageUrl={getImageUrl}
+                                getInitials={getInitials}
+                            />
                         </div>
                     </section>
                 )}
@@ -227,9 +160,10 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
 
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {pinnedPosts.map((post) => (
-                                    <div
+                                    <Link
                                         key={post.id}
-                                        className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                                        href={route('public.posts.show', { post: post.slug })}
+                                        className="group block bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
                                     >
                                         <div className="relative h-48 overflow-hidden">
                                             <img
@@ -270,7 +204,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                                                 <span>{formatDate(post.published_at)}</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -353,9 +287,10 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
 
                             <div className="grid md:grid-cols-3 gap-6">
                                 {recentPosts.map((post) => (
-                                    <div
+                                    <Link
                                         key={post.id}
-                                        className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                                        href={route('public.posts.show', { post: post.slug })}
+                                        className="group block bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
                                     >
                                         <div className="relative h-48 overflow-hidden">
                                             <img
@@ -391,7 +326,7 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                                                 <span>{formatDate(post.published_at || post.created_at)}</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>

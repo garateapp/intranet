@@ -14,6 +14,8 @@ export default function Create({ categories }) {
         status: 'draft',
         is_featured: false,
         is_pinned: false,
+        show_in_public: true,
+        show_in_dashboard: true,
         published_at: '',
         tags: '',
         featured_image: null,
@@ -21,7 +23,7 @@ export default function Create({ categories }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        post(route('posts.store'), {
+        post(route('admin.posts.store'), {
             onSuccess: () => reset(),
         });
     }
@@ -162,7 +164,30 @@ export default function Create({ categories }) {
                                 </div>
 
                                 {/* Options */}
-                                <div className="flex space-x-4">
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap gap-4">
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.show_in_dashboard}
+                                                onChange={(e) => setData('show_in_dashboard', e.target.checked)}
+                                                className="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                            />
+                                            <span className="ms-2 text-sm text-gray-600">Visible para logueados</span>
+                                        </label>
+
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.show_in_public}
+                                                onChange={(e) => setData('show_in_public', e.target.checked)}
+                                                className="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                            />
+                                            <span className="ms-2 text-sm text-gray-600">Visible en la parte pública</span>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-4">
                                     <label className="flex items-center">
                                         <input
                                             type="checkbox"
@@ -182,12 +207,13 @@ export default function Create({ categories }) {
                                         />
                                         <span className="ms-2 text-sm text-gray-600">Pinned</span>
                                     </label>
+                                    </div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex items-center justify-end space-x-4">
                                     <Link
-                                        href={route('posts.index')}
+                                        href={route('admin.posts.index')}
                                         className="text-gray-600 hover:text-gray-900"
                                     >
                                         Cancel

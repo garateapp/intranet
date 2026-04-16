@@ -4,7 +4,6 @@ import PortalHero from '@/Components/PortalHero';
 import PortalSection from '@/Components/PortalSection';
 import GlobalSearchBar from '@/Components/GlobalSearchBar';
 import QuickLinksGrid from '@/Components/QuickLinksGrid';
-import PostHighlightCard from '@/Components/PostHighlightCard';
 import PeopleCard from '@/Components/PeopleCard';
 import EventsList from '@/Components/EventsList';
 import HrPortalCard from '@/Components/HrPortalCard';
@@ -67,6 +66,94 @@ export default function Dashboard({
                         <GlobalSearchBar action={route('search.index')} />
                     </PortalSection>
 
+                    {/* Featured Posts */}
+                    {featuredPosts && featuredPosts.length > 0 && (
+                        <PortalSection
+                            title="Noticias Destacadas"
+                            subtitle="Mantente informado de las últimas novedades"
+                            action={
+                                featuredPosts[0] ? (
+                                    <Link
+                                        href={route('public.posts.show', { post: featuredPosts[0].slug })}
+                                        className="text-sm font-medium text-green-600 hover:text-green-700"
+                                    >
+                                        Abrir destacada →
+                                    </Link>
+                                ) : null
+                            }
+                        >
+                            <div className="carousel w-full rounded-2xl bg-gradient-to-br from-green-950 via-green-900 to-emerald-900 shadow-xl">
+                                {featuredPosts.map((post, index) => {
+                                    const slideId = `dashboard-post-slide-${post.id}`;
+                                    const prevId = `dashboard-post-slide-${featuredPosts[(index - 1 + featuredPosts.length) % featuredPosts.length].id}`;
+                                    const nextId = `dashboard-post-slide-${featuredPosts[(index + 1) % featuredPosts.length].id}`;
+
+                                    return (
+                                        <div
+                                            key={post.id}
+                                            id={slideId}
+                                            className="carousel-item relative w-full"
+                                        >
+                                            <div className="flex min-h-[260px] w-full flex-col justify-between px-6 py-8 md:min-h-[300px] md:px-10">
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        {post.category && (
+                                                            <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-green-50">
+                                                                {post.category}
+                                                            </span>
+                                                        )}
+                                                        {post.is_pinned && (
+                                                            <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                                                                Prioritario
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <h3 className="max-w-3xl text-2xl font-black leading-tight text-white md:text-4xl">
+                                                            {post.title}
+                                                        </h3>
+                                                        {post.excerpt && (
+                                                            <p className="max-w-2xl text-sm text-green-50/90 md:text-base">
+                                                                {post.excerpt}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                                                    <div className="text-sm text-green-100/90">
+                                                        {post.published_at && <span>{post.published_at}</span>}
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3">
+                                                        {featuredPosts.length > 1 && (
+                                                            <>
+                                                                <a href={`#${prevId}`} className="btn btn-circle btn-sm border-none bg-white/15 text-white hover:bg-white/25">
+                                                                    ❮
+                                                                </a>
+                                                                <a href={`#${nextId}`} className="btn btn-circle btn-sm border-none bg-white/15 text-white hover:bg-white/25">
+                                                                    ❯
+                                                                </a>
+                                                            </>
+                                                        )}
+
+                                                        <Link
+                                                            href={route('public.posts.show', { post: post.slug })}
+                                                            className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-green-800 transition hover:bg-lime-100"
+                                                        >
+                                                            Ver noticia
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </PortalSection>
+                    )}
+
                     {/* Quick Links */}
                     {quickLinks && quickLinks.length > 0 && (
                         <PortalSection
@@ -82,28 +169,6 @@ export default function Dashboard({
                             }
                         >
                             <QuickLinksGrid links={quickLinks} />
-                        </PortalSection>
-                    )}
-
-                    {/* Featured Posts */}
-                    {featuredPosts && featuredPosts.length > 0 && (
-                        <PortalSection
-                            title="Noticias Destacadas"
-                            subtitle="Mantente informado de las últimas novedades"
-                            action={
-                                <Link
-                                    href={route('posts.index')}
-                                    className="text-sm font-medium text-green-600 hover:text-green-700"
-                                >
-                                    Ver todas →
-                                </Link>
-                            }
-                        >
-                            <div className="space-y-3">
-                                {featuredPosts.map((post) => (
-                                    <PostHighlightCard key={post.id} post={post} />
-                                ))}
-                            </div>
                         </PortalSection>
                     )}
 
