@@ -99,7 +99,11 @@ class DashboardController extends Controller
                     'title' => $post->title,
                     'slug' => $post->slug,
                     'excerpt' => $post->excerpt,
-                    'category' => $post->category?->name,
+                    'featured_image' => $post->featured_image,
+                    'category' => $post->category ? [
+                        'name' => $post->category->name,
+                        'color' => $post->category->color,
+                    ] : null,
                     'published_at' => $post->published_at?->format('Y-m-d H:i:s'),
                     'is_pinned' => $post->is_pinned,
                 ];

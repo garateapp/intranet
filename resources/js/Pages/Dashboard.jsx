@@ -41,6 +41,17 @@ export default function Dashboard({
         };
         return colors[status] || 'bg-gray-100 text-gray-800';
     };
+
+    const getPostImageUrl = (post) => {
+        if (post.featured_image) {
+            return `/storage/${post.featured_image}`;
+        }
+
+        const color = post.category?.color?.replace('#', '') || '038c34';
+
+        return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23${color}'/%3E%3Cstop offset='1' stop-color='%23014622'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='64' fill='white' opacity='0.25'%3E${encodeURIComponent(post.category?.name || 'Noticia')}%3C/text%3E%3C/svg%3E`;
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="Inicio" />
@@ -94,12 +105,19 @@ export default function Dashboard({
                                             id={slideId}
                                             className="carousel-item relative w-full"
                                         >
-                                            <div className="flex min-h-[260px] w-full flex-col justify-between px-6 py-8 md:min-h-[300px] md:px-10">
+                                            <div className="relative min-h-[260px] w-full overflow-hidden md:min-h-[300px]">
+                                                <img
+                                                    src={getPostImageUrl(post)}
+                                                    alt={post.title}
+                                                    className="absolute inset-0 h-full w-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/35" />
+                                                <div className="relative flex h-full w-full flex-col justify-between px-6 py-8 md:px-10">
                                                 <div className="space-y-4">
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         {post.category && (
                                                             <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-green-50">
-                                                                {post.category}
+                                                                {post.category.name}
                                                             </span>
                                                         )}
                                                         {post.is_pinned && (
@@ -146,6 +164,7 @@ export default function Dashboard({
                                                         </Link>
                                                     </div>
                                                 </div>
+                                            </div>
                                             </div>
                                         </div>
                                     );
