@@ -109,24 +109,33 @@ Recommended JSON shape:
     {
       "name": "Greenex SpA",
       "slug": "greenex-spa",
-      "cost_centers": [
+      "roots": [
         {
-          "name": "Contabilidad, Tesoreria y Gestion",
-          "slug": "contabilidad-tesoreria-y-gestion",
-          "supervisors": [
+          "person": {
+            "key": "greenex-spa::12.463.824-0",
+            "name": "Romero Donoso Ivan Alejandro",
+            "rut": "12.463.824-0",
+            "position": "Gerente",
+            "sex": "M",
+            "cost_center": "Gerencia General",
+            "company": "Greenex SpA",
+            "supervisor_name": "Romero Donoso Ivan Alejandro"
+          },
+          "children": [
             {
-              "name": "Mario Alonso Yanez Arenas",
-              "people": [
-                {
-                  "name": "Alvarez Garcia Marcela Karina",
-                  "rut": "12.517.586-4",
-                  "position": "Jefa de Administracion",
-                  "sex": "F"
-                }
-              ]
+              "person": {
+                "key": "greenex-spa::14.334.328-6",
+                "name": "Yañez Arenas Mario Alonso",
+                "rut": "14.334.328-6",
+                "position": "Gerente de Administración y Finanzas",
+                "sex": "M",
+                "cost_center": "Gerencia Administración y Finanzas",
+                "company": "Greenex SpA",
+                "supervisor_name": "Romero Donoso Ivan Alejandro"
+              },
+              "children": []
             }
-          ],
-          "people_without_supervisor": []
+          ]
         }
       ]
     }
@@ -137,12 +146,13 @@ Recommended JSON shape:
 Key design choices:
 
 - top-level grouping is by company
-- second-level grouping is by cost center
-- within each cost center, people are grouped by supervisor name
-- supervisors are represented as group labels, not as linked internal users
-- if a supervisor value is missing or unmatched, the person is placed in `people_without_supervisor`
+- each company contains one or more root people nodes
+- hierarchy is built from `Nombre Supervisor`
+- identity must use a stable internal key based on company plus RUT, not only full name
+- if a person reports to themselves, they become a root node
+- if the supervisor is not found in the same company dataset, that person also becomes a root node
 
-This gives a stable, understandable hierarchy while preserving the information BUK exports.
+This gives a true person-based organigram instead of an area listing.
 
 ## Render Strategy
 
@@ -153,11 +163,10 @@ Instead:
 - load the single import marked `is_current`
 - return the parsed `snapshot_json` to Inertia
 - render companies as root sections
-- render cost centers as child blocks
-- render supervisor groups inside each cost center
-- render people cards under each supervisor group
+- render each company root as the top of a person tree
+- render each node recursively with its direct reports below it
 
-This structure maps directly to the CSV semantics without forcing an artificial recursive tree model.
+This structure matches the organigram semantics directly.
 
 ## UI and Navigation
 
@@ -173,14 +182,15 @@ Expected behavior:
 
 Visual hierarchy:
 
-- company card or banner
-- cost center panels beneath each company
-- supervisor headers inside each cost center
-- person badges or cards with:
+- company section or banner
+- one or more root person cards below the company header
+- recursive child rows beneath each person node
+- connector lines between each supervisor and their direct reports
+- person cards with:
   - full name
   - position
+  - optional cost center as metadata
   - optional RUT
-  - optional sex marker if design keeps it useful
 
 ### Admin Upload
 
@@ -248,7 +258,10 @@ Suggested service responsibilities:
 - read and validate header row
 - iterate over records
 - normalize key string fields
-- build company -> cost center -> supervisor -> people structure
+- build all person nodes first
+- connect nodes using supervisor relationships
+- detect roots by self-reference or missing supervisor
+- build company -> roots -> recursive children structure
 - return final snapshot and row count
 
 This keeps controllers thin and makes the transformation testable without HTTP concerns.
@@ -324,8 +337,9 @@ Service-level tests should verify:
 
 - header validation
 - grouping by company
-- grouping by cost center
-- grouping by supervisor inside each cost center
+- root creation for self-managed people
+- root creation when supervisor is missing
+- recursive parent-child connections
 - row counting
 
 ## Delivery Outcome
@@ -334,7 +348,7 @@ At the end of this work, the intranet will have:
 
 - an admin-only CSV upload flow for BUK organigrams
 - a persistent current organigram snapshot
-- a public organigram page rendered from that snapshot
+- a public organigram page rendered as a hierarchical person-based chart
 - full replacement semantics on every upload
 
-The resulting system matches the operational rule that the BUK CSV is the source of truth for the visible organizational chart.
+The resulting system matches the operational rule that the BUK CSV is the source of truth for the visible organizational chart and presents it as a true organigram.
