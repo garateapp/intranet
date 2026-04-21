@@ -33,7 +33,7 @@ class AdminOrganigramController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'file' => ['required', 'file', 'mimes:csv,txt'],
+            'file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'], // 10MB max
         ]);
 
         try {
@@ -41,7 +41,7 @@ class AdminOrganigramController extends Controller
         } catch (InvalidArgumentException $exception) {
             return back()->withErrors([
                 'file' => $exception->getMessage(),
-            ]);
+            ])->withInput();
         }
 
         DB::transaction(function () use ($request, $validated, $snapshot): void {
@@ -59,8 +59,16 @@ class AdminOrganigramController extends Controller
             ]);
         });
 
+        $warningMessage = '';
+        if (!empty($snapshot['source']['errors'])) {
+            $warningMessage = count($snapshot['source']['errors']) . ' errores encontrados durante la importación. ';
+        }
+        if (!empty($snapshot['source']['duplicates'])) {
+            $warningMessage .= count($snapshot['source']['duplicates']) . ' registros duplicados omitidos.';
+        }
+
         return redirect()
             ->route('admin.organigram.index')
-            ->with('success', 'Organigrama actualizado correctamente.');
+            ->with('success', 'Organigrama actualizado correctamente.'.($warningMessage ? ' '.$warningMessage : ''));
     }
 }

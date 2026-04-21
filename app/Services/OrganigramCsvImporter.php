@@ -61,10 +61,24 @@ class OrganigramCsvImporter
     private function buildSnapshot(array $rows): array
     {
         $companies = [];
+        $importErrors = [];
+        $duplicatedEntries = [];
 
-        foreach ($rows as $row) {
+        foreach ($rows as $index => $row) {
             $companyName = $this->normalizeText($row['Nombre Empresa']);
             $companyKey = Str::slug($companyName ?: 'sin-empresa');
+            $rut = $this->normalizeText($row['Rut']);
+            $name = $this->normalizeText($row['Nombre Completo']);
+
+            // Validación de datos vacíos o inconsistentes
+            if ($name === '') {
+                $importErrors[] = [
+                    'row' => $index + 2, // +2 porque cuenta desde 1 y hay header
+                    'error' => 'Nombre completo vacío',
+                    'data' => $row,
+                ];
+                continue;
+            }
 
             if (! isset($companies[$companyKey])) {
                 $companies[$companyKey] = [
@@ -75,18 +89,71 @@ class OrganigramCsvImporter
                 ];
             }
 
+            // Generar clave única para la persona
+            $personKey = $companyKey.'::'.($rut !== '' ? $rut : Str::slug($name));
+
+            // Detectar duplicados
+            if (isset($companies[$companyKey]['nodes'][$personKey])) {
+                $duplicatedEntries[] = [
+                    'row' => $index + 2,
+                    'name' => $name,
+                    'rut' => $rut,
+                ];
+                continue; // Saltar duplicados
+            }
+
             $person = $this->buildPerson($row, $companyName, $companyKey);
-            $companies[$companyKey]['nodes'][$person['key']] = [
+            $companies[$companyKey]['nodes'][$personKey] = [
                 'person' => $person,
                 'children' => [],
             ];
         }
 
-        $companies = array_values(array_map(function (array $company) {
+        $companies = array_values(array_map(function (array $company) use (&$importErrors, &$duplicatedEntries) {
             $keysByName = [];
 
             foreach ($company['nodes'] as $nodeKey => $node) {
                 $keysByName[$node['person']['name']] = $nodeKey;
+            }
+
+            // Validación de ciclos en la jerarquía
+            $visited = [];
+            $detectCycle = function (string $nodeKey) use (&$detectCycle, &$visited, $company, &$importErrors): bool {
+                if (isset($visited[$nodeKey])) {
+                    return true; // Ciclo detectado
+                }
+                
+                $visited[$nodeKey] = true;
+                $node = $company['nodes'][$nodeKey];
+                $supervisorName = $node['person']['supervisor_name'];
+                
+                if ($supervisorName === '' || $supervisorName === $node['person']['name']) {
+                    unset($visited[$nodeKey]);
+                    return false;
+                }
+                
+                $supervisorKey = $keysByName[$supervisorName] ?? null;
+                if ($supervisorKey === null) {
+                    unset($visited[$nodeKey]);
+                    return false;
+                }
+                
+                if ($detectCycle($supervisorKey)) {
+                    $importErrors[] = [
+                        'row' => 'N/A',
+                        'error' => "Ciclo detectado en jerarquía: {$node['person']['name']}",
+                        'data' => $node['person'],
+                    ];
+                    return true;
+                }
+                
+                unset($visited[$nodeKey]);
+                return false;
+            };
+
+            foreach ($company['nodes'] as $nodeKey => $node) {
+                $visited = [];
+                $detectCycle($nodeKey);
             }
 
             foreach ($company['nodes'] as $nodeKey => $node) {
@@ -122,6 +189,8 @@ class OrganigramCsvImporter
             'generated_at' => now()->toIso8601String(),
             'source' => [
                 'row_count' => count($rows),
+                'errors' => $importErrors,
+                'duplicates' => $duplicatedEntries,
             ],
             'companies' => $companies,
         ];
