@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import RelationGraph from 'relation-graph-react';
+import TextInput from '@/Components/TextInput';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 
 
@@ -26,6 +29,10 @@ function flattenPeople(roots) {
 // --- COMPONENTE DE EMPRESA ---
 function CompanyOrganigram({ company, globalMap }) {
     const graphRef = useRef(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [expandedNodes, setExpandedNodes] = useState(new Set());
+    const [highlightedNode, setHighlightedNode] = useState(null);
+
 // Definición del Slot del Nodo
     const MyNodeSlot = ({ node }) => {
         // Ignorar raíz virtual
@@ -42,11 +49,13 @@ function CompanyOrganigram({ company, globalMap }) {
             if (instance) instance.toggleNodeExpanded(node);
         };
 
+        const isHighlighted = highlightedNode && highlightedNode === node.id;
+
         return (
             <div
                 className={`relative flex items-center gap-3 p-3 rounded-xl border shadow-sm transition-all duration-300 ${
                     hasChildren ? 'bg-white border-emerald-200' : 'bg-slate-50 border-slate-200'
-                }`}
+                } ${isHighlighted ? 'ring-2 ring-emerald-500 bg-emerald-50' : ''}`}
                 style={{ width: '320px', height: '80px', overflow: 'hidden' }}
             >
                 {/* Avatar */}
@@ -59,7 +68,7 @@ function CompanyOrganigram({ company, globalMap }) {
                 {/* Contenedor de Texto: AQUÍ ESTÁ EL POSITION */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center items-start text-left">
                     <p className="w-full truncate text-[13px] font-bold text-slate-800 m-0 p-0 leading-tight">
-                        {person.name}  {person.position || 'CARGO NO DEFINIDO'}
+                        {person.name}
                     </p>
                     <p className="w-full truncate text-[11px] font-bold text-emerald-600 uppercase mt-1 leading-none block italic">
                         {person.position || 'CARGO NO DEFINIDO'}
@@ -82,7 +91,8 @@ function CompanyOrganigram({ company, globalMap }) {
             </div>
         );
     };
-        const graphData = useMemo(() => {
+
+    const graphData = useMemo(() => {
         const allInCompany = flattenPeople(company.roots || []);
         const nodes = [];
         const lines = [];
@@ -140,6 +150,68 @@ function CompanyOrganigram({ company, globalMap }) {
         }
     }, [graphData]);
 
+    // Funciones para expandir/colapsar todo
+    const expandAllNodes = useCallback(() => {
+        const instance = graphRef.current?.getInstance();
+        if (instance) {
+            graphData.nodes.forEach(node => {
+                if (!node.data?.isVirtualRoot && node.data?.directReportsCount > 0) {
+                    instance.expandNode(node.id);
+                }
+            });
+        }
+    }, [graphData]);
+
+    const collapseAllNodes = useCallback(() => {
+        const instance = graphRef.current?.getInstance();
+        if (instance) {
+            graphData.nodes.forEach(node => {
+                if (!node.data?.isVirtualRoot && node.data?.directReportsCount > 0) {
+                    instance.collapseNode(node.id);
+                }
+            });
+        }
+    }, [graphData]);
+
+    // Búsqueda y resaltado de personas
+    const handleSearch = useCallback((term) => {
+        setSearchTerm(term);
+        if (term.trim() === '') {
+            setHighlightedNode(null);
+            return;
+        }
+
+        const searchTermLower = term.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+        const found = graphData.nodes.find(node => {
+            if (node.data?.isVirtualRoot) return false;
+            const personName = (node.data?.person?.name || '').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+            const personPosition = (node.data?.person?.position || '').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
+            return personName.includes(searchTermLower) || personPosition.includes(searchTermLower);
+        });
+
+        if (found) {
+            setHighlightedNode(found.id);
+            const instance = graphRef.current?.getInstance();
+            if (instance) {
+                instance.focusNodeById(found.id);
+                // Expandir padres si es necesario
+                let currentId = found.id;
+                let parent = graphData.nodes.find(n => 
+                    graphData.lines.some(l => l.from === n.id && l.to === currentId)
+                );
+                while (parent) {
+                    instance.expandNode(parent.id);
+                    currentId = parent.id;
+                    parent = graphData.nodes.find(n => 
+                        graphData.lines.some(l => l.from === n.id && l.to === currentId)
+                    );
+                }
+            }
+        } else {
+            setHighlightedNode(null);
+        }
+    }, [graphData]);
+
     const graphOptions = {
         layout: {
             layoutName: 'folder',
@@ -163,15 +235,36 @@ function CompanyOrganigram({ company, globalMap }) {
 
     return (
         <section className="mb-12  border border-slate-200 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
-            <div className="bg-slate-50 border-b border-slate-100 px-8 py-5 flex justify-between items-center">
-                <div>
-                    <h2 className="text-lg font-bold text-slate-800 tracking-tight">{company.name}</h2>
-                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Estructura Organizativa</p>
+            <div className="bg-slate-50 border-b border-slate-100 px-8 py-5 flex flex-col gap-4">
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800 tracking-tight">{company.name}</h2>
+                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Estructura Organizativa</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                            {graphData.nodes.length - 1} Colaboradores
+                        </span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                        {graphData.nodes.length - 1} Colaboradores
-                    </span>
+                
+                {/* Barra de búsqueda y controles */}
+                <div className="flex gap-2 items-center flex-wrap">
+                    <div className="flex-1 min-w-[200px]">
+                        <TextInput
+                            type="text"
+                            placeholder="Buscar persona o cargo..."
+                            value={searchTerm}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="w-full"
+                        />
+                    </div>
+                    <SecondaryButton onClick={expandAllNodes} className="text-xs">
+                        Expandir todo
+                    </SecondaryButton>
+                    <SecondaryButton onClick={collapseAllNodes} className="text-xs">
+                        Colapsar todo
+                    </SecondaryButton>
                 </div>
             </div>
             <div style={{ height: '600px', width: '100%' }}>
@@ -187,8 +280,19 @@ function CompanyOrganigram({ company, globalMap }) {
 }
 
 // --- PÁGINA PRINCIPAL ---
-export default function Index({ snapshot }) {
+export default function Index({ snapshot, currentImport }) {
     const companies = snapshot?.companies ?? [];
+    
+    // Calcular estadísticas totales
+    const totalStats = useMemo(() => {
+        let totalPeople = 0;
+        companies.forEach((c) => {
+            const flat = flattenPeople(c.roots || []);
+            totalPeople += flat.length;
+        });
+        return { totalPeople, companiesCount: companies.length };
+    }, [companies]);
+
     const globalMap = useMemo(() => {
         const map = new Map();
         companies.forEach((c) => {
@@ -208,9 +312,39 @@ export default function Index({ snapshot }) {
             <Head title="Organigrama" />
             <div className="py-10 bg-[#fbfcfd] min-h-screen px-6">
                 <div className="mx-auto max-w-[1500px] space-y-12">
+                    {/* Estadísticas generales */}
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="rounded-lg border border-emerald-200 bg-white p-4 shadow-sm">
+                            <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Total Colaboradores</dt>
+                            <dd className="mt-2 text-2xl font-bold text-emerald-700">{totalStats.totalPeople}</dd>
+                        </div>
+                        <div className="rounded-lg border border-emerald-200 bg-white p-4 shadow-sm">
+                            <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Empresas</dt>
+                            <dd className="mt-2 text-2xl font-bold text-emerald-700">{totalStats.companiesCount}</dd>
+                        </div>
+                        {currentImport && (
+                            <div className="rounded-lg border border-emerald-200 bg-white p-4 shadow-sm">
+                                <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Última Actualización</dt>
+                                <dd className="mt-2 text-sm font-medium text-emerald-700">
+                                    {new Date(currentImport.created_at).toLocaleDateString('es-CL', { 
+                                        day: '2-digit', 
+                                        month: 'short', 
+                                        year: 'numeric' 
+                                    })}
+                                </dd>
+                            </div>
+                        )}
+                    </div>
+
                     {companies.map((company) => (
                         <CompanyOrganigram key={company.slug} company={company} globalMap={globalMap} />
                     ))}
+
+                    {companies.length === 0 && (
+                        <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
+                            <p className="text-slate-500">No hay organigramas cargados. Contacta al administrador para subir uno.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

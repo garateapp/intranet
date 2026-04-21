@@ -2,9 +2,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Index({ currentImport }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors, progress } = useForm({
         file: null,
     });
@@ -27,6 +28,13 @@ export default function Index({ currentImport }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
+                    {/* Mensajes de éxito/error */}
+                    {flash?.success && (
+                        <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4">
+                            <p className="text-sm text-emerald-800">{flash.success}</p>
+                        </div>
+                    )}
+
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <h3 className="text-lg font-semibold text-gray-900">Organigrama visible actual</h3>
@@ -77,6 +85,9 @@ export default function Index({ currentImport }) {
                                         className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
                                     />
                                     <InputError message={errors.file} className="mt-2" />
+                                    <p className="mt-2 text-xs text-gray-500">
+                                        Tamaño máximo: 10MB. Formato esperado: CSV con separador punto y coma (;)
+                                    </p>
                                 </div>
 
                                 {progress && (
