@@ -17,6 +17,7 @@ use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\CorporateEventController;
 use App\Http\Controllers\OrganigramController;
+use App\Http\Controllers\AdminOrganigramController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\DocumentLibraryController;
 use App\Http\Controllers\ServiceStatusController;
@@ -88,6 +89,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Phase 2: Portal admin routes
         Route::resource('organizational-units', OrganizationalUnitController::class);
+        Route::get('admin/organigram', [AdminOrganigramController::class, 'index'])->name('admin.organigram.index');
+        Route::post('admin/organigram', [AdminOrganigramController::class, 'store'])->name('admin.organigram.store');
         Route::get('organizational-units/{organizationalUnit}/assign-members', [OrganizationalUnitController::class, 'assignMembers'])
             ->name('organizational-units.assign-members');
         Route::post('organizational-units/{organizationalUnit}/update-members', [OrganizationalUnitController::class, 'updateMembers'])
