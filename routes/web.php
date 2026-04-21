@@ -31,6 +31,8 @@ use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\UserRequestAdminController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\UserActivityController as UserActivityWebController;
+use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\SurveyResponseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -38,6 +40,7 @@ use Inertia\Inertia;
 // Public routes
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
 Route::get('/noticia/{post:slug}', [PostController::class, 'show'])->name('public.posts.show');
+Route::post('/encuestas/{survey}/responder', [SurveyResponseController::class, 'store'])->name('surveys.respond');
 
 // Google OAuth routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -109,6 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('admin/services/{service}/history', [ServiceAdminController::class, 'history'])->name('admin.services.history');
 
         Route::resource('request-types', RequestTypeController::class);
+        Route::resource('surveys', SurveyController::class);
         Route::resource('user-requests', UserRequestAdminController::class)->only(['index', 'show', 'edit', 'update']);
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
