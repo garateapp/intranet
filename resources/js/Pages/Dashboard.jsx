@@ -8,6 +8,7 @@ import PeopleCard from '@/Components/PeopleCard';
 import EventsList from '@/Components/EventsList';
 import HrPortalCard from '@/Components/HrPortalCard';
 import FaqAccordion from '@/Components/FaqAccordion';
+import SurveyCard from '@/Components/SurveyCard';
 
 export default function Dashboard({
     hero,
@@ -20,7 +21,11 @@ export default function Dashboard({
     services,
     onboarding,
     recentRequests,
+    surveys,
 }) {
+    const activeSurveys = surveys?.filter((survey) => !survey.is_closed) ?? [];
+    const closedSurveys = surveys?.filter((survey) => survey.is_closed) ?? [];
+
     const getStatusBadgeColor = (status) => {
         const colors = {
             operativo: 'bg-green-100 text-green-800',
@@ -76,6 +81,19 @@ export default function Dashboard({
                     <PortalSection title="Buscador">
                         <GlobalSearchBar action={route('search.index')} />
                     </PortalSection>
+
+                    {activeSurveys.length > 0 && (
+                        <PortalSection
+                            title="Encuestas Activas"
+                            subtitle="Participa en las encuestas vigentes antes de que finalicen"
+                        >
+                            <div className="space-y-6">
+                                {activeSurveys.map((survey) => (
+                                    <SurveyCard key={survey.id} survey={survey} />
+                                ))}
+                            </div>
+                        </PortalSection>
+                    )}
 
                     {/* Featured Posts */}
                     {featuredPosts && featuredPosts.length > 0 && (
@@ -213,6 +231,19 @@ export default function Dashboard({
                     <PortalSection title="Recursos Humanos">
                         <HrPortalCard portal={hrPortal} />
                     </PortalSection>
+
+                    {closedSurveys.length > 0 && (
+                        <PortalSection
+                            title="Encuestas Cerradas"
+                            subtitle="Resultados y registros de encuestas que ya finalizaron"
+                        >
+                            <div className="space-y-6">
+                                {closedSurveys.map((survey) => (
+                                    <SurveyCard key={survey.id} survey={survey} />
+                                ))}
+                            </div>
+                        </PortalSection>
+                    )}
 
                     {/* People Directory Preview */}
                     {directoryUsers && directoryUsers.length > 0 && (

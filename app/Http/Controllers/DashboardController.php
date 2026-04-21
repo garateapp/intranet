@@ -11,6 +11,7 @@ use App\Models\CorporateEvent;
 use App\Models\Faq;
 use App\Models\Setting;
 use App\Models\Service;
+use App\Models\Survey;
 use App\Models\UserOnboardingProgress;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
@@ -18,8 +19,48 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    private function getHomepageSurveys(?User $user, Request $request)
+    {
+        return Survey::published()
+            ->with(['questions.options'])
+            ->withCount('responses')
+            ->get()
+            ->sortBy([
+                fn (Survey $survey) => $survey->isClosed() ? 1 : 0,
+                fn (Survey $survey) => $survey->ends_at->timestamp,
+            ])
+            ->take(3)
+            ->map(function (Survey $survey) use ($user, $request) {
+                $anonymousToken = $request->session()->get("survey_response_tokens.{$survey->id}");
+                $hasResponded = $survey->hasResponseFrom($user, $anonymousToken);
+
+                return [
+                    'id' => $survey->id,
+                    'title' => $survey->title,
+                    'description' => $survey->description,
+                    'is_anonymous' => $survey->is_anonymous,
+                    'ends_at' => $survey->endsAtLabel(),
+                    'is_closed' => $survey->isClosed(),
+                    'has_responded' => $hasResponded,
+                    'responses_count' => $survey->responses_count,
+                    'login_required' => ! $survey->is_anonymous,
+                    'questions' => $survey->questions->map(fn ($question) => [
+                        'id' => $question->id,
+                        'prompt' => $question->prompt,
+                        'options' => $question->options->map(fn ($option) => [
+                            'id' => $option->id,
+                            'label' => $option->label,
+                        ])->values(),
+                    ])->values(),
+                ];
+            })
+            ->values();
+    }
+
     public function welcome()
     {
+        $user = auth()->user();
+
         $featuredPosts = Post::with(['user', 'category'])
             ->published()
             ->visibleInPublic()
@@ -59,6 +100,7 @@ class DashboardController extends Controller
             'recentPosts' => $recentPosts,
             'activeLinks' => $activeLinks,
             'categories' => $categories,
+            'surveys' => $this->getHomepageSurveys($user, request()),
         ]);
     }
 
@@ -250,6 +292,7 @@ class DashboardController extends Controller
             'services' => $servicesSummary,
             'onboarding' => $onboardingStats,
             'recentRequests' => $recentRequests,
+            'surveys' => $this->getHomepageSurveys($user, request()),
         ]);
     }
 }

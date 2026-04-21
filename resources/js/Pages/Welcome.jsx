@@ -1,7 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import PublicPostsCarousel from '@/Components/PublicPostsCarousel';
+import SurveyCard from '@/Components/SurveyCard';
 
-export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts, activeLinks, categories }) {
+export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts, activeLinks, categories, surveys }) {
+    const activeSurveys = surveys?.filter((survey) => !survey.is_closed) ?? [];
+    const closedSurveys = surveys?.filter((survey) => survey.is_closed) ?? [];
+
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -122,6 +126,27 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                         </div>
                     </div>
                 </section>
+
+                {activeSurveys.length > 0 && (
+                    <section className="relative z-10 pb-16 px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="mb-10">
+                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                                    Encuestas Activas
+                                </h3>
+                                <p className="text-green-200">
+                                    Participa desde aquí. Si una encuesta no es anónima, deberás iniciar sesión.
+                                </p>
+                            </div>
+
+                            <div className="space-y-6">
+                                {activeSurveys.map((survey) => (
+                                    <SurveyCard key={survey.id} survey={survey} variant="dark" />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* Public Posts Carousel */}
                 {featuredPosts && featuredPosts.length > 0 && (
@@ -271,6 +296,27 @@ export default function Welcome({ auth, featuredPosts, pinnedPosts, recentPosts,
                         </div>
                     </div>
                 </section>
+
+                {closedSurveys.length > 0 && (
+                    <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="mb-10">
+                                <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                                    Encuestas Cerradas
+                                </h3>
+                                <p className="text-green-200">
+                                    Historial de encuestas que ya no admiten más respuestas.
+                                </p>
+                            </div>
+
+                            <div className="space-y-6">
+                                {closedSurveys.map((survey) => (
+                                    <SurveyCard key={survey.id} survey={survey} variant="dark" />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* Recent Posts Grid - News Portal Style */}
                 {recentPosts && recentPosts.length > 0 && (

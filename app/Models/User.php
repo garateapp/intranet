@@ -123,6 +123,16 @@ class User extends Authenticatable
         return $this->hasMany(UserActivity::class);
     }
 
+    public function createdSurveys()
+    {
+        return $this->hasMany(Survey::class, 'created_by');
+    }
+
+    public function surveyResponses()
+    {
+        return $this->hasMany(SurveyResponse::class);
+    }
+
     public function isAdmin()
     {
         return $this->role === 'admin';

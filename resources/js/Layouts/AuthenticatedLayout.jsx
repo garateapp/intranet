@@ -133,7 +133,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown>
                                         <Dropdown.Trigger>
                                             <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('admin.organigram.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
+                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('admin.organigram.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('surveys.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
                                                     ? 'text-gray-900 border-b-2 border-orange-500'
                                                     : 'text-orange-600 hover:text-orange-700'
                                             }`}>
@@ -194,6 +194,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('request-types.index')}>
                                                 <div className="flex items-center gap-2">Tipos de Solicitud</div>
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('surveys.index')}>
+                                                <div className="flex items-center gap-2">Encuestas</div>
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('user-requests.index')}>
                                                 <div className="flex items-center gap-2">Solicitudes</div>
@@ -379,6 +382,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('admin.documents.index')} active={route().current('admin.documents.*')}>Documentos (Admin)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('admin.services.index')} active={route().current('admin.services.*')}>Servicios (Admin)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('request-types.index')} active={route().current('request-types.*')}>Tipos de Solicitud</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('surveys.index')} active={route().current('surveys.*')}>Encuestas</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('user-requests.index')} active={route().current('user-requests.*')}>Solicitudes</ResponsiveNavLink>
                                 <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">FAQ & Eventos</div>
                                 <ResponsiveNavLink href={route('faq-categories.index')} active={route().current('faq-categories.*')}>Categorías FAQ</ResponsiveNavLink>
