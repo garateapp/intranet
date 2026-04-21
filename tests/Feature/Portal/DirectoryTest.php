@@ -4,6 +4,7 @@ namespace Tests\Feature\Portal;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class DirectoryTest extends TestCase
@@ -22,10 +23,15 @@ class DirectoryTest extends TestCase
             'is_directory_visible' => false,
         ]);
 
-        $this->actingAs($visible)
-            ->get(route('directory.index'))
-            ->assertOk()
-            ->assertSee($visible->name);
+        $response = $this->actingAs($visible)
+            ->get(route('directory.index'));
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Directory/Index')
+            ->where('people.data.0.name', $visible->name)
+            ->has('people.data', 1)
+        );
     }
 
     public function test_directory_page_renders_for_authenticated_users(): void

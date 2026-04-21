@@ -133,7 +133,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown>
                                         <Dropdown.Trigger>
                                             <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
+                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('admin.organigram.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
                                                     ? 'text-gray-900 border-b-2 border-orange-500'
                                                     : 'text-orange-600 hover:text-orange-700'
                                             }`}>
@@ -143,7 +143,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </button>
                                         </Dropdown.Trigger>
                                         <Dropdown.Content>
-                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Gestión de Usuarios</div>
+                                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Gestión de Usuarios</div>
                                             <Dropdown.Link href={route('users.index')}>
                                                 <div className="flex items-center gap-2">
                                                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
@@ -151,8 +151,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </div>
                                             </Dropdown.Link>
 
-                                            <div class="border-t border-gray-100 my-1"></div>
-                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Contenidos</div>
+                                            <div className="border-t border-gray-100 my-1"></div>
+                                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Contenidos</div>
                                             <Dropdown.Link href={route('admin.posts.index')}>
                                                 <div className="flex items-center gap-2">
                                                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
@@ -172,10 +172,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </div>
                                             </Dropdown.Link>
 
-                                            <div class="border-t border-gray-100 my-1"></div>
-                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organizacional</div>
+                                            <div className="border-t border-gray-100 my-1"></div>
+                                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organizacional</div>
                                             <Dropdown.Link href={route('organizational-units.index')}>
                                                 <div className="flex items-center gap-2">Organigrama</div>
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.organigram.index')}>
+                                                <div className="flex items-center gap-2">Importar organigrama BUK</div>
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('onboarding-stages.index')}>
                                                 <div className="flex items-center gap-2">Onboarding (Etapas)</div>
@@ -196,8 +199,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 <div className="flex items-center gap-2">Solicitudes</div>
                                             </Dropdown.Link>
 
-                                            <div class="border-t border-gray-100 my-1"></div>
-                                            <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">FAQ & Eventos</div>
+                                            <div className="border-t border-gray-100 my-1"></div>
+                                            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">FAQ & Eventos</div>
                                             <Dropdown.Link href={route('faq-categories.index')}>
                                                 <div className="flex items-center gap-2">Categorías FAQ</div>
                                             </Dropdown.Link>
@@ -208,7 +211,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 <div className="flex items-center gap-2">Eventos Corporativos</div>
                                             </Dropdown.Link>
 
-                                            <div class="border-t border-gray-100 my-1"></div>
+                                            <div className="border-t border-gray-100 my-1"></div>
                                             <Dropdown.Link href={route('settings.index')}>
                                                 <div className="flex items-center gap-2">
                                                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -370,6 +373,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('settings.index')} active={route().current('settings.index')}>Configuración</ResponsiveNavLink>
                                 <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Portal Fase 2</div>
                                 <ResponsiveNavLink href={route('organizational-units.index')} active={route().current('organizational-units.*')}>Organigrama</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.organigram.index')} active={route().current('admin.organigram.*')}>Importar organigrama BUK</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-stages.index')} active={route().current('onboarding-stages.*')}>Onboarding (Etapas)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-tasks.index')} active={route().current('onboarding-tasks.*')}>Onboarding (Tareas)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('admin.documents.index')} active={route().current('admin.documents.*')}>Documentos (Admin)</ResponsiveNavLink>

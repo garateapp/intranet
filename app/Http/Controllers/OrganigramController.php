@@ -2,36 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrganizationalUnit;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\OrganigramImport;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class OrganigramController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        // Load all nested children recursively
-        $units = OrganizationalUnit::with(['children.children.children.children.children', 'users'])
-            ->active()
-            ->root()
-            ->orderBy('sort_order')
-            ->get();
+        $currentImport = OrganigramImport::query()
+            ->where('is_current', true)
+            ->latest('id')
+            ->first();
 
-        $users = User::with(['organizationalUnit', 'manager'])
-            ->where('is_directory_visible', true)
-            ->get()
-            ->groupBy('organizational_unit_id');
+        $snapshot = $this->normalizeSnapshot($currentImport?->snapshot_json);
 
-        // Count unassigned users
-        $unassignedCount = User::where('is_directory_visible', true)
-            ->whereNull('organizational_unit_id')
-            ->count();
 
         return Inertia::render('Organigram/Index', [
-            'units' => $units,
-            'users' => $users,
-            'unassignedCount' => $unassignedCount,
+            'snapshot' => $snapshot,
+            'currentImport' => $currentImport ? [
+                'original_filename' => $currentImport->original_filename,
+                'row_count' => $currentImport->row_count,
+                'created_at' => $currentImport->created_at?->toIso8601String(),
+            ] : null,
+            'legacySnapshot' => $this->isLegacySnapshot($currentImport?->snapshot_json),
         ]);
+    }
+
+    private function normalizeSnapshot(null|array $snapshot): ?array
+    {
+        if ($snapshot === null) {
+            return null;
+        }
+
+        $snapshot['companies'] = collect($snapshot['companies'] ?? [])
+            ->map(function (array $company) {
+                if (! array_key_exists('roots', $company) || ! is_array($company['roots'])) {
+                    $company['roots'] = [];
+                }
+
+                return $company;
+            })
+            ->values()
+            ->all();
+
+        return $snapshot;
+    }
+
+    private function isLegacySnapshot(null|array $snapshot): bool
+    {
+        if ($snapshot === null) {
+            return false;
+        }
+
+        foreach ($snapshot['companies'] ?? [] as $company) {
+            if (array_key_exists('cost_centers', $company) && ! array_key_exists('roots', $company)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
