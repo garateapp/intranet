@@ -1,15 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function Edit({ user }) {
+export default function Edit({ user, managers, organizationalUnits }) {
     const { data, setData, post, processing, errors } = useForm({
         name: user.name,
         email: user.email,
+        role: user.role,
         department: user.department || '',
         position: user.position || '',
         phone: user.phone || '',
         location: user.location || '',
         bio: user.bio || '',
+        manager_id: user.manager_id || '',
+        organizational_unit_id: user.organizational_unit_id || '',
         is_directory_visible: user.is_directory_visible,
         is_directory_featured: user.is_directory_featured,
         avatar: null,
@@ -102,6 +105,44 @@ export default function Edit({ user }) {
 
                                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                     <div>
+                                        <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                                            Rol
+                                        </label>
+                                        <select
+                                            id="role"
+                                            value={data.role}
+                                            onChange={(e) => setData('role', e.target.value)}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                        >
+                                            <option value="user">Usuario</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                        {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="manager_id" className="block text-sm font-medium text-gray-700">
+                                            Jefe Directo
+                                        </label>
+                                        <select
+                                            id="manager_id"
+                                            value={data.manager_id}
+                                            onChange={(e) => setData('manager_id', e.target.value)}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                        >
+                                            <option value="">Sin jefe asignado</option>
+                                            {managers.map((m) => (
+                                                <option key={m.id} value={m.id}>
+                                                    {m.name} — {m.email}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.manager_id && <p className="mt-1 text-sm text-red-600">{errors.manager_id}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                    <div>
                                         <label htmlFor="department" className="block text-sm font-medium text-gray-700">
                                             Departamento
                                         </label>
@@ -157,6 +198,26 @@ export default function Edit({ user }) {
                                 </div>
 
                                 <div>
+                                    <label htmlFor="organizational_unit_id" className="block text-sm font-medium text-gray-700">
+                                        Unidad Organizacional
+                                    </label>
+                                    <select
+                                        id="organizational_unit_id"
+                                        value={data.organizational_unit_id}
+                                        onChange={(e) => setData('organizational_unit_id', e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                    >
+                                        <option value="">Sin unidad</option>
+                                        {organizationalUnits.map((unit) => (
+                                            <option key={unit.id} value={unit.id}>
+                                                {unit.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.organizational_unit_id && <p className="mt-1 text-sm text-red-600">{errors.organizational_unit_id}</p>}
+                                </div>
+
+                                <div>
                                     <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
                                         Biografía
                                     </label>
@@ -203,7 +264,7 @@ export default function Edit({ user }) {
                                         disabled={processing}
                                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 disabled:opacity-50"
                                     >
-                                        Guardiar Cambios
+                                        Guardar Cambios
                                     </button>
                                 </div>
                             </form>

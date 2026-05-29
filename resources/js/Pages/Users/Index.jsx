@@ -60,8 +60,8 @@ export default function Index({ users, filters }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departamento</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargo</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jefe Directo</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visible</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destacado</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                                         </tr>
                                     </thead>
@@ -72,14 +72,10 @@ export default function Index({ users, filters }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.department || '-'}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.position || '-'}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.manager?.name || '-'}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.is_directory_visible ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                                         {user.is_directory_visible ? 'Sí' : 'No'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.is_directory_featured ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                                                        {user.is_directory_featured ? 'Sí' : 'No'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
