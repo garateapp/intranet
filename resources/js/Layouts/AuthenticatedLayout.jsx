@@ -89,7 +89,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                            route().current('documents.*') || route().current('services.*') || route().current('my-requests.*')
+                                            route().current('documents.*') || route().current('services.*') || route().current('my-requests.*') || route().current('exit-permits.*')
                                                 ? 'text-gray-900 border-b-2 border-green-500'
                                                 : 'text-gray-500 hover:text-gray-700'
                                         }`}>
@@ -118,6 +118,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 Mis Solicitudes
                                             </div>
                                         </Dropdown.Link>
+                                        <Dropdown.Link href={route('exit-permits.index')}>
+                                            <div className="flex items-center gap-2">
+                                                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                Permisos de Salida
+                                            </div>
+                                        </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
 
@@ -133,7 +139,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown>
                                         <Dropdown.Trigger>
                                             <button className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('admin.organigram.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('surveys.*') || route().current('user-requests.*') || route().current('audit-logs.*') || route().current('user-activities.*')
+                                                route().current('users.*') || route().current('admin.posts.*') || route().current('categories.*') || route().current('links.*') || route().current('settings.*') || route().current('faq-categories.*') || route().current('faqs.*') || route().current('corporate-events.*') || route().current('organizational-units.*') || route().current('admin.organigram.*') || route().current('onboarding-stages.*') || route().current('onboarding-tasks.*') || route().current('documents.*') || route().current('services.*') || route().current('request-types.*') || route().current('surveys.*') || route().current('user-requests.*') || route().current('admin.exit-permits.*') || route().current('audit-logs.*') || route().current('user-activities.*')
                                                     ? 'text-gray-900 border-b-2 border-orange-500'
                                                     : 'text-orange-600 hover:text-orange-700'
                                             }`}>
@@ -200,6 +206,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('user-requests.index')}>
                                                 <div className="flex items-center gap-2">Solicitudes</div>
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.exit-permits.index')}>
+                                                <div className="flex items-center gap-2">Permisos de Salida</div>
                                             </Dropdown.Link>
 
                                             <div className="border-t border-gray-100 my-1"></div>
@@ -355,6 +364,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <ResponsiveNavLink href={route('admin.documents.index')} active={route().current('documents.index')}>Documentos</ResponsiveNavLink>
                         <ResponsiveNavLink href={route('admin.services.index')} active={route().current('services.index')}>Estado de Servicios</ResponsiveNavLink>
                         <ResponsiveNavLink href={route('my-requests.index')} active={route().current('my-requests.index')}>Mis Solicitudes</ResponsiveNavLink>
+                        <ResponsiveNavLink href={route('exit-permits.index')} active={route().current('exit-permits.index')}>Permisos de Salida</ResponsiveNavLink>
 
                         <ResponsiveNavLink
                             href={route('rrhh.index')}
@@ -384,6 +394,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('request-types.index')} active={route().current('request-types.*')}>Tipos de Solicitud</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('surveys.index')} active={route().current('surveys.*')}>Encuestas</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('user-requests.index')} active={route().current('user-requests.*')}>Solicitudes</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.exit-permits.index')} active={route().current('admin.exit-permits.*')}>Permisos de Salida</ResponsiveNavLink>
                                 <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">FAQ & Eventos</div>
                                 <ResponsiveNavLink href={route('faq-categories.index')} active={route().current('faq-categories.*')}>Categorías FAQ</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('faqs.index')} active={route().current('faqs.*')}>FAQs</ResponsiveNavLink>
