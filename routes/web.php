@@ -33,6 +33,8 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\UserActivityController as UserActivityWebController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SurveyResponseController;
+use App\Http\Controllers\ExitPermitController;
+use App\Http\Controllers\AdminExitPermitController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -68,6 +70,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/servicios', [ServiceStatusController::class, 'index'])->name('services.index');
     Route::get('/mis-solicitudes', [MyRequestsController::class, 'index'])->name('my-requests.index');
     Route::post('/mis-solicitudes', [MyRequestsController::class, 'store'])->name('my-requests.store');
+
+    // Exit Permits
+    Route::get('/permisos-salida', [ExitPermitController::class, 'index'])->name('exit-permits.index');
+    Route::get('/permisos-salida/solicitar', [ExitPermitController::class, 'create'])->name('exit-permits.create');
+    Route::post('/permisos-salida', [ExitPermitController::class, 'store'])->name('exit-permits.store');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -117,6 +124,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
+
+        // Admin Exit Permits
+        Route::get('admin/permisos-salida', [AdminExitPermitController::class, 'index'])->name('admin.exit-permits.index');
+        Route::get('admin/permisos-salida/{exit_permit}', [AdminExitPermitController::class, 'show'])->name('admin.exit-permits.show');
+        Route::patch('admin/permisos-salida/{exit_permit}/status', [AdminExitPermitController::class, 'updateStatus'])->name('admin.exit-permits.update-status');
 
         // Activity API endpoints (JSON responses, same session auth)
         Route::get('api/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'index']);
