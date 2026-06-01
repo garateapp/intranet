@@ -98,7 +98,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('corporate-events', CorporateEventController::class);
 
         // Phase 2: Portal admin routes
-        Route::resource('organizational-units', OrganizationalUnitController::class);
+        Route::get('organizational-units/import', [OrganizationalUnitController::class, 'importForm'])->name('organizational-units.import');
+        Route::post('organizational-units/import', [OrganizationalUnitController::class, 'importCsv'])->name('organizational-units.import-csv');
+        Route::resource('organizational-units', OrganizationalUnitController::class)->except(['show']);
         Route::get('admin/organigram', [AdminOrganigramController::class, 'index'])->name('admin.organigram.index');
         Route::post('admin/organigram', [AdminOrganigramController::class, 'store'])->name('admin.organigram.store');
         Route::get('organizational-units/{organizationalUnit}/assign-members', [OrganizationalUnitController::class, 'assignMembers'])

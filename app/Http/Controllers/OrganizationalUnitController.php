@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrganizationalUnit;
 use App\Models\User;
+use App\Services\OrganizationalUnitCsvImporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -142,6 +143,39 @@ class OrganizationalUnitController extends Controller
 
         return redirect()->route('organizational-units.index')
             ->with('success', 'Miembros asignados exitosamente.');
+    }
+
+    public function importForm()
+    {
+        return Inertia::render('OrganizationalUnits/Import');
+    }
+
+    public function importCsv(Request $request, OrganizationalUnitCsvImporter $importer)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+        ]);
+
+        $contents = $request->file('file')->get();
+        // Detect and remove BOM
+        if (substr($contents, 0, 3) === "\xEF\xBB\xBF") {
+            $contents = substr($contents, 3);
+        }
+
+        try {
+            $results = $importer->import($contents);
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['file' => $e->getMessage()]);
+        }
+
+        $message = "Importación completada. Creadas: {$results['created']}, Actualizadas: {$results['updated']}, Omitidas: {$results['skipped']}.";
+        if (!empty($results['errors'])) {
+            $message .= ' Se encontraron ' . count($results['errors']) . ' advertencias.';
+        }
+
+        return redirect()->route('organizational-units.import')
+            ->with('success', $message)
+            ->with('import_errors', $results['errors']);
     }
 
     public function bulkAssignMembers(Request $request)
