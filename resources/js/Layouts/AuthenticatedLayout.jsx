@@ -181,7 +181,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <div className="border-t border-gray-100 my-1"></div>
                                             <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organizacional</div>
                                             <Dropdown.Link href={route('organizational-units.index')}>
-                                                <div className="flex items-center gap-2">Organigrama</div>
+                                                <div className="flex items-center gap-2">Unidades Organizacionales</div>
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('organizational-units.import')}>
+                                                <div className="flex items-center gap-2">Importar Unidades CSV</div>
                                             </Dropdown.Link>
                                             <Dropdown.Link href={route('admin.organigram.index')}>
                                                 <div className="flex items-center gap-2">Importar organigrama BUK</div>
@@ -385,7 +388,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('links.index')} active={route().current('links.*')}>Enlaces</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('settings.index')} active={route().current('settings.index')}>Configuración</ResponsiveNavLink>
                                 <div className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Portal Fase 2</div>
-                                <ResponsiveNavLink href={route('organizational-units.index')} active={route().current('organizational-units.*')}>Organigrama</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('organizational-units.index')} active={route().current('organizational-units.*')}>Unidades Organizacionales</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('organizational-units.import')} active={route().current('organizational-units.import*')}>Importar Unidades CSV</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('admin.organigram.index')} active={route().current('admin.organigram.*')}>Importar organigrama BUK</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-stages.index')} active={route().current('onboarding-stages.*')}>Onboarding (Etapas)</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding-tasks.index')} active={route().current('onboarding-tasks.*')}>Onboarding (Tareas)</ResponsiveNavLink>
