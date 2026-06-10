@@ -7,6 +7,7 @@ use App\Models\ExitPermit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -90,10 +91,32 @@ class ExitPermitController extends Controller
 
     protected function sendNotifications(ExitPermit $exitPermit)
     {
-        // Send email only to the direct boss with the approval link
         if ($exitPermit->manager && $exitPermit->manager->email) {
             Mail::to($exitPermit->manager->email)
-                ->queue(new ExitPermitCreated($exitPermit));
+                ->send(new ExitPermitCreated($exitPermit));
+
+            Log::info('Exit permit email sent to manager', [
+                'exit_permit_id' => $exitPermit->id,
+                'manager_email' => $exitPermit->manager->email,
+            ]);
+        } else {
+            $notified = config('exit-permit.notification_emails', '');
+            if (! empty($notified)) {
+                $emails = array_map('trim', explode(',', $notified));
+                $emails = array_unique(array_filter($emails));
+                Mail::to($emails)
+                    ->send(new ExitPermitCreated($exitPermit));
+
+                Log::info('Exit permit email sent to fallback notifications (no manager)', [
+                    'exit_permit_id' => $exitPermit->id,
+                    'user_id' => $exitPermit->user_id,
+                ]);
+            } else {
+                Log::warning('Exit permit created but no manager and no fallback emails configured', [
+                    'exit_permit_id' => $exitPermit->id,
+                    'user_id' => $exitPermit->user_id,
+                ]);
+            }
         }
     }
 }
