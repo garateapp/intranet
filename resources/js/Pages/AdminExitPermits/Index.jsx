@@ -155,7 +155,7 @@ export default function Index({ permits, stats, filters }) {
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{permit.motivo}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status_badge_color] || 'bg-gray-100 text-gray-800'}`}>
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
                                                                     {permit.status_label}
                                                                 </span>
                                                             </td>

@@ -64,7 +64,7 @@ export default function Dashboard({
             <div className="py-6">
                 <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
                     {/* Hero Section */}
-                    <PortalHero
+                    {/* <PortalHero
                         greeting={hero.greeting}
                         subtitle={hero.subtitle}
                     >
@@ -75,12 +75,12 @@ export default function Dashboard({
                                 month: 'long',
                             })}
                         </div>
-                    </PortalHero>
+                    </PortalHero> */}
 
-                    {/* Global Search */}
+                    {/* Global Search
                     <PortalSection title="Buscador">
                         <GlobalSearchBar action={route('search.index')} />
-                    </PortalSection>
+                    </PortalSection> */}
 
                     {activeSurveys.length > 0 && (
                         <PortalSection

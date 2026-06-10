@@ -78,7 +78,7 @@ export default function Show({ permit }) {
                                 <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4">
                                     <dt className="text-sm font-medium text-gray-500">Estado</dt>
                                     <dd className="mt-1 text-sm sm:col-span-2 sm:mt-0">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status_badge_color] || 'bg-gray-100 text-gray-800'}`}>
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
                                             {permit.status_label}
                                         </span>
                                     </dd>

@@ -35,6 +35,7 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SurveyResponseController;
 use App\Http\Controllers\ExitPermitController;
 use App\Http\Controllers\AdminExitPermitController;
+use App\Http\Controllers\ManagerExitPermitController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -75,6 +76,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/permisos-salida', [ExitPermitController::class, 'index'])->name('exit-permits.index');
     Route::get('/permisos-salida/solicitar', [ExitPermitController::class, 'create'])->name('exit-permits.create');
     Route::post('/permisos-salida', [ExitPermitController::class, 'store'])->name('exit-permits.store');
+
+    // Manager approval routes
+    Route::get('/permisos-salida/aprobaciones', [ManagerExitPermitController::class, 'index'])->name('manager.exit-permits.index');
+    Route::get('/permisos-salida/aprobaciones/{exit_permit}', [ManagerExitPermitController::class, 'show'])->name('manager.exit-permits.show');
+    Route::patch('/permisos-salida/aprobaciones/{exit_permit}/status', [ManagerExitPermitController::class, 'updateStatus'])->name('manager.exit-permits.update-status');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
