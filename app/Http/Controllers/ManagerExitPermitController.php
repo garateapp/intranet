@@ -99,15 +99,23 @@ class ManagerExitPermitController extends Controller
 
     protected function sendStatusChangeNotification(ExitPermit $exitPermit, string $oldStatus): void
     {
-        $additionalEmails = config('exit-permit.notification_emails');
-        if (empty($additionalEmails)) {
-            return;
+        $recipients = [];
+
+        // Always notify the solicitante
+        if ($exitPermit->user?->email) {
+            $recipients[] = $exitPermit->user->email;
         }
 
-        $emails = array_map('trim', explode(',', $additionalEmails));
-        $emails = array_unique(array_filter($emails));
+        // Also notify admin emails from config
+        $additionalEmails = config('exit-permit.notification_emails');
+        if (! empty($additionalEmails)) {
+            $extra = array_map('trim', explode(',', $additionalEmails));
+            $recipients = array_merge($recipients, $extra);
+        }
 
-        foreach ($emails as $email) {
+        $recipients = array_unique(array_filter($recipients));
+
+        foreach ($recipients as $email) {
             Mail::to($email)->send(new ExitPermitStatusChanged($exitPermit, $oldStatus));
         }
     }
