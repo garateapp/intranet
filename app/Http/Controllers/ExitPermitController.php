@@ -90,22 +90,10 @@ class ExitPermitController extends Controller
 
     protected function sendNotifications(ExitPermit $exitPermit)
     {
-        $emails = [];
-
+        // Send email only to the direct boss with the approval link
         if ($exitPermit->manager && $exitPermit->manager->email) {
-            $emails[] = $exitPermit->manager->email;
-        }
-
-        $additionalEmails = env('EXIT_PERMIT_NOTIFICATION_EMAILS');
-        if ($additionalEmails) {
-            $extra = array_map('trim', explode(',', $additionalEmails));
-            $emails = array_merge($emails, $extra);
-        }
-
-        $emails = array_unique(array_filter($emails));
-
-        foreach ($emails as $email) {
-            Mail::to($email)->queue(new ExitPermitCreated($exitPermit));
+            Mail::to($exitPermit->manager->email)
+                ->queue(new ExitPermitCreated($exitPermit));
         }
     }
 }
