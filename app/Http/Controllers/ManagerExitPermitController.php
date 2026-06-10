@@ -108,7 +108,7 @@ class ManagerExitPermitController extends Controller
         $emails = array_unique(array_filter($emails));
 
         foreach ($emails as $email) {
-            Mail::to($email)->queue(new ExitPermitStatusChanged($exitPermit, $oldStatus));
+            Mail::to($email)->send(new ExitPermitStatusChanged($exitPermit, $oldStatus));
         }
     }
 }
