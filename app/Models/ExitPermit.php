@@ -19,6 +19,7 @@ class ExitPermit extends Model
         'hora_retorno',
         'motivo',
         'observaciones',
+        'notification_email',
         'status',
         'admin_notes',
         'rejection_reason',

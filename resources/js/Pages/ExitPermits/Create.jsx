@@ -1,20 +1,41 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useEffect } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function Create({ manager }) {
+export default function Create({ manager, supervisedUsers, userLoginMethod }) {
     const user = usePage().props.auth.user;
+    const isSupervisor = supervisedUsers?.length > 0;
 
     const form = useForm({
+        user_id: '',
         fecha_salida: '',
         hora_salida: '',
         fecha_retorno: '',
         hora_retorno: '',
         motivo: '',
         observaciones: '',
+        notification_email: '',
     });
+
+    const selectedUserId = form.data.user_id || user.id;
+    const selectedUser = selectedUserId === user.id
+        ? user
+        : supervisedUsers?.find(u => u.id === Number(selectedUserId));
+
+    const needsNotificationEmail = selectedUser?.login_method !== 'google';
+
+    useEffect(() => {
+        if (needsNotificationEmail && selectedUser?.email && !form.data.notification_email) {
+            form.setData('notification_email', selectedUser.email);
+        }
+    }, [selectedUserId]);
 
     function handleSubmit(e) {
         e.preventDefault();
+        const data = { ...form.data };
+        if (data.user_id) {
+            data.user_id = Number(data.user_id);
+        }
         form.post(route('exit-permits.store'));
     }
 
@@ -41,25 +62,81 @@ export default function Create({ manager }) {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Employee selector for supervisors */}
+                                {isSupervisor && (
+                                    <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 space-y-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-blue-700">Solicitante</label>
+                                            <select
+                                                value={form.data.user_id}
+                                                onChange={(e) => form.setData('user_id', e.target.value)}
+                                                className="mt-1 block w-full rounded-md border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            >
+                                                <option value="">Yo ({user.name})</option>
+                                                {supervisedUsers.map((su) => (
+                                                    <option key={su.id} value={su.id}>
+                                                        {su.name} — {su.email}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* User info */}
                                 <div className="rounded-lg bg-gray-50 p-4 space-y-3">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Solicitante</label>
-                                        <p className="mt-1 text-gray-900 font-medium">{user.name}</p>
+                                        <p className="mt-1 text-gray-900 font-medium">
+                                            {selectedUser?.name ?? user.name}
+                                        </p>
                                     </div>
-                                    {manager && (
+                                    {manager && selectedUserId === user.id && (
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Jefe Directo</label>
                                             <p className="mt-1 text-gray-900 font-medium">{manager.name} — {manager.email}</p>
                                         </div>
                                     )}
-                                    {!manager && (
+                                    {selectedUserId !== user.id && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-amber-700">Creado por supervisor</label>
+                                            <p className="mt-1 text-amber-600 text-sm">
+                                                Estás creando este permiso en nombre de <strong>{selectedUser?.name}</strong>.
+                                                El jefe directo recibirá la notificación para aprobación.
+                                            </p>
+                                        </div>
+                                    )}
+                                    {!manager && selectedUserId === user.id && (
                                         <div>
                                             <label className="block text-sm font-medium text-amber-700">Jefe Directo</label>
                                             <p className="mt-1 text-amber-600 text-sm">No tienes un jefe directo asignado en el organigrama. La solicitud se enviará solo a las casillas de notificación.</p>
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Notification email for non-Google users */}
+                                {needsNotificationEmail && (
+                                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 space-y-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-amber-700">
+                                                Correo para Notificaciones <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="email"
+                                                value={form.data.notification_email}
+                                                onChange={(e) => form.setData('notification_email', e.target.value)}
+                                                className="mt-1 block w-full rounded-md border-amber-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
+                                                placeholder="correo@ejemplo.com"
+                                            />
+                                            <p className="mt-1 text-sm text-amber-600">
+                                                No iniciaste sesión con Google. Ingresa un correo donde quieras recibir la respuesta de tu solicitud.
+                                            </p>
+                                            {form.errors.notification_email && (
+                                                <p className="mt-1 text-sm text-red-600">{form.errors.notification_email}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Date/time fields */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
