@@ -101,9 +101,10 @@ class ManagerExitPermitController extends Controller
     {
         $recipients = [];
 
-        // Always notify the solicitante
-        if ($exitPermit->user?->email) {
-            $recipients[] = $exitPermit->user->email;
+        // Always notify the solicitante (use notification_email if provided)
+        $employeeEmail = $exitPermit->notification_email ?? $exitPermit->user?->email;
+        if ($employeeEmail) {
+            $recipients[] = $employeeEmail;
         }
 
         // Also notify admin emails from config
