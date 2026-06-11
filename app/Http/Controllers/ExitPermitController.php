@@ -45,6 +45,7 @@ class ExitPermitController extends Controller
             'observaciones' => ['nullable', 'string', 'max:5000'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'notification_email' => ['nullable', 'email', 'max:255'],
+            'con_goce_sueldo' => ['nullable', 'boolean'],
         ]);
 
         $targetUserId = ! empty($validated['user_id']) ? (int) $validated['user_id'] : $user->id;
@@ -76,6 +77,7 @@ class ExitPermitController extends Controller
             'motivo' => $validated['motivo'],
             'observaciones' => $validated['observaciones'],
             'notification_email' => $validated['notification_email'] ?? null,
+            'con_goce_sueldo' => $validated['con_goce_sueldo'] ?? true,
             'status' => 'pendiente',
             'created_by' => $user->id,
         ]);
@@ -90,6 +92,7 @@ class ExitPermitController extends Controller
     {
         $user = Auth::user();
         $status = $request->input('status', '');
+        $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
         $permitsQuery = ExitPermit::with(['user', 'manager'])
             ->forUser($user->id)
@@ -97,6 +100,10 @@ class ExitPermitController extends Controller
 
         if (! empty($status)) {
             $permitsQuery->byStatus($status);
+        }
+
+        if (! empty($fecha)) {
+            $permitsQuery->whereDate('fecha_salida', $fecha);
         }
 
         $permits = $permitsQuery->paginate(15);
@@ -113,6 +120,7 @@ class ExitPermitController extends Controller
             'stats' => $stats,
             'filters' => [
                 'status' => $status,
+                'fecha' => $fecha,
             ],
         ]);
     }

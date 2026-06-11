@@ -8,15 +8,17 @@ const statusBadgeClasses = {
     rechazada: 'bg-red-100 text-red-800',
 };
 
-export default function Index({ permits, stats, filters }) {
+export default function Index({ permits, stats, filters, isNotificationUser }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [search, setSearch] = useState(filters.search || '');
+    const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
 
     function handleFilter(e) {
         e.preventDefault();
         router.get(route('manager.exit-permits.index'), {
             status: statusFilter || undefined,
             search: search || undefined,
+            fecha: fecha || undefined,
         });
     }
 
@@ -25,6 +27,7 @@ export default function Index({ permits, stats, filters }) {
             router.get(url, {
                 status: statusFilter || undefined,
                 search: search || undefined,
+                fecha: fecha || undefined,
             });
         }
     }
@@ -34,9 +37,19 @@ export default function Index({ permits, stats, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Aprobaciones de Permisos de Salida
-                </h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                        {isNotificationUser ? 'Todas las Aprobaciones' : 'Aprobaciones de Permisos de Salida'}
+                    </h2>
+                    {isNotificationUser && (
+                        <Link
+                            href={route('manager.exit-permits.download-csv', { fecha })}
+                            className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
+                        >
+                            Descargar CSV
+                        </Link>
+                    )}
+                </div>
             }
         >
             <Head title="Aprobaciones Pendientes" />
@@ -67,12 +80,26 @@ export default function Index({ permits, stats, filters }) {
                                 <span className="ml-1 text-red-600">Rechazadas</span>
                             </div>
                         )}
+                        {isNotificationUser && (
+                            <div className="rounded-full bg-purple-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-purple-700">Vista global</span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Filters */}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-sm font-medium text-gray-700">Fecha</label>
+                                    <input
+                                        type="date"
+                                        value={fecha}
+                                        onChange={(e) => setFecha(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
+                                    />
+                                </div>
                                 <div className="flex-1 min-w-[200px]">
                                     <label className="block text-sm font-medium text-gray-700">Buscar</label>
                                     <input
@@ -139,6 +166,7 @@ export default function Index({ permits, stats, filters }) {
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Salida</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Retorno</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motivo</th>
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goce</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
                                                     </tr>
@@ -158,6 +186,11 @@ export default function Index({ permits, stats, filters }) {
                                                                 ) : <span className="text-gray-400">—</span>}
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{permit.motivo}</td>
+                                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                                                                    {permit.con_goce_sueldo_label}
+                                                                </span>
+                                                            </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
                                                                     {permit.status_label}

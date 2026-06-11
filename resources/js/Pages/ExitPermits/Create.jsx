@@ -15,6 +15,7 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
         motivo: '',
         observaciones: '',
         notification_email: '',
+        con_goce_sueldo: true,
     });
 
     const selectedUserId = form.data.user_id || user.id;
@@ -184,6 +185,22 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         />
                                     </div>
+                                </div>
+
+                                {/* Paid leave toggle */}
+                                <div className="rounded-lg bg-gray-50 p-4">
+                                    <label className="flex items-center justify-between cursor-pointer">
+                                        <div>
+                                            <span className="text-sm font-medium text-gray-700">Con goce de sueldo</span>
+                                            <p className="text-xs text-gray-500 mt-0.5">Indica si esta salida será con o sin goce de sueldo</p>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={form.data.con_goce_sueldo}
+                                            onChange={(e) => form.setData('con_goce_sueldo', e.target.checked)}
+                                            className="toggle toggle-success"
+                                        />
+                                    </label>
                                 </div>
 
                                 {/* Motivo */}
