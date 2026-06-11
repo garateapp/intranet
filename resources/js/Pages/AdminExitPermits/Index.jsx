@@ -11,12 +11,14 @@ const statusBadgeClasses = {
 export default function Index({ permits, stats, filters }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [search, setSearch] = useState(filters.search || '');
+    const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
 
     function handleFilter(e) {
         e.preventDefault();
         router.get(route('admin.exit-permits.index'), {
             status: statusFilter || undefined,
             search: search || undefined,
+            fecha: fecha || undefined,
         });
     }
 
@@ -25,6 +27,7 @@ export default function Index({ permits, stats, filters }) {
             router.get(url, {
                 status: statusFilter || undefined,
                 search: search || undefined,
+                fecha: fecha || undefined,
             });
         }
     }
@@ -73,6 +76,15 @@ export default function Index({ permits, stats, filters }) {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-sm font-medium text-gray-700">Fecha</label>
+                                    <input
+                                        type="date"
+                                        value={fecha}
+                                        onChange={(e) => setFecha(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+                                    />
+                                </div>
                                 <div className="flex-1 min-w-[200px]">
                                     <label className="block text-sm font-medium text-gray-700">Buscar</label>
                                     <input
@@ -139,6 +151,7 @@ export default function Index({ permits, stats, filters }) {
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jefe Directo</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Salida</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motivo</th>
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goce</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
                                                     </tr>
@@ -154,6 +167,11 @@ export default function Index({ permits, stats, filters }) {
                                                                 {permit.hora_salida && <span className="text-gray-500 ml-1">{permit.hora_salida}</span>}
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{permit.motivo}</td>
+                                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                                                                    {permit.con_goce_sueldo_label}
+                                                                </span>
+                                                            </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
                                                                     {permit.status_label}

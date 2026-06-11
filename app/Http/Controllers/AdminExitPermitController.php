@@ -9,13 +9,30 @@ use Inertia\Inertia;
 
 class AdminExitPermitController extends Controller
 {
+    protected function isNotificationUser(): bool
+    {
+        $emails = config('exit-permit.notification_emails', '');
+        if (empty($emails)) return false;
+        $list = array_map('trim', explode(',', $emails));
+        return in_array(Auth::user()->email, $list);
+    }
+
+    protected function authorizeAccess(): void
+    {
+        if (! Auth::user()->isAdmin() && ! $this->isNotificationUser()) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+    }
+
     public function index(Request $request)
     {
+        $this->authorizeAccess();
+
         $status = $request->input('status', '');
         $search = $request->input('search', '');
+        $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
-        $permitsQuery = ExitPermit::with(['user', 'manager'])
-            ->latest();
+        $permitsQuery = ExitPermit::with(['user', 'manager'])->latest();
 
         if (! empty($status)) {
             $permitsQuery->byStatus($status);
@@ -25,6 +42,10 @@ class AdminExitPermitController extends Controller
             $permitsQuery->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%");
             });
+        }
+
+        if (! empty($fecha)) {
+            $permitsQuery->whereDate('fecha_salida', $fecha);
         }
 
         $permits = $permitsQuery->paginate(15);
@@ -42,12 +63,15 @@ class AdminExitPermitController extends Controller
             'filters' => [
                 'status' => $status,
                 'search' => $search,
+                'fecha' => $fecha,
             ],
         ]);
     }
 
     public function show(ExitPermit $exitPermit)
     {
+        $this->authorizeAccess();
+
         $exitPermit->load(['user', 'manager']);
 
         return Inertia::render('AdminExitPermits/Show', [
@@ -57,6 +81,8 @@ class AdminExitPermitController extends Controller
 
     public function updateStatus(Request $request, ExitPermit $exitPermit)
     {
+        $this->authorizeAccess();
+
         $validated = $request->validate([
             'status' => ['required', 'in:pendiente,aprobada,rechazada'],
             'admin_notes' => ['nullable', 'string', 'max:5000'],

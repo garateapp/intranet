@@ -20,11 +20,16 @@ class ExitPermit extends Model
         'motivo',
         'observaciones',
         'notification_email',
+        'con_goce_sueldo',
         'status',
         'admin_notes',
         'rejection_reason',
         'created_by',
         'updated_by',
+    ];
+
+    protected $appends = [
+        'con_goce_sueldo_label',
     ];
 
     protected function casts(): array
@@ -34,6 +39,7 @@ class ExitPermit extends Model
             'fecha_retorno' => 'date:Y-m-d',
             'hora_salida' => 'string',
             'hora_retorno' => 'string',
+            'con_goce_sueldo' => 'boolean',
         ];
     }
 
@@ -90,5 +96,10 @@ class ExitPermit extends Model
             'rechazada' => 'Rechazada',
             default => ucfirst(str_replace('_', ' ', $this->status)),
         };
+    }
+
+    public function getConGoceSueldoLabelAttribute()
+    {
+        return $this->con_goce_sueldo ? 'Con goce de sueldo' : 'Sin goce de sueldo';
     }
 }

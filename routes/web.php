@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Manager approval routes
     Route::get('/permisos-salida/aprobaciones', [ManagerExitPermitController::class, 'index'])->name('manager.exit-permits.index');
+    Route::get('/permisos-salida/aprobaciones/descargar', [ManagerExitPermitController::class, 'downloadCsv'])->name('manager.exit-permits.download-csv');
     Route::get('/permisos-salida/aprobaciones/{exit_permit}', [ManagerExitPermitController::class, 'show'])->name('manager.exit-permits.show');
     Route::patch('/permisos-salida/aprobaciones/{exit_permit}/status', [ManagerExitPermitController::class, 'updateStatus'])->name('manager.exit-permits.update-status');
 
@@ -89,6 +90,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Logout
     Route::post('/logout', [GoogleAuthController::class, 'logout'])->name('logout');
+
+    // Exit Permits - accessible by admin role OR notification email users
+    Route::get('admin/permisos-salida', [AdminExitPermitController::class, 'index'])->name('admin.exit-permits.index');
+    Route::get('admin/permisos-salida/{exit_permit}', [AdminExitPermitController::class, 'show'])->name('admin.exit-permits.show');
+    Route::patch('admin/permisos-salida/{exit_permit}/status', [AdminExitPermitController::class, 'updateStatus'])->name('admin.exit-permits.update-status');
 
     // Admin-only resource routes
     Route::middleware(['admin'])->group(function () {
@@ -132,11 +138,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
-
-        // Admin Exit Permits
-        Route::get('admin/permisos-salida', [AdminExitPermitController::class, 'index'])->name('admin.exit-permits.index');
-        Route::get('admin/permisos-salida/{exit_permit}', [AdminExitPermitController::class, 'show'])->name('admin.exit-permits.show');
-        Route::patch('admin/permisos-salida/{exit_permit}/status', [AdminExitPermitController::class, 'updateStatus'])->name('admin.exit-permits.update-status');
 
         // Activity API endpoints (JSON responses, same session auth)
         Route::get('api/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'index']);
