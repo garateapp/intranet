@@ -42,12 +42,12 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                         {isNotificationUser ? 'Todas las Aprobaciones' : 'Aprobaciones de Permisos de Salida'}
                     </h2>
                     {isNotificationUser && (
-                        <Link
+                        <a
                             href={route('manager.exit-permits.download-csv', { fecha })}
                             className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
                         >
                             Descargar CSV
-                        </Link>
+                        </a>
                     )}
                 </div>
             }
