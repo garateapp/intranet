@@ -21,14 +21,22 @@ class ExitPermitController extends Controller
             $manager = User::find($user->manager_id);
         }
 
+        $isNotificationUser = $this->isNotificationUser();
+
+        if ($isNotificationUser) {
+            $allUsers = User::orderBy('name')
+                ->get(['id', 'name', 'email', 'login_method']);
+        }
+
         $supervisedUsers = User::where('manager_id', $user->id)
             ->orderBy('name')
             ->get(['id', 'name', 'email', 'login_method']);
 
         return Inertia::render('ExitPermits/Create', [
             'manager' => $manager,
-            'supervisedUsers' => $supervisedUsers,
+            'supervisedUsers' => $isNotificationUser ? $allUsers : $supervisedUsers,
             'userLoginMethod' => $user->login_method,
+            'isNotificationUser' => $isNotificationUser,
         ]);
     }
 
@@ -45,13 +53,12 @@ class ExitPermitController extends Controller
             'observaciones' => ['nullable', 'string', 'max:5000'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'notification_email' => ['nullable', 'email', 'max:255'],
-            'con_goce_sueldo' => ['nullable', 'boolean'],
         ]);
 
         $targetUserId = ! empty($validated['user_id']) ? (int) $validated['user_id'] : $user->id;
 
-        // If creating for another user, validate supervisor relationship
-        if ((int) $targetUserId !== (int) $user->id) {
+        // If creating for another user, validate relationship (unless notification user)
+        if ((int) $targetUserId !== (int) $user->id && ! $this->isNotificationUser()) {
             $targetUser = User::findOrFail($targetUserId);
             if ((int) $targetUser->manager_id !== (int) $user->id) {
                 abort(403, 'No puedes crear permisos para este usuario.');
@@ -77,7 +84,6 @@ class ExitPermitController extends Controller
             'motivo' => $validated['motivo'],
             'observaciones' => $validated['observaciones'],
             'notification_email' => $validated['notification_email'] ?? null,
-            'con_goce_sueldo' => $validated['con_goce_sueldo'] ?? true,
             'status' => 'pendiente',
             'created_by' => $user->id,
         ]);
@@ -91,12 +97,16 @@ class ExitPermitController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $isNotificationUser = $this->isNotificationUser();
         $status = $request->input('status', '');
         $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
         $permitsQuery = ExitPermit::with(['user', 'manager'])
-            ->forUser($user->id)
             ->latest();
+
+        if (! $isNotificationUser) {
+            $permitsQuery->forUser($user->id);
+        }
 
         if (! empty($status)) {
             $permitsQuery->byStatus($status);
@@ -108,11 +118,12 @@ class ExitPermitController extends Controller
 
         $permits = $permitsQuery->paginate(15);
 
+        $baseQuery = $isNotificationUser ? ExitPermit::query() : ExitPermit::forUser($user->id);
         $stats = [
-            'total' => ExitPermit::forUser($user->id)->count(),
-            'pendiente' => ExitPermit::forUser($user->id)->byStatus('pendiente')->count(),
-            'aprobada' => ExitPermit::forUser($user->id)->byStatus('aprobada')->count(),
-            'rechazada' => ExitPermit::forUser($user->id)->byStatus('rechazada')->count(),
+            'total' => (clone $baseQuery)->count(),
+            'pendiente' => (clone $baseQuery)->byStatus('pendiente')->count(),
+            'aprobada' => (clone $baseQuery)->byStatus('aprobada')->count(),
+            'rechazada' => (clone $baseQuery)->byStatus('rechazada')->count(),
         ];
 
         return Inertia::render('ExitPermits/Index', [
@@ -122,6 +133,7 @@ class ExitPermitController extends Controller
                 'status' => $status,
                 'fecha' => $fecha,
             ],
+            'isNotificationUser' => $isNotificationUser,
         ]);
     }
 
@@ -169,5 +181,11 @@ class ExitPermitController extends Controller
                 'user_id' => $exitPermit->user_id,
             ]);
         }
+    }
+
+    protected function isNotificationUser(): bool
+    {
+        $notificationEmails = config('exit-permit.notification_emails', '');
+        return in_array(Auth::user()->email, array_map('trim', explode(',', $notificationEmails)));
     }
 }

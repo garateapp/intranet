@@ -11,6 +11,7 @@ export default function Show({ permit }) {
     const form = useForm({
         status: 'aprobada',
         rejection_reason: '',
+        con_goce_sueldo: permit.con_goce_sueldo,
     });
 
     function handleSubmit(e) {
@@ -150,6 +151,24 @@ export default function Show({ permit }) {
                                             <p className="mt-1 text-sm text-red-600">{form.errors.status}</p>
                                         )}
                                     </div>
+
+                                    {/* Only show goce toggle when approving */}
+                                    {form.data.status === 'aprobada' && (
+                                        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                                            <label className="flex items-center justify-between cursor-pointer">
+                                                <div>
+                                                    <span className="text-sm font-medium text-blue-700">Con goce de sueldo</span>
+                                                    <p className="text-xs text-blue-500 mt-0.5">Indica si esta salida será con o sin goce de sueldo</p>
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={form.data.con_goce_sueldo}
+                                                    onChange={(e) => form.setData('con_goce_sueldo', e.target.checked)}
+                                                    className="toggle toggle-success"
+                                                />
+                                            </label>
+                                        </div>
+                                    )}
 
                                     {form.data.status === 'rechazada' && (
                                         <div>

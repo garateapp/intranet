@@ -8,7 +8,7 @@ const statusBadgeClasses = {
     rechazada: 'bg-red-100 text-red-800',
 };
 
-export default function Index({ permits, stats, filters }) {
+export default function Index({ permits, stats, filters, isNotificationUser }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
 
@@ -37,6 +37,11 @@ export default function Index({ permits, stats, filters }) {
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Mis Permisos de Salida
+                        {isNotificationUser && (
+                            <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 align-middle">
+                                Vista global
+                            </span>
+                        )}
                     </h2>
                     <Link
                         href={route('exit-permits.create')}

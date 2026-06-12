@@ -2,9 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useEffect } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function Create({ manager, supervisedUsers, userLoginMethod }) {
+export default function Create({ manager, supervisedUsers, userLoginMethod, isNotificationUser }) {
     const user = usePage().props.auth.user;
-    const isSupervisor = supervisedUsers?.length > 0;
+    const isSupervisor = isNotificationUser || supervisedUsers?.length > 0;
 
     const form = useForm({
         user_id: '',
@@ -15,7 +15,6 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
         motivo: '',
         observaciones: '',
         notification_email: '',
-        con_goce_sueldo: true,
     });
 
     const selectedUserId = form.data.user_id || user.id;
@@ -63,7 +62,7 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Employee selector for supervisors */}
+                                {/* Employee selector for supervisors / notification users */}
                                 {isSupervisor && (
                                     <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 space-y-3">
                                         <div>
@@ -76,11 +75,15 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
                                                 <option value="">Yo ({user.name})</option>
                                                 {supervisedUsers.map((su) => (
                                                     <option key={su.id} value={su.id}>
-                                                        {su.name} — {su.email}
+                                                        {su.name}
+                                                        {isNotificationUser ? ` — ${su.email}` : ''}
                                                     </option>
                                                 ))}
                                             </select>
                                         </div>
+                                        {isNotificationUser && (
+                                            <p className="text-xs text-blue-600">Puedes crear permisos para cualquier usuario del sistema.</p>
+                                        )}
                                     </div>
                                 )}
 
@@ -185,22 +188,6 @@ export default function Create({ manager, supervisedUsers, userLoginMethod }) {
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         />
                                     </div>
-                                </div>
-
-                                {/* Paid leave toggle */}
-                                <div className="rounded-lg bg-gray-50 p-4">
-                                    <label className="flex items-center justify-between cursor-pointer">
-                                        <div>
-                                            <span className="text-sm font-medium text-gray-700">Con goce de sueldo</span>
-                                            <p className="text-xs text-gray-500 mt-0.5">Indica si esta salida será con o sin goce de sueldo</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={form.data.con_goce_sueldo}
-                                            onChange={(e) => form.setData('con_goce_sueldo', e.target.checked)}
-                                            className="toggle toggle-success"
-                                        />
-                                    </label>
                                 </div>
 
                                 {/* Motivo */}
