@@ -96,12 +96,14 @@ class ManagerExitPermitController extends Controller
         $validated = $request->validate([
             'status' => ['required', 'in:aprobada,rechazada'],
             'rejection_reason' => ['required_if:status,rechazada', 'nullable', 'string', 'max:5000'],
+            'con_goce_sueldo' => ['nullable', 'boolean'],
         ]);
 
         $oldStatus = $exitPermit->status;
         $exitPermit->update([
             'status' => $validated['status'],
             'rejection_reason' => $validated['rejection_reason'] ?? null,
+            'con_goce_sueldo' => $validated['con_goce_sueldo'] ?? $exitPermit->con_goce_sueldo,
             'updated_by' => $user->id,
         ]);
 
