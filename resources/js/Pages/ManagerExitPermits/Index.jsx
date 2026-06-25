@@ -2,6 +2,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
+const statusBadgeClasses = {
+    pendiente: 'bg-amber-100 text-amber-800',
+    visada: 'bg-blue-100 text-blue-800',
+};
+
 export default function Index({ permits, stats, filters, isNotificationUser }) {
     const [search, setSearch] = useState(filters.search || '');
     const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
@@ -30,7 +35,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        {isNotificationUser ? 'Todas las Salidas' : 'Salidas'}
+                        {isNotificationUser ? 'Todas las Solicitudes' : 'Solicitudes de Permisos'}
                     </h2>
                     {isNotificationUser && (
                         <a
@@ -43,7 +48,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                 </div>
             }
         >
-            <Head title="Salidas" />
+            <Head title="Permisos de Salida" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
@@ -53,6 +58,18 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                             <span className="font-semibold text-gray-900">{stats.total}</span>
                             <span className="ml-1 text-gray-600">Total</span>
                         </div>
+                        {stats.pendiente > 0 && (
+                            <div className="rounded-full bg-amber-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-amber-700">{stats.pendiente}</span>
+                                <span className="ml-1 text-amber-600">Pendientes</span>
+                            </div>
+                        )}
+                        {stats.visada > 0 && (
+                            <div className="rounded-full bg-blue-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-blue-700">{stats.visada}</span>
+                                <span className="ml-1 text-blue-600">Visadas</span>
+                            </div>
+                        )}
                         {stats.con_goce > 0 && (
                             <div className="rounded-full bg-blue-100 px-4 py-2 text-sm">
                                 <span className="font-semibold text-blue-700">{stats.con_goce}</span>
@@ -116,17 +133,17 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                        No hay salidas
+                                        No hay solicitudes
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Cuando tus colaboradores informen una salida, aparecerán aquí.
+                                        Cuando tus colaboradores soliciten un permiso de salida, aparecerán aquí.
                                     </p>
                                 </div>
                             ) : (
                                 <>
                                     {permits.data.length === 0 ? (
                                         <div className="py-8 text-center text-gray-500">
-                                            No se encontraron salidas con los filtros seleccionados.
+                                            No se encontraron solicitudes con los filtros seleccionados.
                                         </div>
                                     ) : (
                                         <>
@@ -139,12 +156,13 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Retorno</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motivo</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goce</th>
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
                                                     {permits.data.map((permit) => (
-                                                        <tr key={permit.id}>
+                                                        <tr key={permit.id} className={permit.status === 'pendiente' ? 'bg-amber-50/50' : ''}>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-600">#{permit.id}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{permit.user?.name || '—'}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
@@ -163,11 +181,16 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
+                                                                    {permit.status_label}
+                                                                </span>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                                 <Link
                                                                     href={route('manager.exit-permits.show', permit.id)}
                                                                     className="text-amber-600 hover:text-amber-900 font-medium"
                                                                 >
-                                                                    Ver detalle
+                                                                    {permit.status === 'pendiente' ? 'Visar' : 'Ver detalle'}
                                                                 </Link>
                                                             </td>
                                                         </tr>

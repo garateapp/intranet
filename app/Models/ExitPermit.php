@@ -81,9 +81,8 @@ class ExitPermit extends Model
     public function getStatusBadgeColorAttribute()
     {
         return match ($this->status) {
-            'pendiente' => 'bg-gray-100 text-gray-800',
-            'aprobada' => 'bg-green-100 text-green-800',
-            'rechazada' => 'bg-red-100 text-red-800',
+            'pendiente' => 'bg-amber-100 text-amber-800',
+            'visada' => 'bg-blue-100 text-blue-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
@@ -91,9 +90,8 @@ class ExitPermit extends Model
     public function getStatusLabelAttribute()
     {
         return match ($this->status) {
-            'pendiente' => 'Pendiente',
-            'aprobada' => 'Aprobada',
-            'rechazada' => 'Rechazada',
+            'pendiente' => 'Pendiente de visado',
+            'visada' => 'Visada',
             default => ucfirst(str_replace('_', ' ', $this->status)),
         };
     }

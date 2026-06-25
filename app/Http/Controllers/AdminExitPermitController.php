@@ -53,8 +53,7 @@ class AdminExitPermitController extends Controller
         $stats = [
             'total' => ExitPermit::count(),
             'pendiente' => ExitPermit::byStatus('pendiente')->count(),
-            'aprobada' => ExitPermit::byStatus('aprobada')->count(),
-            'rechazada' => ExitPermit::byStatus('rechazada')->count(),
+            'visada' => ExitPermit::byStatus('visada')->count(),
         ];
 
         return Inertia::render('AdminExitPermits/Index', [
@@ -84,15 +83,13 @@ class AdminExitPermitController extends Controller
         $this->authorizeAccess();
 
         $validated = $request->validate([
-            'status' => ['required', 'in:pendiente,aprobada,rechazada'],
+            'status' => ['required', 'in:pendiente,visada'],
             'admin_notes' => ['nullable', 'string', 'max:5000'],
-            'rejection_reason' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $exitPermit->update([
             'status' => $validated['status'],
             'admin_notes' => $validated['admin_notes'] ?? $exitPermit->admin_notes,
-            'rejection_reason' => $validated['rejection_reason'] ?? null,
             'updated_by' => Auth::id(),
         ]);
 

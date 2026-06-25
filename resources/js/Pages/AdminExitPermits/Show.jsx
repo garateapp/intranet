@@ -2,16 +2,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 const statusBadgeClasses = {
-    pendiente: 'bg-gray-100 text-gray-800',
-    aprobada: 'bg-green-100 text-green-800',
-    rechazada: 'bg-red-100 text-red-800',
+    pendiente: 'bg-amber-100 text-amber-800',
+    visada: 'bg-blue-100 text-blue-800',
 };
 
 export default function Show({ permit }) {
     const form = useForm({
         status: permit.status,
         admin_notes: permit.admin_notes || '',
-        rejection_reason: '',
     });
 
     function handleSubmit(e) {
@@ -105,13 +103,6 @@ export default function Show({ permit }) {
                                 </div>
                             )}
 
-                            {permit.rejection_reason && (
-                                <div className="mt-4 rounded-lg bg-red-50 p-4">
-                                    <h4 className="text-sm font-medium text-red-800 uppercase tracking-wider">Motivo de Rechazo</h4>
-                                    <p className="mt-2 text-sm text-red-700 whitespace-pre-wrap">{permit.rejection_reason}</p>
-                                </div>
-                            )}
-
                             {permit.admin_notes && (
                                 <div className="mt-4 rounded-lg bg-blue-50 p-4">
                                     <h4 className="text-sm font-medium text-blue-800 uppercase tracking-wider">Notas Administrativas</h4>
@@ -134,28 +125,12 @@ export default function Show({ permit }) {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
                                     >
                                         <option value="pendiente">Pendiente</option>
-                                        <option value="aprobada">Aprobar</option>
-                                        <option value="rechazada">Rechazar</option>
+                                        <option value="visada">Visada</option>
                                     </select>
                                     {form.errors.status && (
                                         <p className="mt-1 text-sm text-red-600">{form.errors.status}</p>
                                     )}
                                 </div>
-
-                                {form.data.status === 'rechazada' && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Motivo de Rechazo <span className="text-red-500">*</span>
-                                        </label>
-                                        <textarea
-                                            value={form.data.rejection_reason}
-                                            onChange={(e) => form.setData('rejection_reason', e.target.value)}
-                                            rows={3}
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-                                            placeholder="Indica el motivo del rechazo..."
-                                        />
-                                    </div>
-                                )}
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Notas Administrativas</label>
