@@ -23,12 +23,9 @@ class ManagerExitPermitController extends Controller
         $search = $request->input('search', '');
         $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
-        $permitsQuery = ExitPermit::with(['user', 'manager'])->latest();
-
-        // Notification users see all; managers see only their subordinates
-        if (! $this->isNotificationUser()) {
-            $permitsQuery->where('manager_id', $user->id);
-        }
+        $permitsQuery = ExitPermit::with(['user', 'manager'])
+            ->where('manager_id', $user->id)
+            ->latest();
 
         if (! empty($search)) {
             $permitsQuery->whereHas('user', function ($q) use ($search) {
@@ -42,7 +39,7 @@ class ManagerExitPermitController extends Controller
 
         $permits = $permitsQuery->paginate(15);
 
-        $baseQuery = $this->isNotificationUser() ? ExitPermit::query() : ExitPermit::where('manager_id', $user->id);
+        $baseQuery = ExitPermit::where('manager_id', $user->id);
         $stats = [
             'total' => (clone $baseQuery)->count(),
             'pendiente' => (clone $baseQuery)->where('status', 'pendiente')->count(),
@@ -66,8 +63,7 @@ class ManagerExitPermitController extends Controller
     {
         $user = Auth::user();
 
-        // Notification users can see any permit; managers only their own
-        if (! $this->isNotificationUser() && $exitPermit->manager_id !== $user->id) {
+        if ($exitPermit->manager_id !== $user->id) {
             abort(403, 'No tienes permiso para ver esta solicitud.');
         }
 
@@ -111,6 +107,7 @@ class ManagerExitPermitController extends Controller
         $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
         $permits = ExitPermit::with(['user', 'manager'])
+            ->where('manager_id', Auth::id())
             ->where('status', 'visada')
             ->when($fecha, fn ($q) => $q->whereDate('fecha_salida', $fecha))
             ->orderBy('fecha_salida')

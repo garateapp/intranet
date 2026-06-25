@@ -29,7 +29,22 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
     }
 
     const hasAnyPermits = permits.total > 0;
+    const formatearFecha = (fechaISO) => {
+  if (!fechaISO) return '';
 
+  const fecha = new Date(fechaISO);
+
+  // Configuramos el formato en español/chileno de 24 horas
+  return new Intl.DateTimeFormat('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false // Forzar formato de 24 horas
+  }).format(fecha).replace(/,/g, ''); // Quitamos la coma que a veces separa fecha y hora
+};
     return (
         <AuthenticatedLayout
             header={
@@ -113,7 +128,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                     </div>
 
                     {/* Permits table */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <div className="overflow-x-auto bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             {!hasAnyPermits ? (
                                 <div className="py-12 text-center">
@@ -124,14 +139,14 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         No tienes permisos de salida
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Informa tu primera salida en horario laboral desde aquí.
+                                        Solicita tu primera salida en horario laboral desde aquí.
                                     </p>
                                     <div className="mt-6">
                                         <Link
                                             href={route('exit-permits.create')}
                                             className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                                         >
-                                            Informar Salida
+                                            Solicitar Autorización de Salida
                                         </Link>
                                     </div>
                                 </div>
@@ -176,17 +191,17 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                                 {permit.motivo}
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                                                                     {permit.con_goce_sueldo_label}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
-                                                                    {permit.status_label}
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.status==='pendiente' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                                                    {permit.status}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                                                {permit.created_at}
+                                                                {formatearFecha(permit.created_at)}
                                                             </td>
                                                         </tr>
                                                     ))}
