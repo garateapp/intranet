@@ -196,7 +196,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.status==='pendiente' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.status==='pendiente' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
                                                                     {permit.status}
                                                                 </span>
                                                             </td>
