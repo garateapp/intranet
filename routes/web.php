@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/permisos-salida/aprobaciones', [ManagerExitPermitController::class, 'index'])->name('manager.exit-permits.index');
     Route::get('/permisos-salida/aprobaciones/descargar', [ManagerExitPermitController::class, 'downloadCsv'])->name('manager.exit-permits.download-csv');
     Route::get('/permisos-salida/aprobaciones/{exit_permit}', [ManagerExitPermitController::class, 'show'])->name('manager.exit-permits.show');
-    Route::patch('/permisos-salida/aprobaciones/{exit_permit}/status', [ManagerExitPermitController::class, 'updateStatus'])->name('manager.exit-permits.update-status');
+    Route::patch('/permisos-salida/aprobaciones/{exit_permit}/goce-sueldo', [ManagerExitPermitController::class, 'updateGoceSueldo'])->name('manager.exit-permits.update-goce-sueldo');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

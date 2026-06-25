@@ -62,13 +62,13 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                             <span className="font-semibold text-gray-900">{stats.total}</span>
                             <span className="ml-1 text-gray-600">Total</span>
                         </div>
-                        {stats.pendiente > 0 && (
+                        {/* {stats.pendiente > 0 && (
                             <div className="rounded-full bg-gray-100 px-4 py-2 text-sm">
                                 <span className="font-semibold text-gray-700">{stats.pendiente}</span>
                                 <span className="ml-1 text-gray-600">Pendiente</span>
                             </div>
-                        )}
-                        {stats.aprobada > 0 && (
+                        )} */}
+                        {/* {stats.aprobada > 0 && (
                             <div className="rounded-full bg-green-100 px-4 py-2 text-sm">
                                 <span className="font-semibold text-green-700">{stats.aprobada}</span>
                                 <span className="ml-1 text-green-600">Aprobada</span>
@@ -79,7 +79,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                 <span className="font-semibold text-red-700">{stats.rechazada}</span>
                                 <span className="ml-1 text-red-600">Rechazada</span>
                             </div>
-                        )}
+                        )} */}
                     </div>
 
                     {/* Filter */}

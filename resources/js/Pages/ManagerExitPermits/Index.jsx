@@ -2,21 +2,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-const statusBadgeClasses = {
-    pendiente: 'bg-gray-100 text-gray-800',
-    aprobada: 'bg-green-100 text-green-800',
-    rechazada: 'bg-red-100 text-red-800',
-};
-
 export default function Index({ permits, stats, filters, isNotificationUser }) {
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [search, setSearch] = useState(filters.search || '');
     const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
 
     function handleFilter(e) {
         e.preventDefault();
         router.get(route('manager.exit-permits.index'), {
-            status: statusFilter || undefined,
             search: search || undefined,
             fecha: fecha || undefined,
         });
@@ -25,7 +17,6 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
     function handlePageChange(url) {
         if (url) {
             router.get(url, {
-                status: statusFilter || undefined,
                 search: search || undefined,
                 fecha: fecha || undefined,
             });
@@ -39,7 +30,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        {isNotificationUser ? 'Todas las Aprobaciones' : 'Aprobaciones de Permisos de Salida'}
+                        {isNotificationUser ? 'Todas las Solicitudes' : 'Solicitudes de Permisos'}
                     </h2>
                     {isNotificationUser && (
                         <a
@@ -52,7 +43,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                 </div>
             }
         >
-            <Head title="Aprobaciones Pendientes" />
+            <Head title="Permisos de Salida" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
@@ -62,22 +53,16 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                             <span className="font-semibold text-gray-900">{stats.total}</span>
                             <span className="ml-1 text-gray-600">Total</span>
                         </div>
-                        {stats.pendiente > 0 && (
-                            <div className="rounded-full bg-amber-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-amber-700">{stats.pendiente}</span>
-                                <span className="ml-1 text-amber-600">Pendientes</span>
+                        {stats.con_goce > 0 && (
+                            <div className="rounded-full bg-blue-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-blue-700">{stats.con_goce}</span>
+                                <span className="ml-1 text-blue-600">Con goce</span>
                             </div>
                         )}
-                        {stats.aprobada > 0 && (
-                            <div className="rounded-full bg-green-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-green-700">{stats.aprobada}</span>
-                                <span className="ml-1 text-green-600">Aprobadas</span>
-                            </div>
-                        )}
-                        {stats.rechazada > 0 && (
-                            <div className="rounded-full bg-red-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-red-700">{stats.rechazada}</span>
-                                <span className="ml-1 text-red-600">Rechazadas</span>
+                        {stats.sin_goce > 0 && (
+                            <div className="rounded-full bg-orange-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-orange-700">{stats.sin_goce}</span>
+                                <span className="ml-1 text-orange-600">Sin goce</span>
                             </div>
                         )}
                         {isNotificationUser && (
@@ -110,19 +95,6 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
                                     />
                                 </div>
-                                <div className="flex-1 min-w-[200px]">
-                                    <label className="block text-sm font-medium text-gray-700">Estado</label>
-                                    <select
-                                        value={statusFilter}
-                                        onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
-                                    >
-                                        <option value="">Todos</option>
-                                        <option value="pendiente">Pendiente</option>
-                                        <option value="aprobada">Aprobada</option>
-                                        <option value="rechazada">Rechazada</option>
-                                    </select>
-                                </div>
                                 <div>
                                     <button
                                         type="submit"
@@ -144,7 +116,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                        No hay solicitudes pendientes
+                                        No hay solicitudes
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-500">
                                         Cuando tus colaboradores soliciten un permiso de salida, aparecerán aquí.
@@ -167,13 +139,12 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Retorno</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motivo</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goce</th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
                                                     {permits.data.map((permit) => (
-                                                        <tr key={permit.id} className={permit.status === 'pendiente' ? 'bg-amber-50/50' : ''}>
+                                                        <tr key={permit.id}>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-600">#{permit.id}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{permit.user?.name || '—'}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
@@ -192,16 +163,11 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
-                                                                    {permit.status_label}
-                                                                </span>
-                                                            </td>
-                                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                                                 <Link
                                                                     href={route('manager.exit-permits.show', permit.id)}
                                                                     className="text-amber-600 hover:text-amber-900 font-medium"
                                                                 >
-                                                            {permit.status === 'pendiente' ? 'Revisar' : 'Ver detalle'}
+                                                                    Ver detalle
                                                                 </Link>
                                                             </td>
                                                         </tr>

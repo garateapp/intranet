@@ -232,7 +232,7 @@ export default function Create({ manager, supervisedUsers, userLoginMethod, isNo
                                         disabled={form.processing}
                                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 disabled:opacity-50"
                                     >
-                                        {form.processing ? 'Enviando...' : 'Solicitar Permiso'}
+                                        {form.processing ? 'Enviando...' : 'Informar Permiso'}
                                     </button>
                                 </div>
                             </form>
