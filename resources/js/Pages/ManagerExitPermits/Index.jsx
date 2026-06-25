@@ -1,31 +1,90 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 const statusBadgeClasses = {
     pendiente: 'bg-amber-100 text-amber-800',
     visada: 'bg-blue-100 text-blue-800',
 };
 
+const periods = [
+    { value: 'hoy', label: 'Hoy' },
+    { value: 'mes', label: 'Mes actual' },
+    { value: 'año', label: 'Año actual' },
+];
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function monthStart() {
+    const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+function monthEnd() {
+    const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()}`;
+}
+
+function yearStart() { return `${new Date().getFullYear()}-01-01`; }
+
+function yearEnd() { return `${new Date().getFullYear()}-12-31`; }
+
 export default function Index({ permits, stats, filters, isNotificationUser }) {
     const [search, setSearch] = useState(filters.search || '');
-    const [fecha, setFecha] = useState(filters.fecha || new Date().toISOString().split('T')[0]);
+    const [periodo, setPeriodo] = useState(filters.periodo || 'hoy');
+    const [fechaDesde, setFechaDesde] = useState(filters.fecha_desde || today());
+    const [fechaHasta, setFechaHasta] = useState(filters.fecha_hasta || today());
+
+    function applyPeriod(p) {
+        let desde = '', hasta = '';
+        if (p === 'hoy') { desde = today(); hasta = today(); }
+        else if (p === 'mes') { desde = monthStart(); hasta = monthEnd(); }
+        else if (p === 'año') { desde = yearStart(); hasta = yearEnd(); }
+
+        setPeriodo(p);
+        setFechaDesde(desde);
+        setFechaHasta(hasta);
+
+        router.get(route('manager.exit-permits.index'), {
+            search: search || undefined,
+            periodo: p,
+            fecha_desde: desde,
+            fecha_hasta: hasta,
+        });
+    }
+
+    const doFilter = useCallback(() => {
+        setPeriodo('');
+        router.get(route('manager.exit-permits.index'), {
+            search: search || undefined,
+            periodo: '',
+            fecha_desde: fechaDesde || undefined,
+            fecha_hasta: fechaHasta || undefined,
+        });
+    }, [search, fechaDesde, fechaHasta]);
 
     function handleFilter(e) {
         e.preventDefault();
-        router.get(route('manager.exit-permits.index'), {
-            search: search || undefined,
-            fecha: fecha || undefined,
-        });
+        doFilter();
     }
 
     function handlePageChange(url) {
         if (url) {
+            const params = new URL(url);
             router.get(url, {
                 search: search || undefined,
-                fecha: fecha || undefined,
+                periodo: periodo || undefined,
+                fecha_desde: fechaDesde || undefined,
+                fecha_hasta: fechaHasta || undefined,
             });
         }
+    }
+
+    function buildCsvUrl() {
+        const params = new URLSearchParams();
+        if (periodo) params.set('periodo', periodo);
+        if (!periodo && fechaDesde) params.set('fecha_desde', fechaDesde);
+        if (!periodo && fechaHasta) params.set('fecha_hasta', fechaHasta);
+        const qs = params.toString();
+        return route('manager.exit-permits.download-csv') + (qs ? '?' + qs : '');
     }
 
     const hasAnyPermits = permits.total > 0;
@@ -39,7 +98,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                     </h2>
                     {isNotificationUser && (
                         <a
-                            href={route('manager.exit-permits.download-csv', { fecha })}
+                            href={buildCsvUrl()}
                             className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
                         >
                             Descargar CSV
@@ -91,14 +150,40 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
 
                     {/* Filters */}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6">
+                        <div className="p-6 space-y-4">
+                            {/* Period quick buttons */}
+                            <div className="flex flex-wrap gap-2">
+                                {periods.map((p) => (
+                                    <button
+                                        key={p.value}
+                                        onClick={() => applyPeriod(p.value)}
+                                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                            periodo === p.value
+                                                ? 'bg-amber-600 text-white'
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {p.label}
+                                    </button>
+                                ))}
+                            </div>
+
                             <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
-                                <div className="flex-1 min-w-[200px]">
-                                    <label className="block text-sm font-medium text-gray-700">Fecha</label>
+                                <div className="flex-1 min-w-[160px]">
+                                    <label className="block text-sm font-medium text-gray-700">Desde</label>
                                     <input
                                         type="date"
-                                        value={fecha}
-                                        onChange={(e) => setFecha(e.target.value)}
+                                        value={fechaDesde}
+                                        onChange={(e) => { setPeriodo(''); setFechaDesde(e.target.value); }}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-[160px]">
+                                    <label className="block text-sm font-medium text-gray-700">Hasta</label>
+                                    <input
+                                        type="date"
+                                        value={fechaHasta}
+                                        onChange={(e) => { setPeriodo(''); setFechaHasta(e.target.value); }}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500"
                                     />
                                 </div>
@@ -176,13 +261,13 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{permit.motivo}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
                                                                     {permit.con_goce_sueldo_label}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.status==='pendiente' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
-                                                                    {permit.status}
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
+                                                                    {permit.status_label}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
