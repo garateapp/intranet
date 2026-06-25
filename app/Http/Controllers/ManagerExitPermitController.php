@@ -21,7 +21,24 @@ class ManagerExitPermitController extends Controller
     {
         $user = Auth::user();
         $search = $request->input('search', '');
-        $fecha = $request->input('fecha', now()->format('Y-m-d'));
+        $periodo = $request->input('periodo', 'hoy');
+        $fecha_desde = $request->input('fecha_desde', now()->format('Y-m-d'));
+        $fecha_hasta = $request->input('fecha_hasta', now()->format('Y-m-d'));
+
+        // Calculate date range based on period
+        $desde = $fecha_desde;
+        $hasta = $fecha_hasta;
+
+        if ($periodo === 'hoy') {
+            $desde = now()->format('Y-m-d');
+            $hasta = now()->format('Y-m-d');
+        } elseif ($periodo === 'mes') {
+            $desde = now()->startOfMonth()->format('Y-m-d');
+            $hasta = now()->endOfMonth()->format('Y-m-d');
+        } elseif ($periodo === 'año') {
+            $desde = now()->startOfYear()->format('Y-m-d');
+            $hasta = now()->endOfYear()->format('Y-m-d');
+        }
 
         $permitsQuery = ExitPermit::with(['user', 'manager'])->latest();
 
@@ -35,19 +52,32 @@ class ManagerExitPermitController extends Controller
             });
         }
 
-        if (! empty($fecha)) {
-            $permitsQuery->whereDate('fecha_salida', $fecha);
+        if (! empty($desde)) {
+            $permitsQuery->whereDate('fecha_salida', '>=', $desde);
+        }
+
+        if (! empty($hasta)) {
+            $permitsQuery->whereDate('fecha_salida', '<=', $hasta);
         }
 
         $permits = $permitsQuery->paginate(15);
 
-        $baseQuery = $this->isNotificationUser() ? ExitPermit::query() : ExitPermit::where('manager_id', $user->id);
+        // Stats use same date range
+        $statsQuery = $this->isNotificationUser() ? ExitPermit::query() : ExitPermit::where('manager_id', $user->id);
+
+        if (! empty($desde)) {
+            $statsQuery->whereDate('fecha_salida', '>=', $desde);
+        }
+        if (! empty($hasta)) {
+            $statsQuery->whereDate('fecha_salida', '<=', $hasta);
+        }
+
         $stats = [
-            'total' => (clone $baseQuery)->count(),
-            'pendiente' => (clone $baseQuery)->where('status', 'pendiente')->count(),
-            'visada' => (clone $baseQuery)->where('status', 'visada')->count(),
-            'con_goce' => (clone $baseQuery)->where('con_goce_sueldo', true)->count(),
-            'sin_goce' => (clone $baseQuery)->where('con_goce_sueldo', false)->count(),
+            'total' => (clone $statsQuery)->count(),
+            'pendiente' => (clone $statsQuery)->where('status', 'pendiente')->count(),
+            'visada' => (clone $statsQuery)->where('status', 'visada')->count(),
+            'con_goce' => (clone $statsQuery)->where('con_goce_sueldo', true)->count(),
+            'sin_goce' => (clone $statsQuery)->where('con_goce_sueldo', false)->count(),
         ];
 
         return Inertia::render('ManagerExitPermits/Index', [
@@ -55,7 +85,9 @@ class ManagerExitPermitController extends Controller
             'stats' => $stats,
             'filters' => [
                 'search' => $search,
-                'fecha' => $fecha,
+                'periodo' => $periodo,
+                'fecha_desde' => $desde,
+                'fecha_hasta' => $hasta,
             ],
             'isNotificationUser' => $this->isNotificationUser(),
         ]);
@@ -106,16 +138,33 @@ class ManagerExitPermitController extends Controller
             abort(403, 'No tienes permiso para descargar este reporte.');
         }
 
-        $fecha = $request->input('fecha', now()->format('Y-m-d'));
+        $periodo = $request->input('periodo', 'hoy');
+        $fecha_desde = $request->input('fecha_desde', now()->format('Y-m-d'));
+        $fecha_hasta = $request->input('fecha_hasta', now()->format('Y-m-d'));
+
+        $desde = $fecha_desde;
+        $hasta = $fecha_hasta;
+
+        if ($periodo === 'hoy') {
+            $desde = now()->format('Y-m-d');
+            $hasta = now()->format('Y-m-d');
+        } elseif ($periodo === 'mes') {
+            $desde = now()->startOfMonth()->format('Y-m-d');
+            $hasta = now()->endOfMonth()->format('Y-m-d');
+        } elseif ($periodo === 'año') {
+            $desde = now()->startOfYear()->format('Y-m-d');
+            $hasta = now()->endOfYear()->format('Y-m-d');
+        }
 
         $permits = ExitPermit::with(['user', 'manager'])
             ->where('status', 'visada')
             ->when(! $this->isNotificationUser(), fn ($q) => $q->where('manager_id', Auth::id()))
-            ->when($fecha, fn ($q) => $q->whereDate('fecha_salida', $fecha))
+            ->when($desde, fn ($q) => $q->whereDate('fecha_salida', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('fecha_salida', '<=', $hasta))
             ->orderBy('fecha_salida')
             ->get();
 
-        $filename = "aprobaciones_{$fecha}.csv";
+        $filename = "solicitudes_{$desde}_al_{$hasta}.csv";
         $headers = [
             'Content-Type' => 'text/csv; charset=utf-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
