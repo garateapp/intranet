@@ -36,7 +36,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Mis Permisos de Salida
+                        Mis Salidas
                         {isNotificationUser && (
                             <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 align-middle">
                                 Vista global
@@ -47,12 +47,12 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                         href={route('exit-permits.create')}
                         className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                     >
-                        Nuevo Permiso
+                        Nueva Salida
                     </Link>
                 </div>
             }
         >
-            <Head title="Mis Permisos de Salida" />
+            <Head title="Mis Salidas" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
@@ -95,7 +95,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     />
                                 </div>
-                                <div className="flex-1 min-w-[200px]">
+                                {/* <div className="flex-1 min-w-[200px]">
                                     <label className="block text-sm font-medium text-gray-700">Estado</label>
                                     <select
                                         value={statusFilter}
@@ -107,7 +107,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         <option value="aprobada">Aprobada</option>
                                         <option value="rechazada">Rechazada</option>
                                     </select>
-                                </div>
+                                </div> */}
                                 <div>
                                     <button
                                         type="submit"
@@ -132,14 +132,14 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         No tienes permisos de salida
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Solicita tu primer permiso de salida desde aquí.
+                                        Informa tu primera salida en horario laboral desde aquí.
                                     </p>
                                     <div className="mt-6">
                                         <Link
                                             href={route('exit-permits.create')}
                                             className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
                                         >
-                                            Solicitar Permiso
+                                            Informar Salida
                                         </Link>
                                     </div>
                                 </div>
@@ -147,7 +147,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                 <>
                                     {permits.data.length === 0 ? (
                                         <div className="py-8 text-center text-gray-500">
-                                            No se encontraron permisos con los filtros seleccionados.
+                                            No se encontraron salidas con los filtros seleccionados.
                                         </div>
                                     ) : (
                                         <>

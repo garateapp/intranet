@@ -30,7 +30,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        {isNotificationUser ? 'Todas las Solicitudes' : 'Solicitudes de Permisos'}
+                        {isNotificationUser ? 'Todas las Salidas' : 'Salidas'}
                     </h2>
                     {isNotificationUser && (
                         <a
@@ -43,7 +43,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                 </div>
             }
         >
-            <Head title="Permisos de Salida" />
+            <Head title="Salidas" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
@@ -116,17 +116,17 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                        No hay solicitudes
+                                        No hay salidas
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Cuando tus colaboradores soliciten un permiso de salida, aparecerán aquí.
+                                        Cuando tus colaboradores informen una salida, aparecerán aquí.
                                     </p>
                                 </div>
                             ) : (
                                 <>
                                     {permits.data.length === 0 ? (
                                         <div className="py-8 text-center text-gray-500">
-                                            No se encontraron solicitudes con los filtros seleccionados.
+                                            No se encontraron salidas con los filtros seleccionados.
                                         </div>
                                     ) : (
                                         <>
