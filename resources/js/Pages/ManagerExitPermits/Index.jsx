@@ -35,7 +35,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Solicitudes de Permisos
+                        {isNotificationUser ? 'Todas las Solicitudes' : 'Solicitudes de Permisos'}
                     </h2>
                     {isNotificationUser && (
                         <a
@@ -80,6 +80,11 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                             <div className="rounded-full bg-orange-100 px-4 py-2 text-sm">
                                 <span className="font-semibold text-orange-700">{stats.sin_goce}</span>
                                 <span className="ml-1 text-orange-600">Sin goce</span>
+                            </div>
+                        )}
+                        {isNotificationUser && (
+                            <div className="rounded-full bg-purple-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-purple-700">Vista global</span>
                             </div>
                         )}
                     </div>
