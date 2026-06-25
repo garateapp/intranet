@@ -45,6 +45,8 @@ class ManagerExitPermitController extends Controller
         $baseQuery = $this->isNotificationUser() ? ExitPermit::query() : ExitPermit::where('manager_id', $user->id);
         $stats = [
             'total' => (clone $baseQuery)->count(),
+            'pendiente' => (clone $baseQuery)->where('status', 'pendiente')->count(),
+            'visada' => (clone $baseQuery)->where('status', 'visada')->count(),
             'con_goce' => (clone $baseQuery)->where('con_goce_sueldo', true)->count(),
             'sin_goce' => (clone $baseQuery)->where('con_goce_sueldo', false)->count(),
         ];
@@ -76,12 +78,12 @@ class ManagerExitPermitController extends Controller
         ]);
     }
 
-    public function updateGoceSueldo(Request $request, ExitPermit $exitPermit)
+    public function visar(Request $request, ExitPermit $exitPermit)
     {
         $user = Auth::user();
 
         if ($exitPermit->manager_id !== $user->id) {
-            abort(403, 'No tienes permiso para modificar esta solicitud.');
+            abort(403, 'No tienes permiso para visar esta solicitud.');
         }
 
         $validated = $request->validate([
@@ -89,6 +91,7 @@ class ManagerExitPermitController extends Controller
         ]);
 
         $exitPermit->update([
+            'status' => 'visada',
             'con_goce_sueldo' => $validated['con_goce_sueldo'],
             'updated_by' => $user->id,
         ]);
@@ -96,7 +99,7 @@ class ManagerExitPermitController extends Controller
         $label = $validated['con_goce_sueldo'] ? 'con goce' : 'sin goce';
 
         return redirect()->route('manager.exit-permits.index')
-            ->with('success', "Permiso actualizado a {$label} de sueldo.");
+            ->with('success', "Permiso visado como {$label} de sueldo.");
     }
 
     public function downloadCsv(Request $request)
@@ -108,7 +111,7 @@ class ManagerExitPermitController extends Controller
         $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
         $permits = ExitPermit::with(['user', 'manager'])
-            ->whereIn('status', ['aprobada', 'rechazada'])
+            ->where('status', 'visada')
             ->when($fecha, fn ($q) => $q->whereDate('fecha_salida', $fecha))
             ->orderBy('fecha_salida')
             ->get();

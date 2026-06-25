@@ -3,9 +3,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 const statusBadgeClasses = {
-    pendiente: 'bg-gray-100 text-gray-800',
-    aprobada: 'bg-green-100 text-green-800',
-    rechazada: 'bg-red-100 text-red-800',
+    pendiente: 'bg-amber-100 text-amber-800',
+    visada: 'bg-blue-100 text-blue-800',
 };
 
 export default function Index({ permits, stats, filters, isNotificationUser }) {
@@ -62,24 +61,18 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                             <span className="font-semibold text-gray-900">{stats.total}</span>
                             <span className="ml-1 text-gray-600">Total</span>
                         </div>
-                        {/* {stats.pendiente > 0 && (
-                            <div className="rounded-full bg-gray-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-gray-700">{stats.pendiente}</span>
-                                <span className="ml-1 text-gray-600">Pendiente</span>
-                            </div>
-                        )} */}
-                        {/* {stats.aprobada > 0 && (
-                            <div className="rounded-full bg-green-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-green-700">{stats.aprobada}</span>
-                                <span className="ml-1 text-green-600">Aprobada</span>
+                        {stats.pendiente > 0 && (
+                            <div className="rounded-full bg-amber-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-amber-700">{stats.pendiente}</span>
+                                <span className="ml-1 text-amber-600">Pendiente</span>
                             </div>
                         )}
-                        {stats.rechazada > 0 && (
-                            <div className="rounded-full bg-red-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-red-700">{stats.rechazada}</span>
-                                <span className="ml-1 text-red-600">Rechazada</span>
+                        {stats.visada > 0 && (
+                            <div className="rounded-full bg-blue-100 px-4 py-2 text-sm">
+                                <span className="font-semibold text-blue-700">{stats.visada}</span>
+                                <span className="ml-1 text-blue-600">Visada</span>
                             </div>
-                        )} */}
+                        )}
                     </div>
 
                     {/* Filter */}
@@ -95,7 +88,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     />
                                 </div>
-                                {/* <div className="flex-1 min-w-[200px]">
+                                <div className="flex-1 min-w-[200px]">
                                     <label className="block text-sm font-medium text-gray-700">Estado</label>
                                     <select
                                         value={statusFilter}
@@ -104,10 +97,9 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                     >
                                         <option value="">Todos</option>
                                         <option value="pendiente">Pendiente</option>
-                                        <option value="aprobada">Aprobada</option>
-                                        <option value="rechazada">Rechazada</option>
+                                        <option value="visada">Visada</option>
                                     </select>
-                                </div> */}
+                                </div>
                                 <div>
                                     <button
                                         type="submit"

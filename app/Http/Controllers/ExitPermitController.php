@@ -84,7 +84,7 @@ class ExitPermitController extends Controller
             'motivo' => $validated['motivo'],
             'observaciones' => $validated['observaciones'],
             'notification_email' => $validated['notification_email'] ?? null,
-            'status' => 'aprobada',
+            'status' => 'pendiente',
             'created_by' => $user->id,
         ]);
 
@@ -122,8 +122,9 @@ class ExitPermitController extends Controller
         $stats = [
             'total' => (clone $baseQuery)->count(),
             'pendiente' => (clone $baseQuery)->byStatus('pendiente')->count(),
-            'aprobada' => (clone $baseQuery)->byStatus('aprobada')->count(),
-            'rechazada' => (clone $baseQuery)->byStatus('rechazada')->count(),
+            'visada' => (clone $baseQuery)->byStatus('visada')->count(),
+            'con_goce' => (clone $baseQuery)->where('con_goce_sueldo', true)->count(),
+            'sin_goce' => (clone $baseQuery)->where('con_goce_sueldo', false)->count(),
         ];
 
         return Inertia::render('ExitPermits/Index', [

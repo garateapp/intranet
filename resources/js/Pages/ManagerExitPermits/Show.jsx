@@ -1,14 +1,21 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+const statusBadgeClasses = {
+    pendiente: 'bg-amber-100 text-amber-800',
+    visada: 'bg-blue-100 text-blue-800',
+};
+
 export default function Show({ permit }) {
+    const isPending = permit.status === 'pendiente';
+
     const form = useForm({
         con_goce_sueldo: permit.con_goce_sueldo,
     });
 
     function handleSubmit(e) {
         e.preventDefault();
-        form.patch(route('manager.exit-permits.update-goce-sueldo', permit.id));
+        form.patch(route('manager.exit-permits.visar', permit.id));
     }
 
     return (
@@ -83,8 +90,8 @@ export default function Show({ permit }) {
                                 <div>
                                     <dt className="text-sm font-medium text-gray-500">Estado</dt>
                                     <dd className="mt-1">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Aprobada
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
+                                            {permit.status_label}
                                         </span>
                                     </dd>
                                 </div>
@@ -100,46 +107,68 @@ export default function Show({ permit }) {
                         </div>
                     </div>
 
-                    {/* Goce de sueldo toggle */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6">
-                            <h3 className="text-lg font-medium text-gray-900 mb-4">Actualizar Goce de Sueldo</h3>
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Visado */}
+                    {isPending && (
+                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <h3 className="text-lg font-medium text-gray-900 mb-4">Visar Permiso</h3>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                                        <label className="flex items-center justify-between cursor-pointer">
+                                            <div>
+                                                <span className="text-sm font-medium text-blue-700">Con goce de sueldo</span>
+                                                <p className="text-xs text-blue-500 mt-0.5">
+                                                    Por defecto es sin goce. Marca si corresponde con goce.
+                                                </p>
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                checked={form.data.con_goce_sueldo}
+                                                onChange={(e) => form.setData('con_goce_sueldo', e.target.checked)}
+                                                className={`toggle ${form.data.con_goce_sueldo ? 'toggle-success' : ''}`}
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div className="flex justify-end gap-3">
+                                        <Link
+                                            href={route('manager.exit-permits.index')}
+                                            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50"
+                                        >
+                                            Cancelar
+                                        </Link>
+                                        <button
+                                            type="submit"
+                                            disabled={form.processing}
+                                            className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 disabled:opacity-50"
+                                        >
+                                            {form.processing ? 'Visando...' : 'Visar'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isPending && (
+                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                            <div className="p-6">
                                 <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
-                                    <label className="flex items-center justify-between cursor-pointer">
+                                    <div className="flex items-center justify-between">
                                         <div>
-                                            <span className="text-sm font-medium text-blue-700">Con goce de sueldo</span>
+                                            <span className="text-sm font-medium text-blue-700">Goce de sueldo</span>
                                             <p className="text-xs text-blue-500 mt-0.5">
-                                                La solicitud se crea sin goce por defecto. Marca si corresponde con goce.
+                                                {permit.con_goce_sueldo_label}
                                             </p>
                                         </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={form.data.con_goce_sueldo}
-                                            onChange={(e) => form.setData('con_goce_sueldo', e.target.checked)}
-                                            className={`toggle ${form.data.con_goce_sueldo ? 'toggle-success' : ''}`}
-                                        />
-                                    </label>
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            Visado
+                                        </span>
+                                    </div>
                                 </div>
-
-                                <div className="flex justify-end gap-3">
-                                    <Link
-                                        href={route('manager.exit-permits.index')}
-                                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50"
-                                    >
-                                        Cancelar
-                                    </Link>
-                                    <button
-                                        type="submit"
-                                        disabled={form.processing}
-                                        className="inline-flex items-center px-4 py-2 bg-amber-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-700 disabled:opacity-50"
-                                    >
-                                        {form.processing ? 'Guardando...' : 'Guardar'}
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>
