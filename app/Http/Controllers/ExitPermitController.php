@@ -84,7 +84,7 @@ class ExitPermitController extends Controller
             'motivo' => $validated['motivo'],
             'observaciones' => $validated['observaciones'],
             'notification_email' => $validated['notification_email'] ?? null,
-            'status' => 'pendiente',
+            'status' => 'aprobada',
             'created_by' => $user->id,
         ]);
 

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ExitPermitStatusChanged;
 use App\Models\ExitPermit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class ManagerExitPermitController extends Controller
@@ -22,7 +20,6 @@ class ManagerExitPermitController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $status = $request->input('status', '');
         $search = $request->input('search', '');
         $fecha = $request->input('fecha', now()->format('Y-m-d'));
 
@@ -31,10 +28,6 @@ class ManagerExitPermitController extends Controller
         // Notification users see all; managers see only their subordinates
         if (! $this->isNotificationUser()) {
             $permitsQuery->where('manager_id', $user->id);
-        }
-
-        if (! empty($status)) {
-            $permitsQuery->where('status', $status);
         }
 
         if (! empty($search)) {
@@ -49,18 +42,17 @@ class ManagerExitPermitController extends Controller
 
         $permits = $permitsQuery->paginate(15);
 
+        $baseQuery = $this->isNotificationUser() ? ExitPermit::query() : ExitPermit::where('manager_id', $user->id);
         $stats = [
-            'total' => ExitPermit::where('manager_id', $user->id)->count(),
-            'pendiente' => ExitPermit::where('manager_id', $user->id)->where('status', 'pendiente')->count(),
-            'aprobada' => ExitPermit::where('manager_id', $user->id)->where('status', 'aprobada')->count(),
-            'rechazada' => ExitPermit::where('manager_id', $user->id)->where('status', 'rechazada')->count(),
+            'total' => (clone $baseQuery)->count(),
+            'con_goce' => (clone $baseQuery)->where('con_goce_sueldo', true)->count(),
+            'sin_goce' => (clone $baseQuery)->where('con_goce_sueldo', false)->count(),
         ];
 
         return Inertia::render('ManagerExitPermits/Index', [
             'permits' => $permits,
             'stats' => $stats,
             'filters' => [
-                'status' => $status,
                 'search' => $search,
                 'fecha' => $fecha,
             ],
@@ -84,37 +76,27 @@ class ManagerExitPermitController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, ExitPermit $exitPermit)
+    public function updateGoceSueldo(Request $request, ExitPermit $exitPermit)
     {
         $user = Auth::user();
 
-        // Ensure the manager owns this permit (notification users can't approve)
         if ($exitPermit->manager_id !== $user->id) {
             abort(403, 'No tienes permiso para modificar esta solicitud.');
         }
 
         $validated = $request->validate([
-            'status' => ['required', 'in:aprobada,rechazada'],
-            'rejection_reason' => ['required_if:status,rechazada', 'nullable', 'string', 'max:5000'],
-            'con_goce_sueldo' => ['nullable', 'boolean'],
+            'con_goce_sueldo' => ['required', 'boolean'],
         ]);
 
-        $oldStatus = $exitPermit->status;
         $exitPermit->update([
-            'status' => $validated['status'],
-            'rejection_reason' => $validated['rejection_reason'] ?? null,
-            'con_goce_sueldo' => $validated['con_goce_sueldo'] ?? $exitPermit->con_goce_sueldo,
+            'con_goce_sueldo' => $validated['con_goce_sueldo'],
             'updated_by' => $user->id,
         ]);
 
-        $this->sendStatusChangeNotification($exitPermit, $oldStatus);
-
-        $message = $validated['status'] === 'aprobada'
-            ? 'Solicitud aprobada exitosamente.'
-            : 'Solicitud rechazada.';
+        $label = $validated['con_goce_sueldo'] ? 'con goce' : 'sin goce';
 
         return redirect()->route('manager.exit-permits.index')
-            ->with('success', $message);
+            ->with('success', "Permiso actualizado a {$label} de sueldo.");
     }
 
     public function downloadCsv(Request $request)
@@ -169,29 +151,5 @@ class ManagerExitPermitController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
-    }
-
-    protected function sendStatusChangeNotification(ExitPermit $exitPermit, string $oldStatus): void
-    {
-        $recipients = [];
-
-        // Always notify the solicitante (use notification_email if provided)
-        $employeeEmail = $exitPermit->notification_email ?? $exitPermit->user?->email;
-        if ($employeeEmail) {
-            $recipients[] = $employeeEmail;
-        }
-
-        // Also notify admin emails from config
-        $additionalEmails = config('exit-permit.notification_emails');
-        if (! empty($additionalEmails)) {
-            $extra = array_map('trim', explode(',', $additionalEmails));
-            $recipients = array_merge($recipients, $extra);
-        }
-
-        $recipients = array_unique(array_filter($recipients));
-
-        foreach ($recipients as $email) {
-            Mail::to($email)->send(new ExitPermitStatusChanged($exitPermit, $oldStatus));
-        }
     }
 }
