@@ -35,7 +35,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        {isNotificationUser ? 'Todas las Solicitudes' : 'Solicitudes de Permisos'}
+                        Solicitudes de Permisos
                     </h2>
                     {isNotificationUser && (
                         <a
@@ -82,11 +82,6 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                 <span className="ml-1 text-orange-600">Sin goce</span>
                             </div>
                         )}
-                        {isNotificationUser && (
-                            <div className="rounded-full bg-purple-100 px-4 py-2 text-sm">
-                                <span className="font-semibold text-purple-700">Vista global</span>
-                            </div>
-                        )}
                     </div>
 
                     {/* Filters */}
@@ -125,7 +120,7 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <div className="overflow-x-auto bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             {!hasAnyPermits ? (
                                 <div className="py-12 text-center">
@@ -176,13 +171,13 @@ export default function Index({ permits, stats, filters, isNotificationUser }) {
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{permit.motivo}</td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.con_goce_sueldo ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                                                                     {permit.con_goce_sueldo_label}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
-                                                                    {permit.status_label}
+                                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${permit.status==='pendiente' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                                                    {permit.status}
                                                                 </span>
                                                             </td>
                                                             <td className="whitespace-nowrap px-6 py-4 text-sm">

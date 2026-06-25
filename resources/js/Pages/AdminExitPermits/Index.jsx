@@ -114,7 +114,7 @@ export default function Index({ permits, stats, filters }) {
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <div className="overflow-x-auto bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             {!hasAnyPermits ? (
                                 <div className="py-12 text-center">
