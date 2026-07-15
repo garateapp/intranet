@@ -8,7 +8,8 @@ use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use OpenSpout\Writer\Common\Options\WriterOptions;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 
 /**
@@ -96,82 +97,76 @@ class AtsDashboardController extends Controller
         $writer->openToFile($tempFile);
 
         // Hoja 1: Resumen
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('REPORTE ATS - ' . now()->format('d/m/Y H:i')),
+        $writer->addRow(new Row([Cell::fromValue('REPORTE ATS - ' . now()->format('d/m/Y H:i'))]));
+        $writer->addRow(new Row([]));
+        $writer->addRow(new Row([
+            Cell::fromValue('Total Vacantes'),
+            Cell::fromValue($vacancies->count()),
         ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Total Vacantes'),
-            \OpenSpout\Common\Entity\Cell::fromValue($vacancies->count()),
+        $writer->addRow(new Row([
+            Cell::fromValue('Activas'),
+            Cell::fromValue($vacancies->where('status', 'active')->count()),
         ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Activas'),
-            \OpenSpout\Common\Entity\Cell::fromValue($vacancies->where('status', 'active')->count()),
+        $writer->addRow(new Row([
+            Cell::fromValue('En Borrador'),
+            Cell::fromValue($vacancies->where('status', 'draft')->count()),
         ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('En Borrador'),
-            \OpenSpout\Common\Entity\Cell::fromValue($vacancies->where('status', 'draft')->count()),
+        $writer->addRow(new Row([
+            Cell::fromValue('Cerradas'),
+            Cell::fromValue($vacancies->where('status', 'closed')->count()),
         ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Cerradas'),
-            \OpenSpout\Common\Entity\Cell::fromValue($vacancies->where('status', 'closed')->count()),
+        $writer->addRow(new Row([
+            Cell::fromValue('Total Postulaciones'),
+            Cell::fromValue($applications->count()),
         ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Total Postulaciones'),
-            \OpenSpout\Common\Entity\Cell::fromValue($applications->count()),
-        ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([]));
+        $writer->addRow(new Row([]));
 
-        // Hoja 1: Detalle de Vacantes
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('VACANTES'),
-        ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Título'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Estado'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Tipo'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Gerente'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Salario'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Etapas'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Postulaciones'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Fecha Creación'),
+        // Detalle de Vacantes
+        $writer->addRow(new Row([Cell::fromValue('VACANTES')]));
+        $writer->addRow(new Row([
+            Cell::fromValue('Título'),
+            Cell::fromValue('Estado'),
+            Cell::fromValue('Tipo'),
+            Cell::fromValue('Gerente'),
+            Cell::fromValue('Salario'),
+            Cell::fromValue('Etapas'),
+            Cell::fromValue('Postulaciones'),
+            Cell::fromValue('Fecha Creación'),
         ]));
         foreach ($vacancies as $v) {
-            $writer->addRow(new \OpenSpout\Common\Entity\Row([
-                \OpenSpout\Common\Entity\Cell::fromValue($v->title),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->status),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->job_type),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->hiringManager?->name ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->salary ? $v->salary_currency . ' ' . number_format($v->salary, 0, ',', '.') : '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->stages->count()),
-                \OpenSpout\Common\Entity\Cell::fromValue($applications->where('vacancy_id', $v->id)->count()),
-                \OpenSpout\Common\Entity\Cell::fromValue($v->created_at->format('d/m/Y')),
+            $writer->addRow(new Row([
+                Cell::fromValue($v->title),
+                Cell::fromValue($v->status),
+                Cell::fromValue($v->job_type),
+                Cell::fromValue($v->hiringManager?->name ?? '-'),
+                Cell::fromValue($v->salary ? $v->salary_currency . ' ' . number_format($v->salary, 0, ',', '.') : '-'),
+                Cell::fromValue($v->stages->count()),
+                Cell::fromValue($applications->where('vacancy_id', $v->id)->count()),
+                Cell::fromValue($v->created_at->format('d/m/Y')),
             ]));
         }
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([]));
+        $writer->addRow(new Row([]));
 
-        // Hoja 2: Todas las Postulaciones
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('POSTULACIONES'),
-        ]));
-        $writer->addRow(new \OpenSpout\Common\Entity\Row([
-            \OpenSpout\Common\Entity\Cell::fromValue('Candidato'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Email'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Teléfono'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Origen'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Vacante'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Etapa Actual'),
-            \OpenSpout\Common\Entity\Cell::fromValue('Fecha Postulación'),
+        // Postulaciones
+        $writer->addRow(new Row([Cell::fromValue('POSTULACIONES')]));
+        $writer->addRow(new Row([
+            Cell::fromValue('Candidato'),
+            Cell::fromValue('Email'),
+            Cell::fromValue('Teléfono'),
+            Cell::fromValue('Origen'),
+            Cell::fromValue('Vacante'),
+            Cell::fromValue('Etapa Actual'),
+            Cell::fromValue('Fecha Postulación'),
         ]));
         foreach ($applications as $app) {
-            $writer->addRow(new \OpenSpout\Common\Entity\Row([
-                \OpenSpout\Common\Entity\Cell::fromValue($app->candidate?->name ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->candidate?->email ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->candidate?->phone ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->candidate?->origin ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->vacancy?->title ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->stage?->name ?? '-'),
-                \OpenSpout\Common\Entity\Cell::fromValue($app->applied_at?->format('d/m/Y') ?? '-'),
+            $writer->addRow(new Row([
+                Cell::fromValue($app->candidate?->name ?? '-'),
+                Cell::fromValue($app->candidate?->email ?? '-'),
+                Cell::fromValue($app->candidate?->phone ?? '-'),
+                Cell::fromValue($app->candidate?->origin ?? '-'),
+                Cell::fromValue($app->vacancy?->title ?? '-'),
+                Cell::fromValue($app->stage?->name ?? '-'),
+                Cell::fromValue($app->applied_at?->format('d/m/Y') ?? '-'),
             ]));
         }
 

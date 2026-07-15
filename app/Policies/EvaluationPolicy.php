@@ -17,12 +17,12 @@ class EvaluationPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     public function view(User $user, Evaluation $evaluation): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -38,12 +38,12 @@ class EvaluationPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     public function update(User $user, Evaluation $evaluation): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -53,7 +53,7 @@ class EvaluationPolicy
 
     public function delete(User $user, Evaluation $evaluation): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
