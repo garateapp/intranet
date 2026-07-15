@@ -42,6 +42,9 @@ export default function Index({ users, filters }) {
                                     <option value="">Todos los roles</option>
                                     <option value="admin">Admin</option>
                                     <option value="user">Usuario</option>
+                                    <option value="recruiter">Reclutador</option>
+                                    <option value="hiring_manager">Contratación</option>
+
                                 </select>
                                 <button
                                     type="submit"

@@ -91,7 +91,7 @@ export default function Show({ permit }) {
                                     <dt className="text-sm font-medium text-gray-500">Estado</dt>
                                     <dd className="mt-1">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeClasses[permit.status] || 'bg-gray-100 text-gray-800'}`}>
-                                            {permit.status_label}
+                                            {permit.statu_label}
                                         </span>
                                     </dd>
                                 </div>

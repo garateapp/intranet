@@ -116,6 +116,8 @@ export default function Edit({ user, managers, organizationalUnits }) {
                                         >
                                             <option value="user">Usuario</option>
                                             <option value="admin">Admin</option>
+                                             <option value="recruiter">Reclutador</option>
+                                    <option value="hiring_manager">Contratación</option>
                                         </select>
                                         {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
                                     </div>
