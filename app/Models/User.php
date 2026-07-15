@@ -5,14 +5,16 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The accessors to append to the model's array form.
@@ -133,6 +135,36 @@ class User extends Authenticatable
         return $this->hasMany(SurveyResponse::class);
     }
 
+    // ========== ATS Relationships ==========
+
+    /**
+     * Vacantes donde este usuario es gerente de contratación.
+     */
+    public function managedVacancies(): HasMany
+    {
+        return $this->hasMany(Vacancy::class, 'hiring_manager_id');
+    }
+
+    /**
+     * Vacantes creadas por este usuario (reclutador/RRHH).
+     */
+    public function createdVacancies(): HasMany
+    {
+        return $this->hasMany(Vacancy::class, 'created_by');
+    }
+
+    /**
+     * Evaluaciones realizadas por este usuario.
+     */
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class, 'evaluator_id');
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol dado usando Spatie.
+     * Mantiene compatibilidad con el método isAdmin() existente.
+     */
     public function isAdmin()
     {
         return $this->role === 'admin';

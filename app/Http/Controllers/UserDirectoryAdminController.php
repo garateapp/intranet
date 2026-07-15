@@ -56,7 +56,7 @@ class UserDirectoryAdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:admin,user,super_admin,recruiter,hiring_manager'],
             'department' => ['nullable', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],

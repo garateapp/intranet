@@ -153,6 +153,110 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                             <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                             RRHH
                         </Link>
+                        {/* ATS Section */}
+                       {(
+    user.role === 'admin' ||
+    user.role === 'super_admin' ||
+    user.role === 'recruiter' ||
+    user.role === 'hiring_manager'
+) && (
+    <>
+        <div className="mt-2 border-t border-gray-100 pt-2">
+            <div className="flex items-center gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-blue-600">
+                <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                </svg>
+
+                ATS
+            </div>
+        </div>
+
+        <Link
+            href={route('ats.dashboard')}
+            className={navLinkClass(
+                route().current('ats.dashboard')
+            )}
+        >
+            <svg
+                className="h-5 w-5 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+            </svg>
+
+            Dashboard ATS
+        </Link>
+
+        <Link
+            href={route('ats.vacancies.index')}
+            className={navLinkClass(
+                route().current('ats.vacancies.*') ||
+                route().current('ats.applications.kanban')
+            )}
+        >
+            <svg
+                className="h-5 w-5 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+            </svg>
+
+            Vacantes
+        </Link>
+
+        <Link
+            href={route('ats.candidates.index')}
+            className={navLinkClass(
+                route().current('ats.candidates.*')
+            )}
+        >
+            <svg
+                className="h-5 w-5 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+            </svg>
+
+            Candidatos
+        </Link>
+
+                            <Link href={route('ats.stages.index')} className={navLinkClass(route().current('ats.stages.*'))}>
+                                <svg className="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+                                Etapas
+                            </Link>
+                                </>
+                        )}
 
                         {/* Admin section */}
                         {user.role === 'admin' && (
@@ -322,6 +426,13 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                 <ResponsiveNavLink href={route('exit-permits.index')} active={route().current('exit-permits.*')}>Permisos de Salida</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('manager.exit-permits.index')} active={route().current('manager.exit-permits.*')}>Aprobaciones</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('rrhh.index')} active={route().current('rrhh.*')}>RRHH</ResponsiveNavLink>
+                                <div className="pt-3 pb-1 text-xs font-semibold text-blue-600 uppercase tracking-wider">ATS</div>
+                                <ResponsiveNavLink href={route('ats.dashboard')} active={route().current('ats.dashboard')}>Dashboard ATS</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('ats.vacancies.index')} active={route().current('ats.vacancies.*') || route().current('ats.applications.kanban')}>Vacantes</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('ats.candidates.index')} active={route().current('ats.candidates.*')}>Candidatos</ResponsiveNavLink>
+                                {user.role === 'admin' && (
+                                    <ResponsiveNavLink href={route('ats.stages.index')} active={route().current('ats.stages.*')}>Etapas</ResponsiveNavLink>
+                                )}
                                 {user.role === 'admin' && (
                                     <>
                                         <div className="pt-3 pb-1 text-xs font-semibold text-orange-500 uppercase tracking-wider">Admin</div>

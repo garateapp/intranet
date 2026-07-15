@@ -36,6 +36,14 @@ use App\Http\Controllers\SurveyResponseController;
 use App\Http\Controllers\ExitPermitController;
 use App\Http\Controllers\AdminExitPermitController;
 use App\Http\Controllers\ManagerExitPermitController;
+use App\Http\Controllers\AtsDashboardController;
+use App\Http\Controllers\VacancyController;
+use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\StageController;
+use App\Http\Controllers\VacancyStageController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\InterviewController;
+use App\Http\Controllers\EvaluationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -138,6 +146,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('user-requests/{user_request}/status', [UserRequestAdminController::class, 'updateStatus'])->name('user-requests.update-status');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
+
+        // ========== MÓDULO ATS ==========
+        // Dashboard ATS
+        Route::get('/ats', [AtsDashboardController::class, 'index'])->name('ats.dashboard');
+        Route::get('/ats/export', [AtsDashboardController::class, 'export'])->name('ats.export');
+
+        // Vacantes
+        Route::resource('ats/vacancies', VacancyController::class)->names('ats.vacancies');
+        Route::put('ats/vacancies/{vacancy}/restore', [VacancyController::class, 'restore'])->name('ats.vacancies.restore');
+
+        // Pipeline de vacantes (configurar etapas)
+        Route::get('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'index'])->name('ats.vacancies.pipeline');
+        Route::post('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'store'])->name('ats.vacancies.pipeline.store');
+        Route::put('ats/vacancies/{vacancy}/pipeline/reorder', [VacancyStageController::class, 'reorder'])->name('ats.vacancies.pipeline.reorder');
+        Route::delete('ats/vacancies/{vacancy}/pipeline/{stageId}', [VacancyStageController::class, 'destroy'])->name('ats.vacancies.pipeline.destroy');
+
+        // Tablero Kanban
+        Route::get('ats/vacancies/{vacancy}/kanban', [ApplicationController::class, 'kanban'])->name('ats.applications.kanban');
+        Route::post('ats/applications', [ApplicationController::class, 'store'])->name('ats.applications.store');
+        Route::patch('ats/applications/{application}/move', [ApplicationController::class, 'move'])->name('ats.applications.move');
+        Route::patch('ats/applications/{application}/hire', [ApplicationController::class, 'hire'])->name('ats.applications.hire');
+        Route::delete('ats/applications/{application}', [ApplicationController::class, 'destroy'])->name('ats.applications.destroy');
+
+        // Candidatos
+        Route::resource('ats/candidates', CandidateController::class)->names('ats.candidates');
+
+        // Entrevistas
+        Route::resource('ats/interviews', InterviewController::class)->names('ats.interviews');
+        Route::get('ats/applications/{application}/interviews', [InterviewController::class, 'index'])->name('ats.application-interviews.index');
+        Route::get('ats/applications/{application}/interviews/create', [InterviewController::class, 'create'])->name('ats.application-interviews.create');
+
+        // Evaluaciones
+        Route::resource('ats/evaluations', EvaluationController::class)->names('ats.evaluations');
+        Route::get('ats/interviews/{interview}/evaluations', [EvaluationController::class, 'index'])->name('ats.interview-evaluations.index');
+        Route::get('ats/interviews/{interview}/evaluations/create', [EvaluationController::class, 'create'])->name('ats.interview-evaluations.create');
+
+        // Etapas globales (solo admin/RRHH)
+        Route::resource('ats/stages', StageController::class)->names('ats.stages');
+        Route::put('ats/stages/reorder', [StageController::class, 'reorder'])->name('ats.stages.reorder');
 
         // Activity API endpoints (JSON responses, same session auth)
         Route::get('api/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'index']);

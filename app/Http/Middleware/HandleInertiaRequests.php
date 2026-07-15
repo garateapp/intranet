@@ -34,6 +34,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Compartir roles y permisos del usuario para control de acceso en frontend
+            'permissions' => fn () => [
+                'roles' => $request->user()?->getRoleNames()->toArray() ?? [],
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name')->toArray() ?? [],
+            ],
         ];
     }
 }
