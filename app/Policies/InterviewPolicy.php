@@ -16,12 +16,12 @@ class InterviewPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     public function view(User $user, Interview $interview): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -32,12 +32,12 @@ class InterviewPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     public function update(User $user, Interview $interview): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -46,6 +46,6 @@ class InterviewPolicy
 
     public function delete(User $user, Interview $interview): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 }

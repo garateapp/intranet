@@ -16,7 +16,7 @@ class StagePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     public function view(User $user, Stage $stage): bool
@@ -26,16 +26,16 @@ class StagePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 
     public function update(User $user, Stage $stage): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 
     public function delete(User $user, Stage $stage): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 }

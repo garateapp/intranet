@@ -20,7 +20,7 @@ class CandidatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     /**
@@ -29,7 +29,7 @@ class CandidatePolicy
      */
     public function view(User $user, Candidate $candidate): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -47,7 +47,7 @@ class CandidatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 
     /**
@@ -55,7 +55,7 @@ class CandidatePolicy
      */
     public function update(User $user, Candidate $candidate): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -68,6 +68,6 @@ class CandidatePolicy
      */
     public function delete(User $user, Candidate $candidate): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 }

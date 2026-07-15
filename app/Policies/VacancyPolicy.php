@@ -20,7 +20,7 @@ class VacancyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
     }
 
     /**
@@ -28,7 +28,7 @@ class VacancyPolicy
      */
     public function view(User $user, Vacancy $vacancy): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter', 'admin'])) {
             return true;
         }
 
@@ -42,7 +42,7 @@ class VacancyPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 
     /**
@@ -50,7 +50,7 @@ class VacancyPolicy
      */
     public function update(User $user, Vacancy $vacancy): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter'])) {
+        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
             return true;
         }
 
@@ -62,6 +62,6 @@ class VacancyPolicy
      */
     public function delete(User $user, Vacancy $vacancy): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter']);
+        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
     }
 }
