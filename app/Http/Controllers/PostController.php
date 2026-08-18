@@ -21,17 +21,17 @@ class PostController extends Controller
             ->latest('published_at');
 
         // Filter by status
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Filter by category
-        if ($request->has('category_id')) {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
         // Search by title
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where('title', 'like', "%{$search}%");
         }
@@ -42,6 +42,16 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
+            'featuredPosts' => Post::with(['user', 'category'])
+                ->featured()
+                ->latest('published_at')
+                ->take(5)
+                ->get(),
+            'postStats' => [
+                'total' => Post::count(),
+                'published' => Post::where('status', 'published')->count(),
+                'drafts' => Post::where('status', 'draft')->count(),
+            ],
             'categories' => $categories,
             'filters' => $request->only(['status', 'category_id', 'search']),
         ]);

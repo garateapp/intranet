@@ -1,249 +1,138 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function Show({ post, relatedPosts, isPublicView = true }) {
+export default function Show({ post, relatedPosts = [], isPublicView = true }) {
     const authUser = usePage().props.auth?.user;
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
+    const [copyState, setCopyState] = useState('idle');
 
-    const getInitials = (name) => {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    };
+    function formatDate(date, includeTime = false) {
+        return new Intl.DateTimeFormat('es-CL', {
+            day: 'numeric', month: 'long', year: 'numeric',
+            ...(includeTime ? { hour: '2-digit', minute: '2-digit' } : {}),
+        }).format(new Date(date));
+    }
 
-    const getImageUrl = (post) => {
-        if (post.featured_image) {
-            return `/storage/${post.featured_image}`;
+    function getInitials(name = 'Equipo editorial') {
+        return name.split(' ').filter(Boolean).map((word) => word[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    function getImageUrl(item) {
+        if (item.featured_image) return `/storage/${item.featured_image}`;
+        const color = (item.category?.color || '#2f6f4e').replace('#', '');
+        const label = encodeURIComponent(item.category?.name || 'Actualidad');
+        return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='800'%3E%3Crect width='1400' height='800' fill='%23${color}'/%3E%3Cpath d='M0 620L400 390L760 590L1100 300L1400 520V800H0Z' fill='%23ffffff' opacity='.1'/%3E%3Ctext x='80' y='130' font-family='Arial' font-size='42' fill='white' opacity='.72'%3E${label}%3C/text%3E%3C/svg%3E`;
+    }
+
+    async function copyLink() {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopyState('copied');
+            window.setTimeout(() => setCopyState('idle'), 2200);
+        } catch {
+            setCopyState('error');
         }
-        const color = post.category?.color || '038c34';
-        return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23${color}'/%3E%3Cstop offset='1' stop-color='%23038c34'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='72' fill='white' opacity='0.3'%3E${encodeURIComponent(post.category?.name || 'Noticia')}%3C/text%3E%3C/svg%3E`;
-    };
+    }
+
+    const backHref = authUser ? route('dashboard') : route('welcome');
+    const publishedAt = post.published_at || post.created_at;
 
     return (
-        <>
-            <Head title={`${post.title} - Gárate Intranet`} />
+        <div className="min-h-[100dvh] bg-[#f7f6f2] text-stone-900">
+            <Head>
+                <title>{`${post.title} | Noticias Gárate`}</title>
+                <meta head-key="description" name="description" content={post.excerpt || post.title} />
+            </Head>
 
-            <div className="min-h-screen bg-gray-50">
-                {/* Hero Image */}
-                <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
-                    <img
-                        src={getImageUrl(post)}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-
-                    {/* Content overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                        {post.category && (
-                            <span
-                                className="inline-block px-4 py-1.5 text-sm font-bold text-white rounded-full mb-4 shadow-lg"
-                                style={{ backgroundColor: post.category.color }}
-                            >
-                                {post.category.name}
-                            </span>
-                        )}
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                            {post.title}
-                        </h1>
-                        <div className="flex items-center gap-4 text-green-100">
-                            <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
-                                    {getInitials(post.user?.name || 'U')}
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-white">{post.user?.name}</p>
-                                    <p className="text-sm">{post.user?.position || post.user?.department || 'Colaborador'}</p>
-                                </div>
-                            </div>
-                            <span className="text-gray-300">•</span>
-                            <time className="text-sm">
-                                {formatDate(post.published_at || post.created_at)}
-                            </time>
-                            <span className="text-gray-300">•</span>
-                            <span className="text-sm">{post.views || 0} lecturas</span>
-                        </div>
+            <header className="border-b border-stone-200 bg-[#f7f6f2]/95 backdrop-blur">
+                <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-5 px-4 py-4 sm:px-6 lg:px-8">
+                    <Link href={backHref} className="inline-flex items-center gap-3 rounded-md text-sm font-semibold text-stone-700 transition hover:text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:ring-offset-4 focus:ring-offset-[#f7f6f2]">
+                        <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m6 6-6-6 6-6" /></svg>
+                        {authUser ? 'Volver a la intranet' : 'Volver al inicio'}
+                    </Link>
+                    <div className="flex items-center gap-3">
+                        <span className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 sm:block">Noticias Gárate</span>
+                        <img src="/img/logo-garate.png" alt="Gárate" className="h-9 w-9 object-contain" />
                     </div>
                 </div>
+            </header>
 
-                {/* Main Content */}
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="grid lg:grid-cols-3 gap-12">
-                        {/* Article */}
-                        <article className="lg:col-span-2">
-                            <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-12">
-                                {post.excerpt && (
-                                    <p className="text-xl text-gray-600 font-medium mb-8 leading-relaxed border-l-4 border-green-500 pl-6">
-                                        {post.excerpt}
-                                    </p>
-                                )}
-
-                                <div
-                                    className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-a:no-underline hover:prose-a:underline"
-                                    dangerouslySetInnerHTML={{ __html: post.content }}
-                                />
-
-                                {/* Tags */}
-                                {post.tags && post.tags.length > 0 && (
-                                    <div className="mt-8 pt-8 border-t border-gray-200">
-                                        <h3 className="text-sm font-semibold text-gray-600 mb-3">Etiquetas:</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {post.tags.map((tag, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors cursor-default"
-                                                >
-                                                    #{tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+            <main>
+                <article>
+                    <div className="mx-auto grid max-w-[1400px] gap-10 px-4 pb-10 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8 lg:pb-14">
+                        <div className="max-w-5xl">
+                            <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">
+                                <span>{post.category?.name || 'Actualidad'}</span>
+                                {post.is_featured && <><span className="h-1 w-1 rounded-full bg-stone-400" aria-hidden="true" /><span>Destacada</span></>}
                             </div>
-
-                            {/* Back to posts */}
-                            <div className="mt-6">
-                                <Link
-                                    href={authUser ? route('dashboard') : route('welcome')}
-                                    className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium transition-colors"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                    </svg>
-                                    {authUser ? 'Volver al dashboard' : 'Volver al inicio'}
-                                </Link>
-                            </div>
-                        </article>
-
-                        {/* Sidebar */}
-                        <aside className="lg:col-span-1">
-                            {/* Author Card */}
-                            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Publicado por</h3>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-16 h-16 bg-gradient-to-br from-lime-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                        {getInitials(post.user?.name || 'U')}
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-900">{post.user?.name}</p>
-                                        {post.user?.department && (
-                                            <p className="text-sm text-gray-600">{post.user.department}</p>
-                                        )}
-                                        {post.user?.position && (
-                                            <p className="text-xs text-gray-500">{post.user.position}</p>
-                                        )}
-                                    </div>
+                            <h1 className="mt-6 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-stone-950 sm:text-5xl lg:text-6xl">{post.title}</h1>
+                            {post.excerpt && <p className="mt-7 max-w-[68ch] text-pretty text-lg leading-8 text-stone-600 sm:text-xl">{post.excerpt}</p>}
+                        </div>
+                        <div className="self-end border-y border-stone-300 py-5">
+                            <p className="text-xs uppercase tracking-[0.16em] text-stone-500">Publicado por</p>
+                            <div className="mt-3 flex items-center gap-3">
+                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-800 text-sm font-semibold text-white">{getInitials(post.user?.name)}</span>
+                                <div className="min-w-0">
+                                    <p className="truncate text-sm font-semibold text-stone-900">{post.user?.name || 'Equipo editorial'}</p>
+                                    <p className="truncate text-xs text-stone-500">{post.user?.position || post.user?.department || 'Comunicaciones'}</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Post Info */}
-                            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Información</h3>
-                                <dl className="space-y-3 text-sm">
-                                    <div>
-                                        <dt className="text-gray-600">Publicado:</dt>
-                                        <dd className="text-gray-900 font-medium">
-                                            {formatDate(post.published_at || post.created_at)}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-gray-600">Lecturas:</dt>
-                                        <dd className="text-gray-900 font-medium">{post.views || 0}</dd>
-                                    </div>
-                                    {post.status && (
-                                        <div>
-                                            <dt className="text-gray-600">Estado:</dt>
-                                            <dd>
-                                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-                                                    post.status === 'published'
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-gray-100 text-gray-700'
-                                                }`}>
-                                                    {post.status === 'published' ? '✓ Publicado' : '⏳ Borrador'}
-                                                </span>
-                                            </dd>
-                                        </div>
-                                    )}
-                                </dl>
+                    <figure className="mx-auto max-w-[1400px] px-0 sm:px-6 lg:px-8">
+                        <div className="overflow-hidden bg-stone-200 sm:rounded-2xl">
+                            <img src={getImageUrl(post)} alt={`Imagen principal de ${post.title}`} className="aspect-[16/8] min-h-[22rem] w-full object-cover" />
+                        </div>
+                    </figure>
+
+                    <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,44rem)_15rem] lg:justify-between lg:px-8">
+                        <div>
+                            <div className="mb-9 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-stone-200 pb-5 text-sm text-stone-500">
+                                <time dateTime={publishedAt}>{formatDate(publishedAt, true)}</time>
+                                <span className="h-1 w-1 rounded-full bg-stone-400" aria-hidden="true" />
+                                <span>{post.views || 0} lecturas</span>
+                                <span className="h-1 w-1 rounded-full bg-stone-400" aria-hidden="true" />
+                                <span>{isPublicView ? 'Acceso público' : 'Acceso interno'}</span>
                             </div>
+                            <div className="post-article-content prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-stone-950 prose-p:leading-8 prose-p:text-stone-700 prose-a:text-emerald-800 prose-a:decoration-emerald-300 prose-strong:text-stone-900 prose-blockquote:border-emerald-700 prose-blockquote:text-stone-600" dangerouslySetInnerHTML={{ __html: post.content }} />
 
-                            {/* Share */}
-                            <div className="bg-white rounded-2xl shadow-lg p-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Compartir</h3>
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => navigator.clipboard.writeText(window.location.href)}
-                                        className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-                                    >
-                                        📋 Copiar enlace
-                                    </button>
+                            {post.tags?.length > 0 && (
+                                <div className="mt-12 border-t border-stone-200 pt-6">
+                                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Temas</p>
+                                    <div className="flex flex-wrap gap-2">{post.tags.map((tag) => <span key={tag} className="rounded-md bg-stone-200/70 px-3 py-1.5 text-sm text-stone-700">{tag}</span>)}</div>
                                 </div>
-                            </div>
+                            )}
+                        </div>
 
-                            <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-3">Acceso</h3>
-                                <p className="text-sm text-gray-600">
-                                    {isPublicView
-                                        ? 'Esta noticia esta disponible en la parte publica de la aplicacion.'
-                                        : 'Esta noticia es visible solo para personas autenticadas.'}
-                                </p>
+                        <aside className="lg:border-l lg:border-stone-200 lg:pl-8" aria-label="Información de la noticia">
+                            <div className="lg:sticky lg:top-8">
+                                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Compartir</p>
+                                <button type="button" onClick={copyLink} className="mt-3 inline-flex w-full items-center justify-between gap-3 rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm font-semibold text-stone-800 transition hover:border-emerald-700 hover:text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:ring-offset-2 active:scale-[0.98]">
+                                    {copyState === 'copied' ? 'Enlace copiado' : 'Copiar enlace'}
+                                    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M8.5 15.5h-2A2.5 2.5 0 014 13V6.5A2.5 2.5 0 016.5 4H13a2.5 2.5 0 012.5 2.5v2m-5 0H17a2.5 2.5 0 012.5 2.5v6.5A2.5 2.5 0 0117 20h-6.5A2.5 2.5 0 018 17.5V11a2.5 2.5 0 012.5-2.5Z" /></svg>
+                                </button>
+                                <p role="status" className={`mt-2 text-xs ${copyState === 'error' ? 'text-red-700' : 'text-emerald-800'}`}>{copyState === 'error' ? 'No pudimos copiar el enlace. Cópialo desde la barra del navegador.' : copyState === 'copied' ? 'Listo para compartir.' : ''}</p>
                             </div>
                         </aside>
                     </div>
-                </div>
+                </article>
 
-                {/* Related Posts */}
-                {relatedPosts && relatedPosts.length > 0 && (
-                    <section className="bg-gray-100 py-16">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-8">
-                                📰 Noticias Relacionadas
-                            </h2>
-                            <div className="grid md:grid-cols-3 gap-6">
-                                {relatedPosts.map((relatedPost) => (
-                                    <Link
-                                        key={relatedPost.id}
-                                        href={route('public.posts.show', relatedPost.slug)}
-                                        className="group block bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
-                                    >
-                                        <div className="h-40 overflow-hidden relative">
-                                            <img
-                                                src={getImageUrl(relatedPost)}
-                                                alt={relatedPost.title}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                            />
-                                            {relatedPost.category && (
-                                                <div className="absolute top-3 left-3">
-                                                    <span
-                                                        className="px-2 py-0.5 text-xs font-bold text-white rounded-full shadow-lg"
-                                                        style={{ backgroundColor: relatedPost.category.color }}
-                                                    >
-                                                        {relatedPost.category.name}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
-                                                {relatedPost.title}
-                                            </h3>
-                                            <p className="text-xs text-gray-600 line-clamp-2 mb-3">
-                                                {relatedPost.excerpt}
-                                            </p>
-                                            <div className="flex items-center justify-between text-xs text-gray-500">
-                                                <div className="flex items-center gap-1">
-                                                    <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                                                        {getInitials(relatedPost.user?.name || 'U')}
-                                                    </div>
-                                                    <span>{relatedPost.user?.name}</span>
-                                                </div>
-                                                <span>{formatDate(relatedPost.published_at || relatedPost.created_at)}</span>
-                                            </div>
+                {relatedPosts.length > 0 && (
+                    <section className="border-t border-stone-200 bg-white py-14 sm:py-20" aria-labelledby="related-title">
+                        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+                            <div className="mb-8 max-w-2xl">
+                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Sigue leyendo</p>
+                                <h2 id="related-title" className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-stone-950">Más noticias de la organización</h2>
+                            </div>
+                            <div className="grid gap-6 lg:grid-cols-2">
+                                {relatedPosts.map((relatedPost, index) => (
+                                    <Link key={relatedPost.id} href={route('public.posts.show', relatedPost.slug)} className={`group grid overflow-hidden border-t border-stone-300 pt-5 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:ring-offset-4 ${index === 0 ? 'gap-5 sm:grid-cols-[1.2fr_1fr] lg:row-span-2 lg:block' : 'gap-5 sm:grid-cols-[11rem_1fr]'}`}>
+                                        <div className={`overflow-hidden rounded-xl bg-stone-100 ${index === 0 ? 'lg:mb-6' : ''}`}><img src={getImageUrl(relatedPost)} alt={`Portada de ${relatedPost.title}`} className={`w-full object-cover transition duration-500 group-hover:scale-[1.035] ${index === 0 ? 'aspect-[16/10]' : 'aspect-[4/3] h-full'}`} /></div>
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">{relatedPost.category?.name || 'Actualidad'}</p>
+                                            <h3 className={`${index === 0 ? 'mt-3 text-2xl' : 'mt-2 text-xl'} font-semibold leading-tight tracking-tight text-stone-950 transition group-hover:text-emerald-800`}>{relatedPost.title}</h3>
+                                            {relatedPost.excerpt && <p className="mt-3 line-clamp-2 text-sm leading-6 text-stone-600">{relatedPost.excerpt}</p>}
+                                            <time className="mt-4 block text-xs text-stone-500" dateTime={relatedPost.published_at || relatedPost.created_at}>{formatDate(relatedPost.published_at || relatedPost.created_at)}</time>
                                         </div>
                                     </Link>
                                 ))}
@@ -251,24 +140,14 @@ export default function Show({ post, relatedPosts, isPublicView = true }) {
                         </div>
                     </section>
                 )}
+            </main>
 
-                {/* Footer */}
-                <footer className="bg-gray-900 text-white py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <div className="flex items-center justify-center gap-3 mb-4">
-                            <img
-                                src="/img/logo-garate.png"
-                                alt="Garate Logo"
-                                className="w-10 h-10 object-contain"
-                            />
-                            <span className="text-xl font-bold">Gárate</span>
-                        </div>
-                        <p className="text-gray-400 text-sm">
-                            © {new Date().getFullYear()} Gárate Intranet • Portal Corporativo
-                        </p>
-                    </div>
-                </footer>
-            </div>
-        </>
+            <footer className="border-t border-stone-800 bg-stone-950 py-8 text-stone-300">
+                <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-4 text-sm sm:px-6 lg:px-8">
+                    <div className="flex items-center gap-3"><img src="/img/logo-garate.png" alt="Gárate" className="h-8 w-8 object-contain" /><span className="font-semibold text-white">Noticias Gárate</span></div>
+                    <p>© {new Date().getFullYear()} Portal corporativo</p>
+                </div>
+            </footer>
+        </div>
     );
 }
