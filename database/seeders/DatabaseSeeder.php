@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
             CorporateEventSeeder::class,
             OrganizationalUnitSeeder::class,
             Phase2ContentSeeder::class,
+            // ATS Module
+            RoleAndPermissionSeeder::class,
+            DefaultStageSeeder::class,
         ]);
     }
 }

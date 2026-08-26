@@ -69,6 +69,10 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdmin = Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->givePermissionTo(Permission::all());
 
+        // Admin: acceso total al sistema (equivalente a super_admin, compatibilidad con role legacy)
+        $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        $admin->givePermissionTo(Permission::all());
+
         // Reclutador/RRHH: acceso global a todas las vacantes y candidatos
         $recruiter = Role::create(['name' => 'recruiter', 'guard_name' => 'web']);
         $recruiter->givePermissionTo([
@@ -91,15 +95,14 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // ========== ASIGNAR ROLES A USUARIOS EXISTENTES ==========
-        // El admin existente recibe super_admin
-        $admin = User::where('email', 'admin@intranet.test')->first();
-        if ($admin) {
-            $admin->assignRole('super_admin');
+        // Usuarios con role legacy 'admin' reciben el rol Spatie 'admin'
+        $adminUsers = User::where('role', 'admin')->get();
+        foreach ($adminUsers as $user) {
+            $user->assignRole('admin');
         }
 
         // Asignar recruiter a algunos usuarios para testing
-        $recruiterUsers = User::where('email', '!=', 'admin@intranet.test')
-            ->where('role', '!=', 'admin')
+        $recruiterUsers = User::where('role', '!=', 'admin')
             ->take(3)
             ->get();
         foreach ($recruiterUsers as $user) {

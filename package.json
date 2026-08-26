@@ -39,6 +39,7 @@
         "@tiptap/react": "^3.22.2",
         "@tiptap/starter-kit": "^3.22.2",
         "daisyui": "^5.5.19",
+        "html2canvas": "^1.4.1",
         "react-hook-form": "^7.81.0",
         "zod": "^4.4.3"
     }

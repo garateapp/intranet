@@ -124,6 +124,10 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                             <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             Onboarding
                         </Link>
+                        <Link href={route('firma.index')} className={navLinkClass(route().current('firma.*'))}>
+                            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            Pie de Firma
+                        </Link>
 
                         <div className="mt-2 border-t border-gray-100 pt-2">
                             <div className={navSectionClass}>Recursos</div>
@@ -419,6 +423,7 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                 <ResponsiveNavLink href={route('organigram.index')} active={route().current('organigram.*')}>Organigrama</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('calendar.index')} active={route().current('calendar.*')}>Calendario</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('onboarding.index')} active={route().current('onboarding.*')}>Onboarding</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('firma.index')} active={route().current('firma.*')}>Pie de Firma</ResponsiveNavLink>
                                 <div className="pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Recursos</div>
                                 <ResponsiveNavLink href={route('documents.index')} active={route().current('documents.*')}>Documentos</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('services.index')} active={route().current('services.*')}>Servicios</ResponsiveNavLink>
@@ -461,8 +466,8 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                 <div className="text-sm font-medium text-gray-800">{user.name}</div>
                                 <div className="text-xs text-gray-500">{user.email}</div>
                                 <div className="mt-2 space-y-1">
-                                    <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                                    <ResponsiveNavLink href={route('logout')} method="post" as="button">Log Out</ResponsiveNavLink>
+                                    <ResponsiveNavLink href={route('profile.edit')}>Perfil</ResponsiveNavLink>
+                                    <ResponsiveNavLink href={route('logout')} method="post" as="button">Salir</ResponsiveNavLink>
                                 </div>
                             </div>
                         </div>
