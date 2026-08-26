@@ -52,7 +52,7 @@ class FirmaController extends Controller
             'website'      => 'https://www.garatehermanos.cl',
             'instagram'    => 'https://www.instagram.com/garatehermanos/',
             'addressLine1' => "Av. O'Higgins 798,",
-            'addressLine2' => 'Codegua, Región del Libertador Bernardo O\'higgins',
+            'addressLine2' => 'Codegua',
         ];
 
         $vcard = $this->buildVcard(
