@@ -7,7 +7,7 @@
     $instagram = $instagram ?? null;
     $addressLine1 = $addressLine1 ?? null;
     $addressLine2 = $addressLine2 ?? null;
-    $logo = $logo ?? secure_asset('img/logo_logo.png');
+    $logo = $logo ?? asset('img/logo_logo.png');
     $qrSvg = $qrSvg ?? null;
     $qrImg = $qrImg ?? null;
     $qrUrl = $qrUrl ?? null;
@@ -24,11 +24,11 @@
     $whatsPhone = preg_replace('/\D+/', '', $phone);
     $whatsUrl = $whatsPhone ? 'https://wa.me/' . $whatsPhone : null;
 
-    $iconMail = secure_asset('img/mail.jpg');
-    $iconPhone = secure_asset('img/phone.jpg');
-    $iconLocation = secure_asset('img/location.jpg');
-    $iconInstagram = secure_asset('img/insta_icono1.png');
-    $iconWeb = secure_asset('img/web_icono1.png');
+    $iconMail = asset('img/mail.jpg');
+    $iconPhone = asset('img/phone.jpg');
+    $iconLocation = asset('img/location.jpg');
+    $iconInstagram = asset('img/insta_icono1.png');
+    $iconWeb = asset('img/web_icono1.png');
 @endphp
 
 <table cellpadding="0" cellspacing="0" role="presentation"

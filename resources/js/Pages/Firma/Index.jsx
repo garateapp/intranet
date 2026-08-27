@@ -5,7 +5,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, useForm } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import { toBlob } from 'html-to-image';
 
 export default function Index({ defaults, signature, html }) {
     const [copiedHtml, setCopiedHtml] = useState(false);
@@ -101,45 +101,29 @@ export default function Index({ defaults, signature, html }) {
         if (!container) return;
 
         setGeneratingImage(true);
-
         try {
-            const originalSrcs = [...container.querySelectorAll('img')].map((img) => ({
-                el: img,
-                src: img.getAttribute('src'),
-            }));
-
             await embedImagesAsBase64(container);
 
-            const canvas = await html2canvas(container, {
-                scale: 2,
-                useCORS: false,
-                allowTaint: true,
+            const blob = await toBlob(container, {
+                pixelRatio: 2,
                 backgroundColor: '#ffffff',
-                logging: false,
+                skipFonts: false,
+                cacheBust: true,
             });
 
-            originalSrcs.forEach(({ el, src }) => el.setAttribute('src', src));
-
-            const blob = await new Promise((resolve, reject) => {
-                canvas.toBlob((b) => {
-                    if (b) resolve(b);
-                    else reject(new Error('No se pudo generar el blob'));
-                }, 'image/png');
-            });
-
-            let clipboardWorks = false;
-            try {
-                if (navigator.clipboard && window.ClipboardItem) {
+            let copied = false;
+            if (blob && navigator.clipboard && window.ClipboardItem) {
+                try {
                     await navigator.clipboard.write([
                         new ClipboardItem({ 'image/png': blob }),
                     ]);
-                    clipboardWorks = true;
+                    copied = true;
+                } catch (_) {
+                    copied = false;
                 }
-            } catch (_) {
-                // clipboard image write not supported
             }
 
-            if (!clipboardWorks) {
+            if (!copied) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -153,7 +137,7 @@ export default function Index({ defaults, signature, html }) {
             setCopiedImage(true);
             setTimeout(() => setCopiedImage(false), 2500);
         } catch (err) {
-            console.error('Error al generar imagen:', err);
+            console.error('Error al copiar imagen:', err);
         } finally {
             setGeneratingImage(false);
         }

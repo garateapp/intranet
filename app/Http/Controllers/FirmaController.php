@@ -166,7 +166,6 @@ class FirmaController extends Controller
 
         return $pngData;
     }
-
     private function buildVcard(
         string $name,
         string $email,
