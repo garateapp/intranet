@@ -58,7 +58,7 @@
                                                         style="border-collapse:collapse;" style="width:30%;">
                                                         <tr>
                                                             <td
-                                                                style="padding-right:5px;width:18px;vertical-align:top;margin-left:5px;">
+                                                                style="padding-right:5px;width:32px;vertical-align:top;margin-left:5px;">
                                                                 <img src="{{ $iconMail }}" alt="Correo"
                                                                     style="width:22px;height:16px;display:block;">
                                                             </td>
@@ -76,7 +76,7 @@
                                                             style="border-collapse:collapse;">
                                                             <tr style="padding-top:5px;">
                                                                 <td
-                                                                    style="padding-left:8px;padding-right:6px;width:18px;vertical-align:top;padding-top:15px;">
+                                                                    style="padding-left:8px;padding-right:6px;width:32px;vertical-align:top;padding-top:15px;">
                                                                     <img src="{{ $iconLocation }}" alt="Ubicación"
                                                                         style="width:16px;height:22px;display:block;">
                                                                 </td>
@@ -96,7 +96,7 @@
                                                             style="border-collapse:collapse;">
                                                             <tr>
                                                                 <td
-                                                                    style="padding-right:10px;width:18px;vertical-align:top;">
+                                                                    style="padding-right:10px;width:32px;vertical-align:top;">
                                                                     <img src="{{ $iconPhone }}" alt="Teléfono"
                                                                         style="width:16px;height:22px;display:block;">
                                                                 </td>
