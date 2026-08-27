@@ -91,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/permisos-salida/aprobaciones/{exit_permit}', [ManagerExitPermitController::class, 'show'])->name('manager.exit-permits.show');
     Route::patch('/permisos-salida/aprobaciones/{exit_permit}/visar', [ManagerExitPermitController::class, 'visar'])->name('manager.exit-permits.visar');
 
+    // Firma de correo
+    Route::get('/firma', [\App\Http\Controllers\FirmaController::class, 'index'])->name('firma.index');
+    Route::post('/firma', [\App\Http\Controllers\FirmaController::class, 'generate'])->name('firma.generate');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
