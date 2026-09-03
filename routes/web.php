@@ -1,52 +1,59 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\Admin\PurchaseInvoiceObjectionReasonController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SapOwnerUserController;
+use App\Http\Controllers\AdminExitPermitController;
+use App\Http\Controllers\AdminOrganigramController;
+use App\Http\Controllers\Api\UserActivityController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\AtsDashboardController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\LinkController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\GoogleAuthController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\PeopleDirectoryController;
-use App\Http\Controllers\FaqPortalController;
 use App\Http\Controllers\CorporateCalendarController;
-use App\Http\Controllers\HrPortalController;
-use App\Http\Controllers\UserDirectoryAdminController;
+use App\Http\Controllers\CorporateEventController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentLibraryController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\ExitPermitController;
 use App\Http\Controllers\FaqCategoryController;
 use App\Http\Controllers\FaqController;
-use App\Http\Controllers\CorporateEventController;
-use App\Http\Controllers\OrganigramController;
-use App\Http\Controllers\AdminOrganigramController;
-use App\Http\Controllers\OnboardingController;
-use App\Http\Controllers\DocumentLibraryController;
-use App\Http\Controllers\ServiceStatusController;
+use App\Http\Controllers\FaqPortalController;
+use App\Http\Controllers\FirmaController;
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\HrPortalController;
+use App\Http\Controllers\InterviewController;
+use App\Http\Controllers\LinkController;
+use App\Http\Controllers\ManagerExitPermitController;
 use App\Http\Controllers\MyRequestsController;
-use App\Http\Controllers\OrganizationalUnitController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OnboardingStageAdminController;
 use App\Http\Controllers\OnboardingTaskAdminController;
-use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\ServiceAdminController;
+use App\Http\Controllers\OrganigramController;
+use App\Http\Controllers\OrganizationalUnitController;
+use App\Http\Controllers\PeopleDirectoryController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseInvoiceAccountingController;
+use App\Http\Controllers\PurchaseInvoiceApprovalController;
+use App\Http\Controllers\PurchaseInvoiceReminderController;
+use App\Http\Controllers\PurchaseInvoiceUnassignedController;
 use App\Http\Controllers\RequestTypeController;
-use App\Http\Controllers\UserRequestAdminController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\UserActivityController as UserActivityWebController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ServiceAdminController;
+use App\Http\Controllers\ServiceStatusController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StageController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SurveyResponseController;
-use App\Http\Controllers\ExitPermitController;
-use App\Http\Controllers\AdminExitPermitController;
-use App\Http\Controllers\ManagerExitPermitController;
-use App\Http\Controllers\AtsDashboardController;
+use App\Http\Controllers\UserActivityController as UserActivityWebController;
+use App\Http\Controllers\UserDirectoryAdminController;
+use App\Http\Controllers\UserRequestAdminController;
 use App\Http\Controllers\VacancyController;
-use App\Http\Controllers\CandidateController;
-use App\Http\Controllers\StageController;
 use App\Http\Controllers\VacancyStageController;
-use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\InterviewController;
-use App\Http\Controllers\EvaluationController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Public routes
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
@@ -92,8 +99,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/permisos-salida/aprobaciones/{exit_permit}/visar', [ManagerExitPermitController::class, 'visar'])->name('manager.exit-permits.visar');
 
     // Firma de correo
-    Route::get('/firma', [\App\Http\Controllers\FirmaController::class, 'index'])->name('firma.index');
-    Route::post('/firma', [\App\Http\Controllers\FirmaController::class, 'generate'])->name('firma.generate');
+    Route::get('/firma', [FirmaController::class, 'index'])->name('firma.index');
+    Route::post('/firma', [FirmaController::class, 'generate'])->name('firma.generate');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -102,6 +109,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Logout
     Route::post('/logout', [GoogleAuthController::class, 'logout'])->name('logout');
+
+    Route::get('/aprobacion-facturas', [PurchaseInvoiceApprovalController::class, 'index'])->name('purchase-invoice-approvals.index');
+    Route::get('/aprobacion-facturas/{purchase_invoice_approval}', [PurchaseInvoiceApprovalController::class, 'show'])->name('purchase-invoice-approvals.show');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/aprobar', [PurchaseInvoiceApprovalController::class, 'approve'])->name('purchase-invoice-approvals.approve');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/objetar', [PurchaseInvoiceApprovalController::class, 'object'])->name('purchase-invoice-approvals.object');
+    Route::get('/contabilidad/aprobacion-facturas', PurchaseInvoiceAccountingController::class)->name('purchase-invoice-approvals.accounting');
+    Route::get('/aprobacion-facturas-sin-asignar', [PurchaseInvoiceUnassignedController::class, 'index'])->name('purchase-invoice-approvals.unassigned');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/asignar-responsable', [PurchaseInvoiceUnassignedController::class, 'assignResponsible'])->name('purchase-invoice-approvals.assign-responsible');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/asignar-oc', [PurchaseInvoiceUnassignedController::class, 'assignPurchaseOrder'])->name('purchase-invoice-approvals.assign-po');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/reconciliar-oc', [PurchaseInvoiceUnassignedController::class, 'reconcile'])->name('purchase-invoice-approvals.reconcile-po');
+    Route::post('/aprobacion-facturas/{purchase_invoice_approval}/asignar-suplente', [PurchaseInvoiceUnassignedController::class, 'assignSubstitute'])->name('purchase-invoice-approvals.assign-substitute');
+    Route::get('/aprobacion-facturas/{purchase_invoice_approval}/adjuntos/{attachment}/descargar', [PurchaseInvoiceApprovalController::class, 'downloadAttachment'])->name('purchase-invoice-approvals.download-attachment');
+    Route::post('/contabilidad/facturas/enviar-recordatorio', [PurchaseInvoiceReminderController::class, 'sendReminder'])->name('purchase-invoice-approvals.send-reminder');
+    Route::get('/configuracion/responsables-sap', [SapOwnerUserController::class, 'index'])->name('sap-owner-users.index');
+    Route::post('/configuracion/responsables-sap', [SapOwnerUserController::class, 'store'])->name('sap-owner-users.store');
+    Route::get('/configuracion/motivos-objecion-facturas', [PurchaseInvoiceObjectionReasonController::class, 'index'])->name('purchase-invoice-objection-reasons.index');
+    Route::post('/configuracion/motivos-objecion-facturas', [PurchaseInvoiceObjectionReasonController::class, 'store'])->name('purchase-invoice-objection-reasons.store');
+    Route::put('/configuracion/motivos-objecion-facturas/{reason}', [PurchaseInvoiceObjectionReasonController::class, 'update'])->name('purchase-invoice-objection-reasons.update');
 
     // Exit Permits - accessible by admin role OR notification email users
     Route::get('admin/permisos-salida', [AdminExitPermitController::class, 'index'])->name('admin.exit-permits.index');
@@ -151,6 +176,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('user-activities', [UserActivityWebController::class, 'index'])->name('user-activities.index');
 
+        // Gestión de roles Spatie
+        Route::get('admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
+        Route::put('admin/roles/{user}', [RoleController::class, 'update'])->name('admin.roles.update');
+
         // ========== MÓDULO ATS ==========
         // Dashboard ATS
         Route::get('/ats', [AtsDashboardController::class, 'index'])->name('ats.dashboard');
@@ -191,13 +220,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('ats/stages/reorder', [StageController::class, 'reorder'])->name('ats.stages.reorder');
 
         // Activity API endpoints (JSON responses, same session auth)
-        Route::get('api/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'index']);
-        Route::get('api/user-activities/stats', [\App\Http\Controllers\Api\UserActivityController::class, 'stats']);
-        Route::get('api/user-activities/export', [\App\Http\Controllers\Api\UserActivityController::class, 'export']);
-        Route::get('api/admin/user-activities', [\App\Http\Controllers\Api\UserActivityController::class, 'adminIndex']);
-        Route::get('api/admin/user-activities/stats', [\App\Http\Controllers\Api\UserActivityController::class, 'adminStats']);
-        Route::get('api/admin/user-activities/export', [\App\Http\Controllers\Api\UserActivityController::class, 'adminExport']);
-        Route::get('api/admin/user-activities/{user}', [\App\Http\Controllers\Api\UserActivityController::class, 'adminUserDetail']);
+        Route::get('api/user-activities', [UserActivityController::class, 'index']);
+        Route::get('api/user-activities/stats', [UserActivityController::class, 'stats']);
+        Route::get('api/user-activities/export', [UserActivityController::class, 'export']);
+        Route::get('api/admin/user-activities', [UserActivityController::class, 'adminIndex']);
+        Route::get('api/admin/user-activities/stats', [UserActivityController::class, 'adminStats']);
+        Route::get('api/admin/user-activities/export', [UserActivityController::class, 'adminExport']);
+        Route::get('api/admin/user-activities/{user}', [UserActivityController::class, 'adminUserDetail']);
     });
 });
 
