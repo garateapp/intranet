@@ -179,6 +179,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Gestión de roles Spatie
         Route::get('admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
         Route::put('admin/roles/{user}', [RoleController::class, 'update'])->name('admin.roles.update');
+        Route::put('admin/roles/{user}/password', [RoleController::class, 'updatePassword'])->name('admin.roles.update-password');
 
         // ========== MÓDULO ATS ==========
         // Dashboard ATS
