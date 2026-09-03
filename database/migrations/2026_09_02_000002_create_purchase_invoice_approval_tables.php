@@ -85,7 +85,7 @@ return new class extends Migration
             $table->decimal('cantidad_factura', 19, 6)->nullable();
             $table->decimal('total_linea_factura', 19, 4)->nullable();
             $table->timestamps();
-            $table->index(['purchase_invoice_approval_id', 'oc_doc_entry']);
+            $table->index(['purchase_invoice_approval_id', 'oc_doc_entry'], 'pia_lines_approval_oc_idx');
         });
 
         Schema::create('purchase_invoice_approval_responsibles', function (Blueprint $table): void {
