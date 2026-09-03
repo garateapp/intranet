@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * The accessors to append to the model's array form.
@@ -59,6 +60,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google_token',
+        'google_refresh_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -123,6 +128,16 @@ class User extends Authenticatable
     public function activities()
     {
         return $this->hasMany(UserActivity::class);
+    }
+
+    public function sapOwnerMappings(): HasMany
+    {
+        return $this->hasMany(SapOwnerUser::class);
+    }
+
+    public function purchaseInvoiceResponsibilities(): HasMany
+    {
+        return $this->hasMany(PurchaseInvoiceApprovalResponsible::class);
     }
 
     public function createdSurveys()
@@ -198,6 +213,6 @@ class User extends Authenticatable
         }
 
         // Local storage path - prepend /storage/
-        return '/storage/' . $this->avatar;
+        return '/storage/'.$this->avatar;
     }
 }

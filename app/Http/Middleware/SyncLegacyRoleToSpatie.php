@@ -18,11 +18,12 @@ class SyncLegacyRoleToSpatie
     {
         $user = $request->user();
 
-        if ($user && $user->role && !$user->hasRole($user->role)) {
-            $spatieRole = Role::where('name', $user->role)->first();
+        if ($user && $user->role && $user->roles()->doesntExist()) {
+            $legacyRole = $user->role === 'user' ? 'usuario' : $user->role;
+            $spatieRole = Role::where('name', $legacyRole)->first();
 
             if ($spatieRole) {
-                $user->syncRoles([$spatieRole]);
+                $user->assignRole($spatieRole);
             }
         }
 

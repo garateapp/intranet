@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children, rightSidebar }) {
     const user = usePage().props.auth.user;
+    const purchaseInvoiceAccess = usePage().props.purchaseInvoiceAccess || {};
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -152,6 +153,18 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                             <svg className="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             Aprobaciones
                         </Link>
+                        <Link href={route('purchase-invoice-approvals.index')} className={navLinkClass(route().current('purchase-invoice-approvals.index') || route().current('purchase-invoice-approvals.show'))}>
+                            <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-7" /></svg>
+                            Facturas OC
+                        </Link>
+                        {purchaseInvoiceAccess.accounting && <Link href={route('purchase-invoice-approvals.accounting')} className={navLinkClass(route().current('purchase-invoice-approvals.accounting'))}>
+                            <svg className="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M5 7h14M5 17h14" /></svg>
+                            Control Contabilidad
+                        </Link>}
+                        {purchaseInvoiceAccess.manageUnassigned && <Link href={route('purchase-invoice-approvals.unassigned')} className={navLinkClass(route().current('purchase-invoice-approvals.unassigned'))}>
+                            <svg className="h-5 w-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z" /></svg>
+                            Sin asignar
+                        </Link>}
 
                         <Link href={route('rrhh.index')} className={`mt-2 ${navLinkClass(route().current('rrhh.*'))}`}>
                             <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
@@ -335,6 +348,11 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                     Configuración
                                 </Link>
+                                {purchaseInvoiceAccess.admin && <>
+                                    <Link href={route('sap-owner-users.index')} className={navLinkClass(route().current('sap-owner-users.*'))}>Responsables SAP</Link>
+                                    <Link href={route('purchase-invoice-objection-reasons.index')} className={navLinkClass(route().current('purchase-invoice-objection-reasons.*'))}>Motivos objeción</Link>
+                                    <Link href={route('admin.roles.index')} className={navLinkClass(route().current('admin.roles.*'))}>Asignar roles</Link>
+                                </>}
                                 <Link href={route('audit-logs.index')} className={navLinkClass(route().current('audit-logs.*'))}>
                                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                                     Auditoría
@@ -345,6 +363,11 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                 </Link>
                             </>
                         )}
+                        {purchaseInvoiceAccess.admin && user.role !== 'admin' && <>
+                            <div className="mt-2 border-t border-gray-100 pt-2"><div className={navSectionClass}>Configuración facturas</div></div>
+                            <Link href={route('sap-owner-users.index')} className={navLinkClass(route().current('sap-owner-users.*'))}>Responsables SAP</Link>
+                            <Link href={route('purchase-invoice-objection-reasons.index')} className={navLinkClass(route().current('purchase-invoice-objection-reasons.*'))}>Motivos objeción</Link>
+                        </>}
                     </nav>
                 </aside>
 
@@ -430,6 +453,9 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                 <ResponsiveNavLink href={route('my-requests.index')} active={route().current('my-requests.*')}>Mis Solicitudes</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('exit-permits.index')} active={route().current('exit-permits.*')}>Permisos de Salida</ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('manager.exit-permits.index')} active={route().current('manager.exit-permits.*')}>Aprobaciones</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('purchase-invoice-approvals.index')} active={route().current('purchase-invoice-approvals.index') || route().current('purchase-invoice-approvals.show')}>Facturas OC</ResponsiveNavLink>
+                                {purchaseInvoiceAccess.accounting && <ResponsiveNavLink href={route('purchase-invoice-approvals.accounting')} active={route().current('purchase-invoice-approvals.accounting')}>Control Contabilidad</ResponsiveNavLink>}
+                                {purchaseInvoiceAccess.manageUnassigned && <ResponsiveNavLink href={route('purchase-invoice-approvals.unassigned')} active={route().current('purchase-invoice-approvals.unassigned')}>Facturas sin asignar</ResponsiveNavLink>}
                                 <ResponsiveNavLink href={route('rrhh.index')} active={route().current('rrhh.*')}>RRHH</ResponsiveNavLink>
                                 <div className="pt-3 pb-1 text-xs font-semibold text-blue-600 uppercase tracking-wider">ATS</div>
                                 <ResponsiveNavLink href={route('ats.dashboard')} active={route().current('ats.dashboard')}>Dashboard ATS</ResponsiveNavLink>
@@ -457,10 +483,19 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                                         <ResponsiveNavLink href={route('faqs.index')} active={route().current('faqs.*')}>FAQs</ResponsiveNavLink>
                                         <ResponsiveNavLink href={route('corporate-events.index')} active={route().current('corporate-events.*')}>Eventos</ResponsiveNavLink>
                                         <ResponsiveNavLink href={route('settings.index')} active={route().current('settings.*')}>Configuración</ResponsiveNavLink>
+                                        {purchaseInvoiceAccess.admin && <>
+                                            <ResponsiveNavLink href={route('sap-owner-users.index')} active={route().current('sap-owner-users.*')}>Responsables SAP</ResponsiveNavLink>
+                                            <ResponsiveNavLink href={route('purchase-invoice-objection-reasons.index')} active={route().current('purchase-invoice-objection-reasons.*')}>Motivos objeción</ResponsiveNavLink>
+                                        </>}
                                         <ResponsiveNavLink href={route('audit-logs.index')} active={route().current('audit-logs.*')}>Auditoría</ResponsiveNavLink>
                                         <ResponsiveNavLink href={route('user-activities.index')} active={route().current('user-activities.*')}>Actividad</ResponsiveNavLink>
                                     </>
                                 )}
+                                {purchaseInvoiceAccess.admin && user.role !== 'admin' && <>
+                                    <div className="pt-3 pb-1 text-xs font-semibold text-orange-500 uppercase tracking-wider">Configuración facturas</div>
+                                    <ResponsiveNavLink href={route('sap-owner-users.index')} active={route().current('sap-owner-users.*')}>Responsables SAP</ResponsiveNavLink>
+                                    <ResponsiveNavLink href={route('purchase-invoice-objection-reasons.index')} active={route().current('purchase-invoice-objection-reasons.*')}>Motivos objeción</ResponsiveNavLink>
+                                </>}
                             </div>
                             <div className="mt-4 border-t border-gray-200 pt-4">
                                 <div className="text-sm font-medium text-gray-800">{user.name}</div>

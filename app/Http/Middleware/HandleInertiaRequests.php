@@ -39,6 +39,13 @@ class HandleInertiaRequests extends Middleware
                 'roles' => $request->user()?->getRoleNames()->toArray() ?? [],
                 'permissions' => $request->user()?->getAllPermissions()->pluck('name')->toArray() ?? [],
             ],
+            'purchaseInvoiceAccess' => fn () => [
+                'accounting' => $request->user()?->hasAnyRole(['super_admin', 'cobrador']) || false,
+                'admin' => $request->user()?->hasRole('super_admin') || false,
+                'manageUnassigned' => $request->user()?->hasAnyRole(['super_admin', 'cobrador']) || false,
+                'sendReminder' => $request->user()?->hasAnyRole(['super_admin', 'cobrador']) || false,
+                'manageRoles' => $request->user()?->hasRole('super_admin') || false,
+            ],
         ];
     }
 }
