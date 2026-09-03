@@ -186,8 +186,7 @@ export default function Index({ defaults, signature, html }) {
                                         type="email"
                                         className="mt-1 block w-full"
                                         value={defaults.email}
-                                        readOnly
-                                        disabled
+
                                     />
                                 </div>
 
@@ -212,7 +211,6 @@ export default function Index({ defaults, signature, html }) {
                                         className="mt-1 block w-full"
                                         value={data.phone}
                                         onChange={(e) => setData('phone', e.target.value)}
-                                        required
                                         maxLength={50}
                                         placeholder="56999999999"
                                     />
