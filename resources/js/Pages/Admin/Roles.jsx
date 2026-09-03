@@ -7,7 +7,9 @@ import { useState } from 'react';
 export default function Roles({ users, availableRoles, filters }) {
     const [selected, setSelected] = useState(null);
     const [search, setSearch] = useState(filters.buscar || '');
+    const [passwordUser, setPasswordUser] = useState(null);
     const form = useForm({ roles: [] });
+    const passwordForm = useForm({ password: '', password_confirmation: '' });
 
     const openEditor = (user) => {
         setSelected(user);
@@ -19,6 +21,20 @@ export default function Roles({ users, availableRoles, filters }) {
         form.put(route('admin.roles.update', selected.id), {
             preserveScroll: true,
             onSuccess: () => setSelected(null),
+        });
+    };
+
+    const openPassword = (user) => {
+        setPasswordUser(user);
+        passwordForm.reset('password', 'password_confirmation');
+        passwordForm.clearErrors();
+    };
+
+    const submitPassword = (event) => {
+        event.preventDefault();
+        passwordForm.put(route('admin.roles.update-password', passwordUser.id), {
+            preserveScroll: true,
+            onSuccess: () => setPasswordUser(null),
         });
     };
 
@@ -71,7 +87,10 @@ export default function Roles({ users, availableRoles, filters }) {
                                                 : <div className="flex flex-wrap gap-1">{user.roles.map((role) => <span key={role} className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">{role}</span>)}</div>}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <button onClick={() => openEditor(user)} className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Editar roles</button>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => openEditor(user)} className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Editar roles</button>
+                                                <button onClick={() => openPassword(user)} className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">Cambiar contraseña</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -100,6 +119,29 @@ export default function Roles({ users, availableRoles, filters }) {
                     <div className="mt-6 flex justify-end gap-2">
                         <button type="button" onClick={() => setSelected(null)} className="rounded-lg border px-4 py-2 text-sm font-semibold">Cancelar</button>
                         <button disabled={form.processing} className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Guardar</button>
+                    </div>
+                </form>
+            </Modal>
+
+            <Modal show={passwordUser !== null} onClose={() => setPasswordUser(null)} maxWidth="sm">
+                <form onSubmit={submitPassword} className="p-6">
+                    <h2 className="text-xl font-bold">Cambiar contraseña</h2>
+                    <p className="mt-1 text-sm text-gray-500">{passwordUser?.name} – {passwordUser?.email}</p>
+                    <div className="mt-5 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Nueva contraseña</label>
+                            <input type="password" value={passwordForm.data.password} onChange={(e) => passwordForm.setData('password', e.target.value)} className="mt-1 block w-full rounded-lg border-gray-300" />
+                            {passwordForm.errors.password && <p className="mt-1 text-sm text-red-600">{passwordForm.errors.password}</p>}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+                            <input type="password" value={passwordForm.data.password_confirmation} onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)} className="mt-1 block w-full rounded-lg border-gray-300" />
+                            {passwordForm.errors.password_confirmation && <p className="mt-1 text-sm text-red-600">{passwordForm.errors.password_confirmation}</p>}
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-2">
+                        <button type="button" onClick={() => setPasswordUser(null)} className="rounded-lg border px-4 py-2 text-sm font-semibold">Cancelar</button>
+                        <button disabled={passwordForm.processing} className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Guardar contraseña</button>
                     </div>
                 </form>
             </Modal>

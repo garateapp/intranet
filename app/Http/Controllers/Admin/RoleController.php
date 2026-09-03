@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
@@ -54,5 +56,20 @@ class RoleController extends Controller
         $user->syncRoles($validated['roles'] ?? []);
 
         return back()->with('success', "Roles de {$user->name} actualizados.");
+    }
+
+    public function updatePassword(Request $request, User $user): RedirectResponse
+    {
+        abort_unless($request->user()->hasRole('super_admin'), 403);
+
+        $validated = $request->validate([
+            'password' => ['required', Password::defaults(), 'confirmed'],
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', "Contraseña de {$user->name} actualizada.");
     }
 }
