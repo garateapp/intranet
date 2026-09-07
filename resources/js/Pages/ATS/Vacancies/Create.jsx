@@ -14,8 +14,13 @@ export default function Create({ hiringManagers, defaultStages }) {
         job_type: 'full_time',
         start_date: '',
         salary: '',
+        renta_liquida: '',
         salary_currency: 'CLP',
         status: 'draft',
+        entry_week: '',
+        entry_week_year: '',
+        exit_week: '',
+        exit_week_year: '',
         hiring_manager_id: '',
     });
 
@@ -101,6 +106,7 @@ export default function Create({ hiringManagers, defaultStages }) {
                                 <option value="full_time">Tiempo Completo</option>
                                 <option value="part_time">Medio Tiempo</option>
                                 <option value="contract">Contrato</option>
+                                <option value="obra">Obra</option>
                             </select>
                         </div>
                         <div>
@@ -117,7 +123,7 @@ export default function Create({ hiringManagers, defaultStages }) {
                         </div>
                     </div>
 
-                    {/* Fila: Fecha + Salario */}
+                    {/* Fila: Fecha + Renta */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-1 block text-sm font-medium text-gray-700">Fecha de Inicio</label>
@@ -129,7 +135,7 @@ export default function Create({ hiringManagers, defaultStages }) {
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Salario (CLP)</label>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Renta Bruta (CLP)</label>
                             <input
                                 type="number"
                                 value={data.salary}
@@ -140,6 +146,82 @@ export default function Create({ hiringManagers, defaultStages }) {
                             />
                         </div>
                     </div>
+
+                    {/* Renta líquida (solo visible para RRHH/Admin y Gerente de Contratación) */}
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-700">Renta Líquida (CLP)</label>
+                        <input
+                            type="number"
+                            value={data.renta_liquida}
+                            onChange={(e) => setData('renta_liquida', e.target.value)}
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Ej: 1219000"
+                            min="0"
+                        />
+                        <p className="mt-1 text-xs text-gray-400">Valor confidencial: solo visible para Gerentes de Contratación y RRHH/Admin.</p>
+                        {errors.renta_liquida && <p className="mt-1 text-xs text-red-500">{errors.renta_liquida}</p>}
+                    </div>
+
+                    {/* Semanas de obra */}
+                    {data.job_type === 'obra' && (
+                        <div className="rounded-lg bg-orange-50 p-4">
+                            <p className="mb-3 text-sm font-medium text-gray-700">Semanas de la Obra *</p>
+                            <div className="grid grid-cols-4 gap-3">
+                                <div>
+                                    <label className="mb-1 block text-xs font-medium text-gray-600">Sem. Ingreso</label>
+                                    <input
+                                        type="number"
+                                        value={data.entry_week}
+                                        onChange={(e) => setData('entry_week', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        placeholder="1-53"
+                                        min="1"
+                                        max="53"
+                                    />
+                                    {errors.entry_week && <p className="mt-1 text-xs text-red-500">{errors.entry_week}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-xs font-medium text-gray-600">Año Ingreso</label>
+                                    <input
+                                        type="number"
+                                        value={data.entry_week_year}
+                                        onChange={(e) => setData('entry_week_year', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        placeholder="2026"
+                                        min="2000"
+                                        max="2100"
+                                    />
+                                    {errors.entry_week_year && <p className="mt-1 text-xs text-red-500">{errors.entry_week_year}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-xs font-medium text-gray-600">Sem. Salida</label>
+                                    <input
+                                        type="number"
+                                        value={data.exit_week}
+                                        onChange={(e) => setData('exit_week', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        placeholder="1-53"
+                                        min="1"
+                                        max="53"
+                                    />
+                                    {errors.exit_week && <p className="mt-1 text-xs text-red-500">{errors.exit_week}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-xs font-medium text-gray-600">Año Salida</label>
+                                    <input
+                                        type="number"
+                                        value={data.exit_week_year}
+                                        onChange={(e) => setData('exit_week_year', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        placeholder="2026"
+                                        min="2000"
+                                        max="2100"
+                                    />
+                                    {errors.exit_week_year && <p className="mt-1 text-xs text-red-500">{errors.exit_week_year}</p>}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Gerente de contratación */}
                     <div>

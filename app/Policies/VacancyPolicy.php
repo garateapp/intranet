@@ -9,9 +9,9 @@ use App\Models\Vacancy;
  * Policy para controlar acceso a vacantes.
  *
  * Lógica:
- * - SuperAdmin: acceso total
- * - Reclutador: acceso global a todas las vacantes
- * - Gerente de Contratación: solo ve vacantes donde es hiring_manager o creador
+ * - SuperAdmin: acceso total a todas las vacantes
+ * - Reclutador / Admin / Gerente de Contratación: solo sus propias vacantes
+ *   (donde es hiring_manager o creador)
  */
 class VacancyPolicy
 {
@@ -20,7 +20,7 @@ class VacancyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager','admin']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager', 'admin']);
     }
 
     /**
@@ -28,11 +28,10 @@ class VacancyPolicy
      */
     public function view(User $user, Vacancy $vacancy): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter', 'admin'])) {
+        if ($user->canViewAllVacancies()) {
             return true;
         }
 
-        // Gerente de contratación solo ve sus vacantes asignadas o creadas
         return $user->id === $vacancy->hiring_manager_id
             || $user->id === $vacancy->created_by;
     }
@@ -42,7 +41,7 @@ class VacancyPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'admin']);
     }
 
     /**
@@ -50,11 +49,7 @@ class VacancyPolicy
      */
     public function update(User $user, Vacancy $vacancy): bool
     {
-        if ($user->hasAnyRole(['super_admin', 'recruiter','admin'])) {
-            return true;
-        }
-
-        return $user->id === $vacancy->hiring_manager_id;
+        return $this->view($user, $vacancy);
     }
 
     /**
@@ -62,6 +57,6 @@ class VacancyPolicy
      */
     public function delete(User $user, Vacancy $vacancy): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
+        return $this->view($user, $vacancy);
     }
 }

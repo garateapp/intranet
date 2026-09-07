@@ -22,10 +22,20 @@ class Vacancy extends Model
         'job_type',
         'start_date',
         'salary',
+        'renta_liquida',
         'salary_currency',
         'status',
+        'entry_week',
+        'entry_week_year',
+        'exit_week',
+        'exit_week_year',
         'hiring_manager_id',
         'created_by',
+    ];
+
+    protected $appends = [
+        'entry_week_label',
+        'exit_week_label',
     ];
 
     protected function casts(): array
@@ -33,6 +43,11 @@ class Vacancy extends Model
         return [
             'start_date' => 'date',
             'salary' => 'decimal:2',
+            'renta_liquida' => 'decimal:2',
+            'entry_week' => 'integer',
+            'entry_week_year' => 'integer',
+            'exit_week' => 'integer',
+            'exit_week_year' => 'integer',
         ];
     }
 
@@ -122,5 +137,76 @@ class Vacancy extends Model
             ->groupBy('stage_id')
             ->pluck('count', 'stage_id')
             ->toArray();
+    }
+
+    /**
+     * Renta líquida protegida: solo Gerente de Contratación en sus propias
+     * vacantes y roles con acceso global (super_admin/admin/recruiter).
+     */
+    public function getRentaLiquidaAttribute($value): ?string
+    {
+        if (!$this->canViewRentaLiquida()) {
+            return null;
+        }
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return number_format((float) $value, 2, '.', '');
+    }
+
+    /**
+     * Indica si el usuario autenticado puede ver la renta líquida de esta vacante.
+     */
+    public function canViewRentaLiquida(): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(['super_admin', 'admin', 'recruiter'])) {
+            return true;
+        }
+
+        if ($user->hasRole('hiring_manager')) {
+            return $this->hiring_manager_id === $user->id || $this->created_by === $user->id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Indica si la vacante es de tipo Obra.
+     */
+    public function isObra(): bool
+    {
+        return $this->job_type === 'obra';
+    }
+
+    /**
+     * Etiqueta legible de la semana de ingreso (ej: "Semana 12 - 2026").
+     */
+    public function getEntryWeekLabelAttribute(): ?string
+    {
+        if ($this->entry_week === null || $this->entry_week === '') {
+            return null;
+        }
+
+        return "Semana {$this->entry_week} - {$this->entry_week_year}";
+    }
+
+    /**
+     * Etiqueta legible de la semana de salida (ej: "Semana 30 - 2026").
+     */
+    public function getExitWeekLabelAttribute(): ?string
+    {
+        if ($this->exit_week === null || $this->exit_week === '') {
+            return null;
+        }
+
+        return "Semana {$this->exit_week} - {$this->exit_week_year}";
     }
 }

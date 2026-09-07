@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Stage;
 use App\Models\Application;
 use App\Http\Requests\VacancyRequest;
+use App\Services\VacancyImporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -37,8 +38,8 @@ class VacancyController extends Controller
             $query->where('title', 'like', "%{$search}%");
         }
 
-        // Gerente de contratación: solo sus vacantes
-        if (Auth::user()->hasRole('hiring_manager')) {
+        // Solo el Superadmin ve todas las vacantes; el resto solo las propias
+        if (! Auth::user()->canViewAllVacancies()) {
             $query->where(function ($q) {
                 $q->where('hiring_manager_id', Auth::id())
                   ->orWhere('created_by', Auth::id());
@@ -74,6 +75,104 @@ class VacancyController extends Controller
         return Inertia::render('ATS/Vacancies/Create', [
             'hiringManagers' => $hiringManagers,
             'defaultStages' => $defaultStages,
+        ]);
+    }
+
+    /**
+     * Descarga la plantilla de ejemplo para la carga masiva de vacantes.
+     */
+    public function template()
+    {
+        $this->authorize('create', Vacancy::class);
+
+        $importer = app(VacancyImporter::class);
+        $tempFile = $importer->generateTemplate();
+
+        return response()->download($tempFile, 'plantilla_vacantes.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Página de carga masiva de vacantes.
+     */
+    public function import()
+    {
+        $this->authorize('create', Vacancy::class);
+
+        return Inertia::render('ATS/Vacancies/Import', [
+            'canDownloadTemplate' => true,
+        ]);
+    }
+
+    /**
+     * Calendario de vacantes de obra por semana de ingreso.
+     */
+    public function calendar(Request $request)
+    {
+        $this->authorize('viewAny', Vacancy::class);
+
+        $year = $request->integer('year', now()->year);
+
+        $own = function ($query) {
+            if (! Auth::user()->canViewAllVacancies()) {
+                $query->where(fn ($q) => $q->where('hiring_manager_id', Auth::id())
+                    ->orWhere('created_by', Auth::id()));
+            }
+        };
+
+        $vacancies = Vacancy::with('hiringManager')
+            ->where('job_type', 'obra')
+            ->whereNotNull('entry_week')
+            ->where('entry_week_year', $year)
+            ->where($own)
+            ->get()
+            ->sortBy('entry_week')
+            ->values();
+
+        $incomplete = Vacancy::with('hiringManager')
+            ->where('job_type', 'obra')
+            ->where(fn ($q) => $q->whereNull('entry_week')->orWhereNull('exit_week'))
+            ->where($own)
+            ->get();
+
+        return Inertia::render('ATS/Vacancies/Calendar', [
+            'year' => $year,
+            'vacancies' => $vacancies,
+            'incomplete' => $incomplete,
+        ]);
+    }
+
+    /**
+     * Procesa el archivo de carga masiva y crea las vacantes.
+     */
+    public function processImport(Request $request)
+    {
+        $this->authorize('create', Vacancy::class);
+
+        $request->validate([
+            'file' => ['required', 'file', 'max:10240'],
+        ], [
+            'file.required' => 'Debe seleccionar un archivo.',
+            'file.max' => 'El archivo no debe superar los 10 MB.',
+        ]);
+
+        $importer = app(VacancyImporter::class);
+
+        try {
+            $result = $importer->import($request->file('file'), Auth::id());
+        } catch (\Throwable $e) {
+            return Inertia::render('ATS/Vacancies/Import', [
+                'result' => [
+                    'total_rows' => 0,
+                    'created' => 0,
+                    'errors' => [['row' => 0, 'error' => $e->getMessage()]],
+                ],
+            ]);
+        }
+
+        return Inertia::render('ATS/Vacancies/Import', [
+            'result' => $result,
         ]);
     }
 
@@ -116,6 +215,7 @@ class VacancyController extends Controller
 
         return Inertia::render('ATS/Vacancies/Show', [
             'vacancy' => $vacancy,
+            'canViewRentaLiquida' => $vacancy->canViewRentaLiquida(),
         ]);
     }
 
@@ -139,6 +239,7 @@ class VacancyController extends Controller
         return Inertia::render('ATS/Vacancies/Edit', [
             'vacancy' => $vacancy,
             'hiringManagers' => $hiringManagers,
+            'canViewRentaLiquida' => $vacancy->canViewRentaLiquida(),
         ]);
     }
 
@@ -189,7 +290,7 @@ class VacancyController extends Controller
         $user = Auth::user();
 
         $query = Vacancy::query();
-        if ($user->hasRole('hiring_manager')) {
+        if (! $user->canViewAllVacancies()) {
             $query->where('hiring_manager_id', Auth::id())
                   ->orWhere('created_by', Auth::id());
         }

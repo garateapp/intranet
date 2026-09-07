@@ -187,6 +187,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/ats/export', [AtsDashboardController::class, 'export'])->name('ats.export');
 
         // Vacantes
+        Route::get('ats/vacancies/calendar', [VacancyController::class, 'calendar'])->name('ats.vacancies.calendar');
+        Route::get('ats/vacancies/template', [VacancyController::class, 'template'])->name('ats.vacancies.template');
+        Route::get('ats/vacancies/import', [VacancyController::class, 'import'])->name('ats.vacancies.import');
+        Route::post('ats/vacancies/import', [VacancyController::class, 'processImport'])->name('ats.vacancies.import.process');
         Route::resource('ats/vacancies', VacancyController::class)->names('ats.vacancies');
         Route::put('ats/vacancies/{vacancy}/restore', [VacancyController::class, 'restore'])->name('ats.vacancies.restore');
 

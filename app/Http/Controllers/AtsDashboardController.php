@@ -26,8 +26,8 @@ class AtsDashboardController extends Controller
         $user = Auth::user();
         $query = Vacancy::query();
 
-        // Filtro por rol
-        if ($user->hasRole('hiring_manager')) {
+        // Solo el Superadmin ve todas las vacantes; el resto solo las propias
+        if (! $user->canViewAllVacancies()) {
             $query->where(function ($q) use ($user) {
                 $q->where('hiring_manager_id', $user->id)
                   ->orWhere('created_by', $user->id);
@@ -78,7 +78,7 @@ class AtsDashboardController extends Controller
         $user = Auth::user();
         $query = Vacancy::query();
 
-        if ($user->hasRole('hiring_manager')) {
+        if (! $user->canViewAllVacancies()) {
             $query->where(function ($q) use ($user) {
                 $q->where('hiring_manager_id', $user->id)
                   ->orWhere('created_by', $user->id);
@@ -129,6 +129,7 @@ class AtsDashboardController extends Controller
             Cell::fromValue('Tipo'),
             Cell::fromValue('Gerente'),
             Cell::fromValue('Salario'),
+            Cell::fromValue('Renta Líquida'),
             Cell::fromValue('Etapas'),
             Cell::fromValue('Postulaciones'),
             Cell::fromValue('Fecha Creación'),
@@ -140,6 +141,7 @@ class AtsDashboardController extends Controller
                 Cell::fromValue($v->job_type),
                 Cell::fromValue($v->hiringManager?->name ?? '-'),
                 Cell::fromValue($v->salary ? $v->salary_currency . ' ' . number_format($v->salary, 0, ',', '.') : '-'),
+                Cell::fromValue($v->renta_liquida !== null ? $v->salary_currency . ' ' . number_format((float) $v->renta_liquida, 0, ',', '.') : '-'),
                 Cell::fromValue($v->stages->count()),
                 Cell::fromValue($applications->where('vacancy_id', $v->id)->count()),
                 Cell::fromValue($v->created_at->format('d/m/Y')),
