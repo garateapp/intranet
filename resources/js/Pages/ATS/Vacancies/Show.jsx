@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Show({ vacancy }) {
+export default function Show({ vacancy, canViewRentaLiquida }) {
     const statusLabels = {
         draft: { label: 'Borrador', color: 'bg-yellow-100 text-yellow-700' },
         active: { label: 'Activa', color: 'bg-green-100 text-green-700' },
@@ -12,6 +12,7 @@ export default function Show({ vacancy }) {
         full_time: 'Tiempo Completo',
         part_time: 'Medio Tiempo',
         contract: 'Contrato',
+        obra: 'Obra',
     };
 
     return (
@@ -117,6 +118,28 @@ export default function Show({ vacancy }) {
                                     <dt className="text-gray-500">Salario</dt>
                                     <dd className="font-medium text-gray-900">{vacancy.salary_currency} {Number(vacancy.salary).toLocaleString('es-CL')}</dd>
                                 </div>
+                            )}
+                            {canViewRentaLiquida && vacancy.renta_liquida && (
+                                <div className="flex justify-between">
+                                    <dt className="text-gray-500">Renta Líquida</dt>
+                                    <dd className="font-medium text-gray-900">{vacancy.salary_currency} {Number(vacancy.renta_liquida).toLocaleString('es-CL')}</dd>
+                                </div>
+                            )}
+                            {vacancy.job_type === 'obra' && (
+                                <>
+                                    {vacancy.entry_week_label && (
+                                        <div className="flex justify-between">
+                                            <dt className="text-gray-500">Semana de ingreso</dt>
+                                            <dd className="font-medium text-gray-900">{vacancy.entry_week_label}</dd>
+                                        </div>
+                                    )}
+                                    {vacancy.exit_week_label && (
+                                        <div className="flex justify-between">
+                                            <dt className="text-gray-500">Semana de salida</dt>
+                                            <dd className="font-medium text-gray-900">{vacancy.exit_week_label}</dd>
+                                        </div>
+                                    )}
+                                </>
                             )}
                             {vacancy.start_date && (
                                 <div className="flex justify-between">
