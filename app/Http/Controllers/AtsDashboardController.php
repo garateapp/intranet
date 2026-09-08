@@ -62,10 +62,40 @@ class AtsDashboardController extends Controller
             ->limit(10)
             ->get();
 
+        // Vacantes cerradas durante la última semana
+        $closedLastWeek = Vacancy::with('hiringManager')
+            ->where('status', 'closed')
+            ->where('updated_at', '>=', now()->subDays(7))
+            ->where(function ($q) use ($user) {
+                if (! $user->canViewAllVacancies()) {
+                    $q->where(fn ($qq) => $qq->where('hiring_manager_id', $user->id)
+                        ->orWhere('created_by', $user->id));
+                }
+            })
+            ->latest('updated_at')
+            ->limit(10)
+            ->get();
+
+        // Vacantes inactivas: sin actualizaciones en los últimos 5 días
+        $inactiveVacancies = Vacancy::with('hiringManager')
+            ->where('status', '!=', 'closed')
+            ->where('updated_at', '<', now()->subDays(5))
+            ->where(function ($q) use ($user) {
+                if (! $user->canViewAllVacancies()) {
+                    $q->where(fn ($qq) => $qq->where('hiring_manager_id', $user->id)
+                        ->orWhere('created_by', $user->id));
+                }
+            })
+            ->latest('updated_at')
+            ->get()
+            ->map(fn (Vacancy $v) => $v->setAttribute('inactive_days', (int) now()->diffInDays($v->updated_at)));
+
         return Inertia::render('ATS/Dashboard', [
             'stats' => $stats,
             'recentVacancies' => $recentVacancies,
             'recentApplications' => $recentApplications,
+            'closedLastWeek' => $closedLastWeek,
+            'inactiveVacancies' => $inactiveVacancies,
         ]);
     }
 

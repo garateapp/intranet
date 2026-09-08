@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureAtsAccess;
 use App\Http\Middleware\EnsureUtf8JsonEncoding;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogUserActivity;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'ats' => EnsureAtsAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

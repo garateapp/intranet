@@ -198,6 +198,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'index'])->name('ats.vacancies.pipeline');
         Route::post('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'store'])->name('ats.vacancies.pipeline.store');
         Route::put('ats/vacancies/{vacancy}/pipeline/reorder', [VacancyStageController::class, 'reorder'])->name('ats.vacancies.pipeline.reorder');
+        Route::patch('ats/vacancies/{vacancy}/pipeline/{stage}/closure', [VacancyStageController::class, 'toggleClosure'])->name('ats.vacancies.pipeline.closure');
         Route::delete('ats/vacancies/{vacancy}/pipeline/{stageId}', [VacancyStageController::class, 'destroy'])->name('ats.vacancies.pipeline.destroy');
 
         // Tablero Kanban
@@ -232,6 +233,49 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('api/admin/user-activities/stats', [UserActivityController::class, 'adminStats']);
         Route::get('api/admin/user-activities/export', [UserActivityController::class, 'adminExport']);
         Route::get('api/admin/user-activities/{user}', [UserActivityController::class, 'adminUserDetail']);
+    });
+
+    // ========== MÓDULO ATS ==========
+    // Roles ATS: super_admin, admin, recruiter, hiring_manager
+    Route::middleware(['ats'])->group(function () {
+        // Dashboard ATS
+        Route::get('/ats', [AtsDashboardController::class, 'index'])->name('ats.dashboard');
+        Route::get('/ats/export', [AtsDashboardController::class, 'export'])->name('ats.export');
+
+        // Vacantes
+        Route::get('ats/vacancies/calendar', [VacancyController::class, 'calendar'])->name('ats.vacancies.calendar');
+        Route::get('ats/vacancies/template', [VacancyController::class, 'template'])->name('ats.vacancies.template');
+        Route::get('ats/vacancies/import', [VacancyController::class, 'import'])->name('ats.vacancies.import');
+        Route::post('ats/vacancies/import', [VacancyController::class, 'processImport'])->name('ats.vacancies.import.process');
+        Route::resource('ats/vacancies', VacancyController::class)->names('ats.vacancies');
+        Route::put('ats/vacancies/{vacancy}/restore', [VacancyController::class, 'restore'])->name('ats.vacancies.restore');
+
+        // Pipeline de vacantes (configurar etapas)
+        Route::get('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'index'])->name('ats.vacancies.pipeline');
+        Route::post('ats/vacancies/{vacancy}/pipeline', [VacancyStageController::class, 'store'])->name('ats.vacancies.pipeline.store');
+        Route::put('ats/vacancies/{vacancy}/pipeline/reorder', [VacancyStageController::class, 'reorder'])->name('ats.vacancies.pipeline.reorder');
+        Route::patch('ats/vacancies/{vacancy}/pipeline/{stage}/closure', [VacancyStageController::class, 'toggleClosure'])->name('ats.vacancies.pipeline.closure');
+        Route::delete('ats/vacancies/{vacancy}/pipeline/{stageId}', [VacancyStageController::class, 'destroy'])->name('ats.vacancies.pipeline.destroy');
+
+        // Tablero Kanban
+        Route::get('ats/vacancies/{vacancy}/kanban', [ApplicationController::class, 'kanban'])->name('ats.applications.kanban');
+        Route::post('ats/applications', [ApplicationController::class, 'store'])->name('ats.applications.store');
+        Route::patch('ats/applications/{application}/move', [ApplicationController::class, 'move'])->name('ats.applications.move');
+        Route::patch('ats/applications/{application}/hire', [ApplicationController::class, 'hire'])->name('ats.applications.hire');
+        Route::delete('ats/applications/{application}', [ApplicationController::class, 'destroy'])->name('ats.applications.destroy');
+
+        // Candidatos
+        Route::resource('ats/candidates', CandidateController::class)->names('ats.candidates');
+
+        // Entrevistas
+        Route::resource('ats/interviews', InterviewController::class)->names('ats.interviews');
+        Route::get('ats/applications/{application}/interviews', [InterviewController::class, 'index'])->name('ats.application-interviews.index');
+        Route::get('ats/applications/{application}/interviews/create', [InterviewController::class, 'create'])->name('ats.application-interviews.create');
+
+        // Evaluaciones
+        Route::resource('ats/evaluations', EvaluationController::class)->names('ats.evaluations');
+        Route::get('ats/interviews/{interview}/evaluations', [EvaluationController::class, 'index'])->name('ats.interview-evaluations.index');
+        Route::get('ats/interviews/{interview}/evaluations/create', [EvaluationController::class, 'create'])->name('ats.interview-evaluations.create');
     });
 });
 

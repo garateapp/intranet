@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AtsStageClosureMail;
 use App\Models\Application;
 use App\Models\Vacancy;
 use App\Models\Candidate;
@@ -9,6 +10,7 @@ use App\Models\Stage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 /**
@@ -77,6 +79,10 @@ class ApplicationController extends Controller
             'applied_at' => now(),
         ]);
 
+        if (Stage::find($validated['stage_id'])?->is_closure) {
+            $this->notifyClosureStage($application);
+        }
+
         return back()->with('success', 'Candidato agregado al pipeline exitosamente.');
     }
 
@@ -95,6 +101,10 @@ class ApplicationController extends Controller
         $oldStage = $application->stage;
 
         $application->update(['stage_id' => $validated['stage_id']]);
+
+        if (Stage::find($validated['stage_id'])?->is_closure) {
+            $this->notifyClosureStage($application);
+        }
 
         return back()->with('success', 'Candidato movido exitosamente.');
     }
@@ -138,5 +148,20 @@ class ApplicationController extends Controller
         });
 
         return back()->with('success', "Candidato {$application->candidate->name} seleccionado. La vacante se ha cerrado automáticamente.");
+    }
+
+    /**
+     * Notifica al destinatario de RRHH (EMAIL_ATS_HR) cuando una postulación
+     * llega a una etapa marcada como etapa de cierre.
+     */
+    private function notifyClosureStage(Application $application): void
+    {
+        $recipient = config('mail.ats_hr_recipient');
+
+        if (! $recipient) {
+            return;
+        }
+
+        Mail::to($recipient)->send(new AtsStageClosureMail($application));
     }
 }

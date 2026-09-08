@@ -121,14 +121,25 @@ class VacancyController extends Controller
             }
         };
 
-        $vacancies = Vacancy::with('hiringManager')
+        $entries = Vacancy::with('hiringManager')
             ->where('job_type', 'obra')
             ->whereNotNull('entry_week')
             ->where('entry_week_year', $year)
             ->where($own)
             ->get()
-            ->sortBy('entry_week')
-            ->values();
+            ->map(fn (Vacancy $v) => $v->setAttribute('event_type', 'entry')
+                ->setAttribute('sort_week', $v->entry_week));
+
+        $exits = Vacancy::with('hiringManager')
+            ->where('job_type', 'obra')
+            ->whereNotNull('exit_week')
+            ->where('exit_week_year', $year)
+            ->where($own)
+            ->get()
+            ->map(fn (Vacancy $v) => $v->setAttribute('event_type', 'exit')
+                ->setAttribute('sort_week', $v->exit_week));
+
+        $vacancies = $entries->concat($exits)->sortBy('sort_week')->values();
 
         $incomplete = Vacancy::with('hiringManager')
             ->where('job_type', 'obra')

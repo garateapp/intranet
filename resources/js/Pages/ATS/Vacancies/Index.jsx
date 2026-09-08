@@ -1,25 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
 
 /**
- * Lista de vacantes con filtros por estado, búsqueda y paginación.
- * Muestra métricas resumen en la parte superior.
+ * Lista de vacantes con filtros por estado y búsqueda, y paginación.
  */
-export default function Index({ vacancies, filters, stats }) {
-    const [search, setSearch] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get(route('ats.vacancies.index'), { search, status: statusFilter }, { preserveState: true });
-    };
-
-    const handleStatusFilter = (status) => {
-        setStatusFilter(status === statusFilter ? '' : status);
-        router.get(route('ats.vacancies.index'), { search, status: status === statusFilter ? '' : status }, { preserveState: true });
-    };
-
+export default function Index({ vacancies, filters }) {
     const statusLabels = {
         draft: { label: 'Borrador', color: 'bg-yellow-100 text-yellow-700' },
         active: { label: 'Activa', color: 'bg-green-100 text-green-700' },
@@ -66,36 +51,36 @@ export default function Index({ vacancies, filters, stats }) {
         >
             <Head title="Vacantes - ATS" />
 
-            {/* Filtros rápidos */}
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-                {Object.entries(statusLabels).map(([key, { label, color }]) => (
-                    <button
-                        key={key}
-                        onClick={() => handleStatusFilter(key)}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition ${
-                            statusFilter === key ? `${color} ring-2 ring-offset-1 ring-current` : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                    >
-                        {label}
-                        <span className="ml-1 text-xs opacity-75">
-                            {key === 'draft' ? stats.draft : key === 'active' ? stats.active : stats.closed}
-                        </span>
-                    </button>
-                ))}
-            </div>
-
-            {/* Búsqueda */}
-            <form onSubmit={handleSearch} className="mb-6">
-                <div className="relative max-w-md">
+            {/* Filtros: búsqueda y estado */}
+            <form action={route('ats.vacancies.index')} method="get" className="mb-6 flex flex-wrap items-center gap-3">
+                <div className="relative min-w-[220px] max-w-md flex-1">
                     <input
                         type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        name="search"
+                        defaultValue={filters.search || ''}
                         placeholder="Buscar vacante por título..."
                         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
-                    <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <svg className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
+                <select
+                    name="status"
+                    defaultValue={filters.status || ''}
+                    onChange={(e) => e.target.form.submit()}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                >
+                    <option value="">Todos los estados</option>
+                    <option value="draft">Borrador</option>
+                    <option value="active">Activa</option>
+                    <option value="closed">Cerrada</option>
+                </select>
+                <button
+                    type="submit"
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    Buscar
+                </button>
             </form>
 
             {/* Lista de vacantes */}
@@ -106,10 +91,15 @@ export default function Index({ vacancies, filters, stats }) {
                     </div>
                 ) : (
                     vacancies.data.map((vacancy) => (
-                        <Link
+                        <div
                             key={vacancy.id}
-                            href={route('ats.applications.kanban', vacancy.id)}
-                            className="group block rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+                            onClick={() => router.visit(route('ats.applications.kanban', vacancy.id))}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') router.visit(route('ats.applications.kanban', vacancy.id));
+                            }}
+                            className="group block cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
                         >
                             <div className="mb-3 flex items-start justify-between">
                                 <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600">
@@ -122,6 +112,20 @@ export default function Index({ vacancies, filters, stats }) {
                             <p className="mb-3 line-clamp-2 text-xs text-gray-500">
                                 {vacancy.description?.substring(0, 120)}...
                             </p>
+                            {(vacancy.entry_week_label || vacancy.exit_week_label) && (
+                                <div className="mb-3 flex flex-wrap gap-1.5">
+                                    {vacancy.entry_week_label && (
+                                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                                            Ingreso: {vacancy.entry_week_label}
+                                        </span>
+                                    )}
+                                    {vacancy.exit_week_label && (
+                                        <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-700">
+                                            Salida: {vacancy.exit_week_label}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
                             {vacancy.job_type === 'obra' && (!vacancy.entry_week || !vacancy.exit_week) && (
                                 <div className="mb-3 flex flex-wrap gap-1">
                                     {!vacancy.entry_week && (
@@ -149,8 +153,23 @@ export default function Index({ vacancies, filters, stats }) {
                                     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                     {vacancy.hiring_manager?.name}
                                 </span>
+                                <span className="ml-auto">
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            router.visit(route('ats.vacancies.edit', vacancy.id));
+                                        }}
+                                        title="Editar vacante"
+                                        className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 font-medium text-gray-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
+                                    >
+                                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        Editar
+                                    </button>
+                                </span>
                             </div>
-                        </Link>
+                        </div>
                     ))
                 )}
             </div>
