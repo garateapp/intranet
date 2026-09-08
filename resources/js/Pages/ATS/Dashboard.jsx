@@ -6,7 +6,7 @@ import { Head, Link } from '@inertiajs/react';
  * Muestra métricas globales: vacantes por estado, total de postulaciones,
  * y actividad reciente del pipeline.
  */
-export default function Dashboard({ stats, recentVacancies, recentApplications }) {
+export default function Dashboard({ stats, recentVacancies, recentApplications, closedLastWeek, inactiveVacancies }) {
     const statCards = [
         { label: 'Total Vacantes', value: stats.total_vacancies, color: 'bg-blue-500', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
         { label: 'Activas', value: stats.active_vacancies, color: 'bg-green-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
@@ -119,6 +119,79 @@ export default function Dashboard({ stats, recentVacancies, recentApplications }
                                         {app.stage?.name}
                                     </span>
                                 </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Vacantes cerradas e inactivas */}
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-900">Cerradas en la última semana</h3>
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                            {closedLastWeek.length}
+                        </span>
+                    </div>
+                    <div className="space-y-3">
+                        {closedLastWeek.length === 0 ? (
+                            <p className="py-4 text-center text-sm text-gray-500">No hay vacantes cerradas esta semana.</p>
+                        ) : (
+                            closedLastWeek.map((vacancy) => (
+                                <Link
+                                    key={vacancy.id}
+                                    href={route('ats.vacancies.show', vacancy.id)}
+                                    className="block rounded-lg border border-gray-100 p-3 transition hover:border-gray-200 hover:bg-gray-50"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">{vacancy.title}</p>
+                                            <p className="text-xs text-gray-500">
+                                                {vacancy.hiring_manager?.name ? `${vacancy.hiring_manager.name} · ` : ''}
+                                                cerrada {new Date(vacancy.updated_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                                            </p>
+                                        </div>
+                                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                            Cerrada
+                                        </span>
+                                    </div>
+                                </Link>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                <div className="rounded-xl border border-red-200 bg-white p-5 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-900">Inactivas (+5 días)</h3>
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                            {inactiveVacancies.length}
+                        </span>
+                    </div>
+                    <div className="space-y-3">
+                        {inactiveVacancies.length === 0 ? (
+                            <p className="py-4 text-center text-sm text-gray-500">No hay vacantes inactivas.</p>
+                        ) : (
+                            inactiveVacancies.map((vacancy) => (
+                                <Link
+                                    key={vacancy.id}
+                                    href={route('ats.vacancies.show', vacancy.id)}
+                                    className="block rounded-lg border border-red-100 p-3 transition hover:border-red-200 hover:bg-red-50/40"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">{vacancy.title}</p>
+                                            <p className="text-xs text-gray-500">
+                                                {vacancy.hiring_manager?.name ? `${vacancy.hiring_manager.name} · ` : ''}
+                                                sin actividad {vacancy.inactive_days} días
+                                            </p>
+                                        </div>
+                                        <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                            {vacancy.inactive_days} d
+                                        </span>
+                                    </div>
+                                </Link>
                             ))
                         )}
                     </div>

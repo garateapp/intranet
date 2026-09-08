@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Destinatario RRHH del módulo ATS
+    |--------------------------------------------------------------------------
+    |
+    | Casilla que recibe las notificaciones cuando un postulante alcanza una
+    | etapa de cierre. Se configura en .env con la variable EMAIL_ATS_HR.
+    |
+    */
+
+    'ats_hr_recipient' => env('EMAIL_ATS_HR'),
+
 ];

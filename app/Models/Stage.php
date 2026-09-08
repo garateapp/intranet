@@ -21,6 +21,7 @@ class Stage extends Model
         'color',
         'sort_order',
         'is_default',
+        'is_closure',
     ];
 
     protected function casts(): array
@@ -28,6 +29,7 @@ class Stage extends Model
         return [
             'sort_order' => 'integer',
             'is_default' => 'boolean',
+            'is_closure' => 'boolean',
         ];
     }
 

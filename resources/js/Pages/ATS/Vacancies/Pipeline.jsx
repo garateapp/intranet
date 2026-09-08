@@ -45,6 +45,14 @@ export default function Pipeline({ vacancy, availableStages }) {
         router.delete(route('ats.vacancies.pipeline.destroy', [vacancy.id, stageId]), { preserveState: true });
     };
 
+    const handleToggleClosure = (stage) => {
+        router.patch(
+            route('ats.vacancies.pipeline.closure', [vacancy.id, stage.id]),
+            {},
+            { preserveState: true }
+        );
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -64,7 +72,10 @@ export default function Pipeline({ vacancy, availableStages }) {
             <div className="mx-auto max-w-2xl space-y-6">
                 {/* Lista de etapas actuales */}
                 <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <h3 className="mb-4 text-sm font-semibold text-gray-900">Etapas actuales ({vacancy.stages?.length || 0})</h3>
+                    <h3 className="mb-1 text-sm font-semibold text-gray-900">Etapas actuales ({vacancy.stages?.length || 0})</h3>
+                    <p className="mb-4 text-xs text-gray-500">
+                        Marca una etapa como <strong>etapa de cierre</strong> para que RRHH reciba un correo cuando un postulante llegue a ella.
+                    </p>
                     <div className="space-y-2">
                         {vacancy.stages?.map((stage, index) => (
                             <div
@@ -81,6 +92,17 @@ export default function Pipeline({ vacancy, availableStages }) {
                                 </span>
                                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: stage.color }} />
                                 <span className="flex-1 text-sm font-medium text-gray-900">{stage.name}</span>
+                                <button
+                                    onClick={() => handleToggleClosure(stage)}
+                                    title="Al llegar un postulante a esta etapa se notifica a RRHH por correo"
+                                    className={`rounded-lg px-2 py-1 text-xs font-medium transition ${
+                                        stage.is_closure
+                                            ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-300 hover:bg-indigo-200'
+                                            : 'text-gray-400 ring-1 ring-gray-200 hover:bg-gray-100 hover:text-gray-600'
+                                    }`}
+                                >
+                                    {stage.is_closure ? '✓ Etapa de cierre' : 'Marcar como cierre'}
+                                </button>
                                 {!stage.is_default && (
                                     <button
                                         onClick={() => handleRemoveStage(stage.id)}

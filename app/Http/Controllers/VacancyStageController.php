@@ -83,6 +83,24 @@ class VacancyStageController extends Controller
     }
 
     /**
+     * Marcar/desmarcar una etapa como etapa de cierre.
+     * Al llegar un postulante a una etapa de cierre se notifica a RRHH por correo.
+     */
+    public function toggleClosure(Vacancy $vacancy, Stage $stage)
+    {
+        $this->authorize('update', $vacancy);
+
+        $stage->update(['is_closure' => ! $stage->is_closure]);
+
+        return back()->with(
+            'success',
+            $stage->is_closure
+                ? "La etapa '{$stage->name}' ahora es etapa de cierre."
+                : "La etapa '{$stage->name}' ya no es etapa de cierre."
+        );
+    }
+
+    /**
      * Eliminar una etapa del pipeline de una vacante.
      */
     public function destroy(Vacancy $vacancy, int $stageId)
