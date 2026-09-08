@@ -82,7 +82,7 @@ class VacancyImporter
      *
      * @return array{total_rows:int, created:int, errors:array<int,array{row:int,error:string}>}
      */
-    public function import(UploadedFile $file, int $createdById): array
+    public function import(UploadedFile $file, int $createdById, bool $allowRenta = true): array
     {
         $path = $file->getRealPath();
         $extension = strtolower($file->getClientOriginalExtension());
@@ -147,9 +147,15 @@ class VacancyImporter
             }
 
             try {
-                DB::transaction(function () use ($validated, $defaultStages, $createdById, &$created) {
+                DB::transaction(function () use ($validated, $defaultStages, $createdById, $allowRenta, &$created) {
                     for ($i = 0; $i < $validated['cantidad']; $i++) {
-                        $vacancy = Vacancy::create([...$validated['data'], 'created_by' => $createdById]);
+                        $data = $validated['data'];
+
+                        if (! $allowRenta) {
+                            unset($data['renta_liquida']);
+                        }
+
+                        $vacancy = Vacancy::create([...$data, 'created_by' => $createdById]);
 
                         foreach ($defaultStages as $index => $stage) {
                             $vacancy->vacancyStages()->create([

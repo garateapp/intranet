@@ -1,12 +1,20 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-export default function Kanban({ vacancy, columns, candidates }) {
+export default function Kanban({ vacancy, columns, candidates, referralUsers = [] }) {
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState('');
     const [draggedApp, setDraggedApp] = useState(null);
     const [hireModal, setHireModal] = useState(null);
+    const [rejectModal, setRejectModal] = useState(null);
+    const [selectedReferred, setSelectedReferred] = useState([]);
+    const [referralNote, setReferralNote] = useState('');
+
+    const rejectedStage = useMemo(
+        () => columns.find((c) => c.stage_name?.toLowerCase() === 'rechazado'),
+        [columns]
+    );
 
     const handleDragStart = (e, application) => {
         setDraggedApp(application);
@@ -28,12 +36,57 @@ export default function Kanban({ vacancy, columns, candidates }) {
         e.preventDefault();
         if (!draggedApp || draggedApp.stage_id === targetStageId) return;
 
+        // Al soltar en "Rechazado", preguntar si desea referir al postulante
+        if (rejectedStage && targetStageId === rejectedStage.stage_id) {
+            setSelectedReferred([]);
+            setReferralNote('');
+            setRejectModal({ application: draggedApp, stageId: targetStageId });
+            setDraggedApp(null);
+            return;
+        }
+
         router.patch(route('ats.applications.move', draggedApp.id), {
             stage_id: targetStageId,
         }, {
             preserveState: true,
             onSuccess: () => setDraggedApp(null),
         });
+    };
+
+    const handleRejectWithoutReferral = () => {
+        const { application, stageId } = rejectModal;
+        router.patch(route('ats.applications.move', application.id), {
+            stage_id: stageId,
+        }, {
+            preserveState: true,
+            onSuccess: () => {
+                setRejectModal(null);
+                setSelectedReferred([]);
+                setReferralNote('');
+            },
+        });
+    };
+
+    const handleRejectAndRefer = () => {
+        const { application, stageId } = rejectModal;
+        router.post(route('ats.applications.refer', application.id), {
+            stage_id: stageId,
+            user_ids: selectedReferred,
+            note: referralNote,
+        }, {
+            preserveState: true,
+            onSuccess: () => {
+                setRejectModal(null);
+                setSelectedReferred([]);
+                setReferralNote('');
+            },
+        });
+    };
+
+    const toggleReferredUser = (userId) => {
+        setSelectedReferred((prev) =>
+            prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+        );
     };
 
     const handleAddCandidate = (e) => {
@@ -219,9 +272,16 @@ export default function Kanban({ vacancy, columns, candidates }) {
                             >
                                 <option value="">Seleccionar candidato...</option>
                                 {candidates.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                                    <option key={c.id} value={c.id} disabled={c.is_in_process}>
+                                        {c.name} ({c.email}){c.is_in_process ? ' — en otro proceso' : ''}
+                                    </option>
                                 ))}
                             </select>
+                            {candidates.some((c) => c.is_in_process) && (
+                                <p className="mb-4 rounded-lg bg-amber-50 p-2 text-xs text-amber-700">
+                                    Los candidatos marcados como "en otro proceso" no pueden participar en más de un proceso activo.
+                                </p>
+                            )}
                             <div className="flex justify-end gap-3">
                                 <button type="button" onClick={() => setShowAddModal(false)}
                                     className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -233,6 +293,92 @@ export default function Kanban({ vacancy, columns, candidates }) {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Rechazar / Referir Candidato */}
+            {rejectModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-xl bg-white p-6 shadow-xl">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Rechazar Candidato</h3>
+                            <p className="text-sm text-gray-500">
+                                <strong>{rejectModal.application.candidate?.name}</strong> quedará fuera del proceso de <strong>{vacancy.title}</strong>.
+                            </p>
+                        </div>
+
+                        <p className="mb-2 text-sm font-medium text-gray-700">
+                            ¿Desea referir al postulante a otro reclutador con procesos activos?
+                        </p>
+
+                        {referralUsers.length > 0 ? (
+                            <div className="mb-3 max-h-56 flex-1 space-y-2 overflow-y-auto rounded-lg border border-gray-200 p-3">
+                                {referralUsers.map((u) => (
+                                    <label
+                                        key={u.id}
+                                        className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
+                                            selectedReferred.includes(u.id)
+                                                ? 'border-red-300 bg-red-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedReferred.includes(u.id)}
+                                            onChange={() => toggleReferredUser(u.id)}
+                                            className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600"
+                                        />
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                                            <p className="truncate text-xs text-gray-500">{u.email}</p>
+                                            <p className="text-xs text-gray-400">
+                                                {u.managed_vacancies_count > 0
+                                                    ? `${u.managed_vacancies_count} proceso(s) activo(s)`
+                                                    : `${u.created_vacancies_count} proceso(s) activo(s)`}
+                                            </p>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="mb-3 rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+                                No hay otros usuarios con procesos de reclutamiento activos disponibles para referir.
+                            </p>
+                        )}
+
+                        <textarea
+                            value={referralNote}
+                            onChange={(e) => setReferralNote(e.target.value)}
+                            placeholder="Nota opcional para el reclutador (motivo de la referencia)..."
+                            className="mb-4 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                            rows={2}
+                        />
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setRejectModal(null)}
+                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleRejectWithoutReferral}
+                                className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                            >
+                                Rechazar sin referir
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleRejectAndRefer}
+                                disabled={selectedReferred.length === 0}
+                                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                            >
+                                Rechazar y referir
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

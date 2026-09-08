@@ -8,6 +8,10 @@ import { useState } from 'react';
 export default function AuthenticatedLayout({ header, children, rightSidebar }) {
     const user = usePage().props.auth.user;
     const purchaseInvoiceAccess = usePage().props.purchaseInvoiceAccess || {};
+    const permissions = usePage().props.permissions || {};
+    const roles = permissions.roles || [];
+    const hasRole = (role) => roles.includes(role);
+    const canAccessAts = ['super_admin', 'admin', 'recruiter', 'hiring_manager'].some(hasRole);
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -171,12 +175,7 @@ export default function AuthenticatedLayout({ header, children, rightSidebar }) 
                             RRHH
                         </Link>
                         {/* ATS Section */}
-                       {(
-    user.role === 'admin' ||
-    user.role === 'super_admin' ||
-    user.role === 'recruiter' ||
-    user.role === 'hiring_manager'
-) && (
+                       {canAccessAts && (
     <>
         <div className="mt-2 border-t border-gray-100 pt-2">
             <div className="flex items-center gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-blue-600">

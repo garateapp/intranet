@@ -186,11 +186,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Solo el Superadmin puede ver todas las vacantes; el resto solo las propias.
+     * SuperAdmin y Admin ven todas las vacantes; el resto solo las propias.
      */
     public function canViewAllVacancies(): bool
     {
-        return $this->hasRole('super_admin');
+        return $this->hasRole(['super_admin', 'admin']);
     }
 
     public function isUser()

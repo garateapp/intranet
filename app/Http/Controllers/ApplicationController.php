@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AtsStageClosureMail;
+use App\Mail\CandidateReferralMail;
 use App\Models\Application;
 use App\Models\Vacancy;
 use App\Models\Candidate;
+use App\Models\CandidateReferral;
 use App\Models\Stage;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,11 +50,47 @@ class ApplicationController extends Controller
             ];
         });
 
+        $candidates = Candidate::orderBy('name')->get(['id', 'name', 'email']);
+
+        // Candidatos que ya están en un proceso activo (para deshabilitarlos en el modal)
+        $inProcessIds = Application::query()
+            ->whereHas('vacancy', fn ($q) => $q->where('status', 'active'))
+            ->whereHas('stage', fn ($q) => $q->whereNotIn('name', ['Rechazado', 'Contratado']))
+            ->pluck('candidate_id')
+            ->unique();
+
+        $candidates->each(function (Candidate $candidate) use ($inProcessIds) {
+            $candidate->setAttribute('is_in_process', $inProcessIds->contains($candidate->id));
+        });
+
+        // Usuarios con procesos de reclutamiento activos (para referir candidatos)
+        $referralUsers = User::query()
+            ->where('id', '!=', Auth::id())
+            ->where($this->activeRecruitmentUsersWhere())
+            ->withCount([
+                'managedVacancies' => fn ($q) => $q->where('status', 'active'),
+                'createdVacancies' => fn ($q) => $q->where('status', 'active'),
+            ])
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
         return Inertia::render('ATS/Applications/Kanban', [
             'vacancy' => $vacancy,
             'columns' => $columns,
-            'candidates' => Candidate::orderBy('name')->get(['id', 'name', 'email']),
+            'candidates' => $candidates,
+            'referralUsers' => $referralUsers,
         ]);
+    }
+
+    /**
+     * Query para usuarios involucrados con procesos de reclutamiento activos.
+     */
+    private function activeRecruitmentUsersWhere(): \Closure
+    {
+        return function ($q) {
+            $q->whereHas('managedVacancies', fn ($v) => $v->where('status', 'active'))
+              ->orWhereHas('createdVacancies', fn ($v) => $v->where('status', 'active'));
+        };
     }
 
     /**
@@ -71,6 +110,13 @@ class ApplicationController extends Controller
             ->exists()) {
             return back()->withErrors([
                 'candidate_id' => 'Este candidato ya está postulado a esta vacante.',
+            ]);
+        }
+
+        // Bloquear candidatos que ya participan en otro proceso de reclutamiento activo
+        if (Candidate::find($validated['candidate_id'])->isInActiveProcess()) {
+            return back()->withErrors([
+                'candidate_id' => 'Este candidato ya participa en un proceso de reclutamiento activo en otra vacante.',
             ]);
         }
 
@@ -148,6 +194,75 @@ class ApplicationController extends Controller
         });
 
         return back()->with('success', "Candidato {$application->candidate->name} seleccionado. La vacante se ha cerrado automáticamente.");
+    }
+
+    /**
+     * Rechazar a un candidato y opcionalmente referirlo a uno o más usuarios
+     * con procesos de reclutamiento activos.
+     */
+    public function refer(Request $request, Application $application)
+    {
+        $this->authorize('update', $application);
+
+        $validated = $request->validate([
+            'stage_id' => ['required', 'exists:stages,id'],
+            'user_ids' => ['sometimes', 'array'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $oldStage = $application->stage;
+
+        DB::transaction(function () use ($application, $validated) {
+            $application->update(['stage_id' => $validated['stage_id']]);
+
+            $userIds = collect($validated['user_ids'] ?? [])
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->filter(fn ($id) => $id !== (int) Auth::id())
+                ->values()
+                ->all();
+
+            if (! empty($userIds)) {
+                $referral = CandidateReferral::create([
+                    'candidate_id' => $application->candidate_id,
+                    'application_id' => $application->id,
+                    'from_user_id' => Auth::id(),
+                    'note' => $validated['note'] ?? null,
+                ]);
+
+                $referral->referredUsers()->sync($userIds);
+
+                $this->notifyReferral($application, $userIds);
+            }
+        });
+
+        if (Stage::find($validated['stage_id'])?->is_closure) {
+            $this->notifyClosureStage($application);
+        }
+
+        $count = count($validated['user_ids'] ?? []);
+
+        $message = $count > 0
+            ? "Candidato rechazado y referido a {$count} usuario(s)."
+            : 'Candidato rechazado del proceso.';
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Notifica por correo a los usuarios a los que se refirió al candidato.
+     */
+    private function notifyReferral(Application $application, array $userIds): void
+    {
+        $mailable = new CandidateReferralMail($application, Auth::user());
+
+        User::whereIn('id', $userIds)->get(['id', 'email'])
+            ->each(function (User $user) use ($mailable) {
+                if ($user->email) {
+                    Mail::to($user->email)->send($mailable);
+                }
+            });
     }
 
     /**

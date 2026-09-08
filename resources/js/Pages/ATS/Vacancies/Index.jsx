@@ -4,7 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 /**
  * Lista de vacantes con filtros por estado y búsqueda, y paginación.
  */
-export default function Index({ vacancies, filters }) {
+export default function Index({ vacancies, filters, recruiters = [], canFilterRecruiter = false }) {
     const statusLabels = {
         draft: { label: 'Borrador', color: 'bg-yellow-100 text-yellow-700' },
         active: { label: 'Activa', color: 'bg-green-100 text-green-700' },
@@ -74,6 +74,19 @@ export default function Index({ vacancies, filters }) {
                     <option value="active">Activa</option>
                     <option value="closed">Cerrada</option>
                 </select>
+                {canFilterRecruiter && (
+                    <select
+                        name="recruiter_id"
+                        defaultValue={filters.recruiter_id || ''}
+                        onChange={(e) => e.target.form.submit()}
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                        <option value="">Todos los reclutantes</option>
+                        {recruiters.map((r) => (
+                            <option key={r.id} value={r.id}>{r.name}</option>
+                        ))}
+                    </select>
+                )}
                 <button
                     type="submit"
                     className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
