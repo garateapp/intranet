@@ -35,13 +35,15 @@ class CandidateController extends Controller
             $query->where('origin', $request->origin);
         }
 
-        // Gerente de contratación: solo candidatos en sus vacantes
+        // Gerente de contratación: candidatos en sus vacantes o registrados por él
         if (Auth::user()->hasRole('hiring_manager')) {
-            $query->whereHas('applications', function ($q) {
-                $q->whereHas('vacancy', function ($vq) {
-                    $vq->where('hiring_manager_id', Auth::id())
-                       ->orWhere('created_by', Auth::id());
-                });
+            $query->where(function ($q) {
+                $q->whereHas('applications', function ($sq) {
+                    $sq->whereHas('vacancy', function ($vq) {
+                        $vq->where('hiring_manager_id', Auth::id())
+                           ->orWhere('created_by', Auth::id());
+                    });
+                })->orWhere('created_by', Auth::id());
             });
         }
 
@@ -74,7 +76,7 @@ class CandidateController extends Controller
      */
     public function store(CandidateRequest $request)
     {
-        $candidate = Candidate::create($request->validated());
+        $candidate = Candidate::create($request->validated() + ['created_by' => Auth::id()]);
 
         return redirect()->route('ats.candidates.index')
             ->with('success', 'Candidato registrado exitosamente.');
