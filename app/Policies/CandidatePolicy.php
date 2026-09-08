@@ -25,7 +25,8 @@ class CandidatePolicy
 
     /**
      * Verificar si el usuario puede ver un candidato específico.
-     * Solo si tiene al menos una postulación en una vacante que le pertenece.
+     * Solo si tiene al menos una postulación en una vacante que le pertenece,
+     * o bien si el propio usuario lo registró.
      */
     public function view(User $user, Candidate $candidate): bool
     {
@@ -33,7 +34,12 @@ class CandidatePolicy
             return true;
         }
 
-        // Gerente de contratación: solo si el candidato está en una de sus vacantes
+        // Gerente de contratación: candidatos que el mismo registró
+        if ($user->hasRole('hiring_manager') && (int) $candidate->created_by === (int) $user->id) {
+            return true;
+        }
+
+        // Gerente de contratación: candidatos en una de sus vacantes
         return $candidate->applications()
             ->whereHas('vacancy', function ($query) use ($user) {
                 $query->where('hiring_manager_id', $user->id)
@@ -47,7 +53,7 @@ class CandidatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'recruiter','admin']);
+        return $user->hasAnyRole(['super_admin', 'recruiter', 'hiring_manager', 'admin']);
     }
 
     /**
