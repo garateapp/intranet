@@ -38,8 +38,15 @@ class VacancyController extends Controller
             $query->where('title', 'like', "%{$search}%");
         }
 
-        // Solo el Superadmin ve todas las vacantes; el resto solo las propias
-        if (! Auth::user()->canViewAllVacancies()) {
+        $canViewAll = Auth::user()->canViewAllVacancies();
+
+        // Filtro por usuario reclutante (solo para admin/superadmin)
+        if ($canViewAll && $request->filled('recruiter_id')) {
+            $query->where('hiring_manager_id', $request->integer('recruiter_id'));
+        }
+
+        // El resto (no admin/superadmin) ve solo sus propias vacantes
+        if (! $canViewAll) {
             $query->where(function ($q) {
                 $q->where('hiring_manager_id', Auth::id())
                   ->orWhere('created_by', Auth::id());
@@ -54,9 +61,15 @@ class VacancyController extends Controller
             return $vacancy;
         });
 
+        $recruiters = $canViewAll
+            ? User::role(['hiring_manager', 'recruiter'])->orderBy('name')->get(['id', 'name'])
+            : collect();
+
         return Inertia::render('ATS/Vacancies/Index', [
             'vacancies' => $vacancies,
-            'filters' => $request->only(['status', 'search']),
+            'filters' => $request->only(['status', 'search', 'recruiter_id']),
+            'recruiters' => $recruiters,
+            'canFilterRecruiter' => $canViewAll,
             'stats' => $this->getDashboardStats(),
         ]);
     }
@@ -81,6 +94,7 @@ class VacancyController extends Controller
         return Inertia::render('ATS/Vacancies/Create', [
             'hiringManagers' => $hiringManagers,
             'defaultStages' => $defaultStages,
+            'canManageRentaLiquida' => $this->canManageRentaLiquida(),
         ]);
     }
 
@@ -177,7 +191,7 @@ class VacancyController extends Controller
         $importer = app(VacancyImporter::class);
 
         try {
-            $result = $importer->import($request->file('file'), Auth::id());
+            $result = $importer->import($request->file('file'), Auth::id(), $this->canManageRentaLiquida());
         } catch (\Throwable $e) {
             return Inertia::render('ATS/Vacancies/Import', [
                 'result' => [
@@ -198,8 +212,14 @@ class VacancyController extends Controller
      */
     public function store(VacancyRequest $request)
     {
+        $data = $request->validated();
+
+        if (! $this->canManageRentaLiquida()) {
+            unset($data['renta_liquida']);
+        }
+
         $vacancy = Vacancy::create([
-            ...$request->validated(),
+            ...$data,
             'created_by' => Auth::id(),
         ]);
 
@@ -258,6 +278,7 @@ class VacancyController extends Controller
             'vacancy' => $vacancy,
             'hiringManagers' => $hiringManagers,
             'canViewRentaLiquida' => $vacancy->canViewRentaLiquida(),
+            'canEditRentaLiquida' => $this->canManageRentaLiquida(),
         ]);
     }
 
@@ -268,10 +289,25 @@ class VacancyController extends Controller
     {
         $this->authorize('update', $vacancy);
 
-        $vacancy->update($request->validated());
+        $data = $request->validated();
+
+        if (! $this->canManageRentaLiquida()) {
+            unset($data['renta_liquida']);
+        }
+
+        $vacancy->update($data);
 
         return redirect()->route('ats.vacancies.index')
             ->with('success', 'Vacante actualizada exitosamente.');
+    }
+
+    /**
+     * Solo roles con acceso global a vacantes pueden gestionar la renta líquida.
+     * El hiring manager puede ver su propia renta pero no editarla.
+     */
+    private function canManageRentaLiquida(): bool
+    {
+        return Auth::user()->hasAnyRole(['super_admin', 'admin', 'recruiter']);
     }
 
     /**

@@ -142,6 +142,42 @@ export default function Show({ candidate }) {
                             )}
                         </div>
                     </div>
+
+                    {/* Referencias a otros reclutadores */}
+                    {candidate.referrals?.length > 0 && (
+                        <div className="mt-6 rounded-xl border border-red-100 bg-white shadow-sm">
+                            <div className="border-b border-red-50 px-5 py-4">
+                                <h3 className="text-sm font-semibold text-gray-900">Referencias a otros reclutadores</h3>
+                            </div>
+                            <div className="divide-y divide-red-50">
+                                {candidate.referrals.map((ref) => (
+                                    <div key={ref.id} className="px-5 py-4">
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <p className="text-sm text-gray-700">
+                                                    Referido por <strong>{ref.from_user?.name}</strong> a{' '}
+                                                    <strong>{ref.referred_users?.map((u) => u.name).join(', ')}</strong>
+                                                </p>
+                                                <p className="mt-0.5 text-xs text-gray-500">
+                                                    {ref.application?.vacancy?.title
+                                                        ? `Vacante de origen: ${ref.application.vacancy.title}`
+                                                        : 'Proceso de origen'}
+                                                    {' · '}
+                                                    {new Date(ref.created_at).toLocaleDateString('es-CL')}
+                                                </p>
+                                                {ref.note && (
+                                                    <p className="mt-1 text-xs italic text-gray-500">"{ref.note}"</p>
+                                                )}
+                                            </div>
+                                            <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-600">
+                                                Referido
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

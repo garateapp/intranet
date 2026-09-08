@@ -4,7 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 /**
  * Formulario para editar una vacante existente.
  */
-export default function Edit({ vacancy, hiringManagers, canViewRentaLiquida }) {
+export default function Edit({ vacancy, hiringManagers, canViewRentaLiquida, canEditRentaLiquida }) {
     const { data, setData, put, processing, errors } = useForm({
         title: vacancy.title || '',
         description: vacancy.description || '',
@@ -104,12 +104,12 @@ export default function Edit({ vacancy, hiringManagers, canViewRentaLiquida }) {
                         </div>
                     </div>
 
-                    {canViewRentaLiquida && (
+                    {canEditRentaLiquida && (
                         <div>
                             <label className="mb-1 block text-sm font-medium text-gray-700">Renta Líquida (CLP)</label>
                             <input type="number" value={data.renta_liquida} onChange={(e) => setData('renta_liquida', e.target.value)}
                                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" min="0" />
-                            <p className="mt-1 text-xs text-gray-400">Valor confidencial: solo visible para Gerentes de Contratación y RRHH/Admin.</p>
+                            <p className="mt-1 text-xs text-gray-400">Valor confidencial: solo editable por RRHH/Admin y Reclutador.</p>
                             {errors.renta_liquida && <p className="mt-1 text-xs text-red-500">{errors.renta_liquida}</p>}
                         </div>
                     )}

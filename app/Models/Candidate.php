@@ -55,4 +55,25 @@ class Candidate extends Model
     {
         return $this->hasManyThrough(Evaluation::class, Interview::class, 'application_id');
     }
+
+    /**
+     * Referencias enviadas de este candidato a otros reclutadores.
+     */
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(CandidateReferral::class);
+    }
+
+    /**
+     * Indica si el candidato participa actualmente en otro proceso de
+     * reclutamiento activo (vacante activa y en una etapa no terminal).
+     * Etapas terminales: "Rechazado" y "Contratado".
+     */
+    public function isInActiveProcess(): bool
+    {
+        return $this->applications()
+            ->whereHas('vacancy', fn ($q) => $q->where('status', 'active'))
+            ->whereHas('stage', fn ($q) => $q->whereNotIn('name', ['Rechazado', 'Contratado']))
+            ->exists();
+    }
 }

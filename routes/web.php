@@ -205,6 +205,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('ats/vacancies/{vacancy}/kanban', [ApplicationController::class, 'kanban'])->name('ats.applications.kanban');
         Route::post('ats/applications', [ApplicationController::class, 'store'])->name('ats.applications.store');
         Route::patch('ats/applications/{application}/move', [ApplicationController::class, 'move'])->name('ats.applications.move');
+        Route::post('ats/applications/{application}/refer', [ApplicationController::class, 'refer'])->name('ats.applications.refer');
         Route::patch('ats/applications/{application}/hire', [ApplicationController::class, 'hire'])->name('ats.applications.hire');
         Route::delete('ats/applications/{application}', [ApplicationController::class, 'destroy'])->name('ats.applications.destroy');
 
@@ -261,6 +262,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('ats/vacancies/{vacancy}/kanban', [ApplicationController::class, 'kanban'])->name('ats.applications.kanban');
         Route::post('ats/applications', [ApplicationController::class, 'store'])->name('ats.applications.store');
         Route::patch('ats/applications/{application}/move', [ApplicationController::class, 'move'])->name('ats.applications.move');
+        Route::post('ats/applications/{application}/refer', [ApplicationController::class, 'refer'])->name('ats.applications.refer');
         Route::patch('ats/applications/{application}/hire', [ApplicationController::class, 'hire'])->name('ats.applications.hire');
         Route::delete('ats/applications/{application}', [ApplicationController::class, 'destroy'])->name('ats.applications.destroy');
 

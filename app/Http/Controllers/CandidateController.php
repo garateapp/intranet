@@ -95,6 +95,10 @@ class CandidateController extends Controller
                     }]);
                 }])->orderByDesc('created_at');
             },
+            'referrals' => function ($q) {
+                $q->with(['fromUser', 'referredUsers', 'application.vacancy'])
+                    ->orderByDesc('created_at');
+            },
         ]);
 
         return Inertia::render('ATS/Candidates/Show', [
