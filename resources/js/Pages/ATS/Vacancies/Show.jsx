@@ -1,7 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
-export default function Show({ vacancy, canViewRentaLiquida }) {
+export default function Show({ vacancy, canViewRentaLiquida, canDelete }) {
+    const handleDelete = () => {
+        if (!confirm(`¿Eliminar la vacante "${vacancy.title}"?`)) return;
+        router.delete(route('ats.vacancies.destroy', vacancy.id));
+    };
     const statusLabels = {
         draft: { label: 'Borrador', color: 'bg-yellow-100 text-yellow-700' },
         active: { label: 'Activa', color: 'bg-green-100 text-green-700' },
@@ -48,6 +52,16 @@ export default function Show({ vacancy, canViewRentaLiquida }) {
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             Editar
                         </Link>
+                        {canDelete && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                            >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                Eliminar
+                            </button>
+                        )}
                     </div>
                 </div>
             }
