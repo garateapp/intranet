@@ -48,6 +48,12 @@ class VacancyController extends Controller
 
         $vacancies = $query->latest()->paginate(12)->withQueryString();
 
+        $vacancies->getCollection()->transform(function (Vacancy $vacancy) {
+            $vacancy->setAttribute('can_delete', Auth::user()->can('delete', $vacancy));
+
+            return $vacancy;
+        });
+
         return Inertia::render('ATS/Vacancies/Index', [
             'vacancies' => $vacancies,
             'filters' => $request->only(['status', 'search']),
@@ -227,6 +233,7 @@ class VacancyController extends Controller
         return Inertia::render('ATS/Vacancies/Show', [
             'vacancy' => $vacancy,
             'canViewRentaLiquida' => $vacancy->canViewRentaLiquida(),
+            'canDelete' => Auth::user()->can('delete', $vacancy),
         ]);
     }
 
