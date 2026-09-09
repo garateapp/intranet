@@ -172,7 +172,7 @@ export default function Index({ vacancies, filters, recruiters = [], canFilterRe
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            router.visit(route('ats.vacancies.edit', vacancy.id));
+                                            router.visit(route('ats.vacancies.edit', vacancy.id) + window.location.search);
                                         }}
                                         title="Editar vacante"
                                         className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 font-medium text-gray-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
@@ -187,7 +187,7 @@ export default function Index({ vacancies, filters, recruiters = [], canFilterRe
                                                 e.preventDefault();
                                                 e.stopPropagation();
                                                 if (!confirm(`¿Eliminar la vacante "${vacancy.title}"?`)) return;
-                                                router.delete(route('ats.vacancies.destroy', vacancy.id));
+                                                router.delete(route('ats.vacancies.destroy', vacancy.id), { preserveScroll: true });
                                             }}
                                             title="Eliminar vacante"
                                             className="inline-flex items-center rounded-lg border border-gray-200 px-2 py-1 text-gray-400 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
