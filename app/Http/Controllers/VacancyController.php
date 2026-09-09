@@ -27,13 +27,13 @@ class VacancyController extends Controller
         $query = Vacancy::with(['hiringManager', 'creator'])
             ->withCount(['applications', 'stages']);
 
-        // Filtrar por estado
-        if ($request->has('status') && $request->status !== '') {
+        // Filtrar por estado (si está vacío, muestra todas)
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Búsqueda por título
-        if ($request->has('search') && $request->search !== '') {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where('title', 'like', "%{$search}%");
         }
@@ -52,7 +52,7 @@ class VacancyController extends Controller
                   ->orWhere('created_by', Auth::id());
             });
         }
-
+        $query->orderBy('title', 'asc');
         $vacancies = $query->latest()->paginate(12)->withQueryString();
 
         $vacancies->getCollection()->transform(function (Vacancy $vacancy) {
@@ -297,7 +297,12 @@ class VacancyController extends Controller
 
         $vacancy->update($data);
 
-        return redirect()->route('ats.vacancies.index')
+        // Conservar los filtros del listado si la edición se inició desde él
+        $backUrl = $request->header('Referer');
+        $query = $backUrl ? parse_url($backUrl, PHP_URL_QUERY) : null;
+        $redirect = $query ? route('ats.vacancies.index') . '?' . $query : route('ats.vacancies.index');
+
+        return redirect($redirect)
             ->with('success', 'Vacante actualizada exitosamente.');
     }
 
@@ -313,13 +318,16 @@ class VacancyController extends Controller
     /**
      * Eliminar una vacante (soft delete).
      */
-    public function destroy(Vacancy $vacancy)
+    public function destroy(Request $request, Vacancy $vacancy)
     {
         $this->authorize('delete', $vacancy);
 
         $vacancy->delete();
 
-        return redirect()->route('ats.vacancies.index')
+        // Regresar al listado con los filtros activos
+        $backUrl = $request->header('Referer') ?: route('ats.vacancies.index');
+
+        return redirect($backUrl)
             ->with('success', 'Vacante eliminada exitosamente.');
     }
 
