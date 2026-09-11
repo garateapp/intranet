@@ -114,6 +114,15 @@ export default function Edit({ vacancy, hiringManagers, canViewRentaLiquida, can
                         </div>
                     )}
 
+                    {canViewRentaLiquida && !canEditRentaLiquida && (
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Renta Líquida (CLP)</label>
+                            <input type="number" value={data.renta_liquida} readOnly
+                                className="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600" min="0" />
+                            <p className="mt-1 text-xs text-gray-400">Valor confidencial: solo visible. Para modificarla, solicita a RRHH/Admin.</p>
+                        </div>
+                    )}
+
                     {data.job_type === 'obra' && (
                         <div className="rounded-lg bg-orange-50 p-4">
                             <p className="mb-3 text-sm font-medium text-gray-700">Semanas de la Obra *</p>
