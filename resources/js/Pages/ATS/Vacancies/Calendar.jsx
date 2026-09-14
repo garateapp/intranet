@@ -24,12 +24,31 @@ export default function Calendar({ year, vacancies, incomplete }) {
         <Link
             key={`${vacancy.event_type}-${vacancy.id}`}
             href={route('ats.vacancies.edit', vacancy.id)}
-            title={`${vacancy.event_type === 'exit' ? 'Sale' : 'Ingresa'}: ${vacancy.title}`}
-            className={`block rounded px-1 py-0.5 text-[10px] leading-tight transition ${extraClass}`}
+            title={`${vacancy.event_type === 'exit' ? 'Sale' : 'Ingresa'}: ${vacancy.title} · ${vacancy.hiring_manager?.name ?? 'Sin gerente'}`}
+            className={`block truncate rounded px-1 py-0.5 text-[10px] leading-tight transition ${extraClass}`}
         >
             {vacancy.title}
         </Link>
     );
+
+    const groupByManager = (items) => {
+        const groups = {};
+        items.forEach((v) => {
+            const name = v.hiring_manager?.name || 'Sin gerente';
+            (groups[name] = groups[name] || []).push(v);
+        });
+        return Object.entries(groups);
+    };
+
+    const renderGroups = (items, extraClass, accentClass) =>
+        groupByManager(items).map(([name, groupItems], index) => (
+            <div key={name} className={index > 0 ? 'mt-1.5 border-t border-gray-200 pt-1.5' : ''}>
+                <div className={`mb-0.5 truncate text-[9px] font-bold uppercase tracking-wide ${accentClass}`}>
+                    {name}
+                </div>
+                {groupItems.map((v) => renderItem(v, extraClass))}
+            </div>
+        ));
 
     return (
         <AuthenticatedLayout
@@ -116,7 +135,7 @@ export default function Calendar({ year, vacancies, incomplete }) {
                                                 <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                                                 Ingresan ({list.entries.length})
                                             </div>
-                                            {list.entries.map((v) => renderItem(v, 'text-blue-800 hover:bg-blue-100'))}
+                                            {renderGroups(list.entries, 'text-blue-800 hover:bg-blue-100', 'text-blue-700')}
                                         </div>
                                     )}
 
@@ -126,7 +145,7 @@ export default function Calendar({ year, vacancies, incomplete }) {
                                                 <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                                 Salen ({list.exits.length})
                                             </div>
-                                            {list.exits.map((v) => renderItem(v, 'text-amber-800 hover:bg-amber-100'))}
+                                            {renderGroups(list.exits, 'text-amber-800 hover:bg-amber-100', 'text-amber-700')}
                                         </div>
                                     )}
                                 </div>
