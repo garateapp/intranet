@@ -39,6 +39,10 @@ class HandleInertiaRequests extends Middleware
                 'roles' => $request->user()?->getRoleNames()->toArray() ?? [],
                 'permissions' => $request->user()?->getAllPermissions()->pluck('name')->toArray() ?? [],
             ],
+            'flash' => [
+                'success' => fn () => $request->hasSession() ? $request->session()->get('success') : null,
+                'error' => fn () => $request->hasSession() ? $request->session()->get('error') : null,
+            ],
             'purchaseInvoiceAccess' => fn () => [
                 'accounting' => $request->user()?->hasAnyRole(['super_admin', 'cobrador']) || false,
                 'admin' => $request->user()?->hasRole('super_admin') || false,

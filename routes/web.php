@@ -141,7 +141,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('settings', SettingController::class)->except(['show']);
 
         // Portal admin routes
-        Route::resource('users', UserDirectoryAdminController::class)->only(['index', 'edit', 'update']);
+        Route::get('users/template', [UserDirectoryAdminController::class, 'template'])->name('users.template');
+        Route::get('users/import', [UserDirectoryAdminController::class, 'import'])->name('users.import');
+        Route::post('users/import', [UserDirectoryAdminController::class, 'processImport'])->name('users.import.process');
+        Route::resource('users', UserDirectoryAdminController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('faq-categories', FaqCategoryController::class);
         Route::resource('faqs', FaqController::class);
         Route::resource('corporate-events', CorporateEventController::class);

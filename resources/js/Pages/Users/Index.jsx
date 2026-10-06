@@ -1,8 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Index({ users, filters }) {
+    const { flash } = usePage().props;
     const [search, setSearch] = useState(filters.q || '');
     const [role, setRole] = useState(filters.role || '');
 
@@ -14,9 +15,28 @@ export default function Index({ users, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Gestión de Usuarios
-                </h2>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                        Gestión de Usuarios
+                    </h2>
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href={route('users.import')}
+                            className="inline-flex items-center gap-2 px-4 py-2 border border-green-600 rounded-md font-semibold text-xs text-green-700 uppercase tracking-widest hover:bg-green-50"
+                        >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Carga Masiva
+                        </Link>
+                        <Link
+                            href={route('users.create')}
+                            className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
+                        >
+                            Nuevo Usuario
+                        </Link>
+                    </div>
+                </div>
             }
         >
             <Head title="Usuarios" />
@@ -25,6 +45,12 @@ export default function Index({ users, filters }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
+                            {flash?.success && (
+                                <div className="mb-6 rounded-md border border-green-200 bg-green-50 p-4">
+                                    <p className="text-sm font-medium text-green-800">{flash.success}</p>
+                                </div>
+                            )}
+
                             {/* Filters */}
                             <form onSubmit={handleFilter} className="mb-6 flex gap-4">
                                 <input
